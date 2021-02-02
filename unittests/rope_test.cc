@@ -104,7 +104,7 @@ TEST(RopeTest, ClearTest) {
   Rope rope;
   rope.Append("wtf");
   EXPECT_TRUE(rope == "wtf");
-  rope.Clear();
+  rope.clear();
   EXPECT_TRUE(rope == "");
 }
 
