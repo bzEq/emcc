@@ -289,6 +289,13 @@ public:
     other.root_ = nullptr;
   }
 
+  Rope &swap(Rope &&other) {
+    auto temp = root_;
+    root_ = other.root_;
+    other.root_ = temp;
+    return *this;
+  }
+
   Rope &Concat(Rope &&other) {
     root_ = Concat(root_, other.root_);
     other.root_ = nullptr;
@@ -378,7 +385,7 @@ public:
     return Append(piece.begin(), piece.end());
   }
 
-  void Clear() {
+  void clear() {
     std::vector<Node *> worklist;
     worklist.push_back(root_);
     while (!worklist.empty()) {
@@ -393,7 +400,7 @@ public:
     root_ = nullptr;
   }
 
-  ~Rope() { Clear(); }
+  ~Rope() { clear(); }
 
   size_t size() const {
     if (root_ == nullptr) {
