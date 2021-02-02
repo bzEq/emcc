@@ -1,4 +1,0 @@
-[submodule "third_party/LuaJIT"]
-	path = third_party/LuaJIT
-	url = git@github.com:bzEq/LuaJIT.git
-	branch = build-with-bazel
