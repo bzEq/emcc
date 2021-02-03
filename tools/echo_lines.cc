@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
   std::string line;
   for (size_t i = 0; i < lb.CountLines(); ++i) {
     line.clear();
-    lb.GetLine(i, ~0, &line);    
+    lb.GetLine(i, ~0, line);
     std::cout << line;
   }
   return 0;
