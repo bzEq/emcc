@@ -143,7 +143,8 @@ private:
     return l;
   }
 
-  Node *TopDownSplay(Node *node, const size_t index) {
+  // ftp://ftp.cs.cmu.edu/usr/ftp/usr/sleator/splaying/top-down-splay.c
+  Node *Splay(Node *node, const size_t index) {
     if (node == nullptr)
       return nullptr;
     while (true) {
@@ -197,9 +198,6 @@ private:
     return node;
   }
 
-  Node *Splay(Node *node, const size_t index) {
-    return TopDownSplay(node, index);
-  }
 
   struct CompareResult {
     int order;
