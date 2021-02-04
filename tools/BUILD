@@ -47,3 +47,19 @@ cc_binary(
         "@fmt//:fmt",
     ],
 )
+
+cc_binary(
+    name = "monkey_typing",
+    srcs = ["monkey_typing.cc"],
+    copts = [
+        "-std=c++17",
+        "-O3",
+        "-Wall",
+    ],
+    linkopts = [
+        "-pthread",
+    ],
+    deps = [
+        "//editor:emcc_editor",
+    ],
+)
