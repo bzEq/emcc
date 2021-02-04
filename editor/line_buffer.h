@@ -46,6 +46,8 @@ public:
   static std::unique_ptr<LineBuffer>
   CreateFromFile(const std::string &filename);
 
+  LineBuffer() : size_(0) {}
+
   size_t CountLines() {
     size_t s = buffer_.size();
     if (s == 0)
