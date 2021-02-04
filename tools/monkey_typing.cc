@@ -13,19 +13,22 @@ int main() {
   auto DoInsert = [&]() {
     size_t line = std::min(buffer.CountLines(), size_t(rnd.Next() * kMaxLines));
     size_t column = 0;
-    size_t len = rnd.Next() *kMaxColumns;
+    size_t len = rnd.Next() * kMaxColumns;
     for (size_t i = 0; i < len; ++i) {
-      if (rnd.Next() < 1.0/len)
+      if (rnd.Next() < 1.0 / len)
         buffer.Insert(line, column, LineBuffer::kNewLine);
       else
         buffer.Insert(line, column, '0');
     }
   };
   auto DoAppend = [&]() {
-    if (rnd.Next() < 1.0 / (1 << 16))
-      buffer.Append(LineBuffer::kNewLine);
-    else
-      buffer.Append('0');
+    size_t len = rnd.Next() * kMaxColumns;
+    for (size_t i = 0; i < len; ++i) {
+      if (rnd.Next() < 1.0 / len)
+        buffer.Append(LineBuffer::kNewLine);
+      else
+        buffer.Append('0');
+    }
   };
   auto DoErase = [&]() {
     size_t line =
@@ -38,9 +41,9 @@ int main() {
   while (true) {
     printf("Iter #%zu: lines: %zu\n", it++, buffer.CountLines());
     auto dice = rnd.Next();
-    if (dice < 0.42)
+    if (dice < 0.6)
       DoErase();
-    else if (dice < 0.55)
+    else if (dice < 0.8)
       DoInsert();
     else
       DoAppend();
