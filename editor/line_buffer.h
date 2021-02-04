@@ -10,6 +10,7 @@
 
 namespace emcc {
 
+// All lines must end with kNewLine except the last one.
 class LineBuffer {
 private:
   static constexpr char kNewLine = '\n';
@@ -18,40 +19,54 @@ private:
 
   LineSpan buffer_;
 
-  void InsertEmptyLine(size_t i) { buffer_.Insert(i, new Line()); }
+  LineBuffer &InsertEmptyLine(size_t i) {
+    auto line = new Line();
+    line->Append(kNewLine);
+    buffer_.Insert(i, line);
+    return *this;
+  }
 
-  void InsertLine(size_t i, Line &&line) {
+  LineBuffer &InsertLine(size_t i, Line &&line) {
     buffer_.Insert(i, new Line(std::move(line)));
+    return *this;
   }
 
 public:
   static std::unique_ptr<LineBuffer>
   CreateFromFile(const std::string &filename);
 
-  LineBuffer() {}
-
-  LineBuffer &swap(LineBuffer &&other) {
-    buffer_.swap(std::move(other.buffer_));
-    return *this;
-  }
-
-  ~LineBuffer() {
-    for (size_t i = 0; i < buffer_.size(); ++i)
-      delete buffer_.At(i);
-  }
-
   size_t CountLines() {
     size_t s = buffer_.size();
+    if (s == 0)
+      return 0;
     if (buffer_.At(s - 1)->empty())
       return s - 1;
     return s;
   }
 
   size_t GetLine(size_t line, size_t limit, std::string &content);
-  bool Insert(size_t line, size_t column, char c);
-  size_t Erase(size_t line, size_t column, size_t len, LineBuffer &erased);
-  bool Append(size_t line, char c);
-  bool Append(char c);
+
+  LineBuffer &Insert(size_t line, size_t column, char c);
+
+  LineBuffer &Append(size_t line, char c) { return Insert(line, ~0, c); }
+
+  LineBuffer &Append(char c) { return Insert(~0, ~0, c); }
+
+  size_t Erase(size_t line, size_t column, size_t len);
+
+  bool Verify() {
+    for (size_t i = 0; i < buffer_.size(); ++i) {
+      auto line = buffer_.At(i);
+      for (size_t j = 0; j < line->size(); ++j) {
+        if (j != line->size() - 1 && line->At(j) == kNewLine)
+          return false;
+        if (j == line->size() - 1 && i != buffer_.size() - 1 &&
+            line->At(j) != kNewLine)
+          return false;
+      }
+    }
+    return true;
+  }
 };
 
 } // namespace emcc
