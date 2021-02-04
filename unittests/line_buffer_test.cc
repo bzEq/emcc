@@ -45,6 +45,12 @@ TEST(LineBufferTest, InsertTest1) {
   lb.GetLine(2, ~0, line);
   EXPECT_TRUE(line == "a");
   EXPECT_TRUE(lb.CountLines() == 3);
+  line.clear();
+  lb.GetLine(0, ~0, line);
+  EXPECT_TRUE(line == "\n");
+  line.clear();
+  lb.GetLine(1, ~0, line);
+  EXPECT_TRUE(line == "\n");
   EXPECT_TRUE(lb.Verify());
 }
 
