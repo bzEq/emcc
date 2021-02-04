@@ -12,33 +12,35 @@ int main() {
   const size_t kMaxColumns = 1 << 16;
   auto DoInsert = [&]() {
     size_t line = std::min(buffer.CountLines(), size_t(rnd.Next() * kMaxLines));
-    size_t column = rnd.Next() * kMaxColumns;
-    size_t len =
-        std::min(kMaxColumns - column, size_t(rnd.Next() * kMaxColumns));
+    size_t column = 0;
+    size_t len = rnd.Next() *kMaxColumns;
     for (size_t i = 0; i < len; ++i) {
-      buffer.Insert(line, column, '0');
+      if (rnd.Next() < 1.0/len)
+        buffer.Insert(line, column, LineBuffer::kNewLine);
+      else
+        buffer.Insert(line, column, '0');
     }
   };
   auto DoAppend = [&]() {
-    if (rnd.Next() < 0.01)
+    if (rnd.Next() < 1.0 / (1 << 16))
       buffer.Append(LineBuffer::kNewLine);
     else
       buffer.Append('0');
   };
   auto DoErase = [&]() {
-    size_t line = rnd.Next() * kMaxLines;
-    size_t column = rnd.Next() * kMaxColumns;
-    size_t len =
-        std::min(kMaxColumns - column, size_t(rnd.Next() * kMaxColumns));
+    size_t line =
+        std::min(buffer.CountLines() - 1, size_t(rnd.Next() * kMaxLines));
+    size_t column = 0;
+    size_t len = rnd.Next() * kMaxColumns;
     buffer.Erase(line, column, len);
   };
   size_t it = 0;
   while (true) {
     printf("Iter #%zu: lines: %zu\n", it++, buffer.CountLines());
     auto dice = rnd.Next();
-    if (dice < 0.1)
+    if (dice < 0.43)
       DoErase();
-    else if (dice < 0.3)
+    else if (dice < 0.55)
       DoInsert();
     else
       DoAppend();
