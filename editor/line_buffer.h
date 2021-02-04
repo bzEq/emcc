@@ -31,6 +31,15 @@ private:
     return *this;
   }
 
+  LineBuffer &RemoveLine(size_t i) {
+    if (i >= buffer_.size())
+      return *this;
+    auto line = buffer_.At(i);
+    delete line;
+    buffer_.Erase(i, 1);
+    return *this;
+  }
+
 public:
   static std::unique_ptr<LineBuffer>
   CreateFromFile(const std::string &filename);

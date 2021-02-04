@@ -48,39 +48,42 @@ TEST(LineBufferTest, InsertTest1) {
   EXPECT_TRUE(lb.Verify());
 }
 
-// TEST(LineBufferTest, EraseTest) {
-//   LineBuffer lb, erased;
-//   lb.Append('a');
-//   lb.Append('b');
-//   lb.Append('c');
-//   lb.Append('d');
-//   EXPECT_TRUE(lb.CountLines() == 1);
-//   lb.Erase(0, 0, 8, erased);
-//   EXPECT_TRUE(lb.CountLines() == 0);
-// }
+TEST(LineBufferTest, EraseTest) {
+  LineBuffer lb;
+  lb.Append('a');
+  lb.Append('b');
+  lb.Append('c');
+  lb.Append('d');
+  EXPECT_TRUE(lb.CountLines() == 1);
+  EXPECT_TRUE(lb.Erase(0, 0, 8) == 4);
+  EXPECT_TRUE(lb.CountLines() == 0);
+  EXPECT_TRUE(lb.Verify());
+}
 
-// TEST(LineBufferTest, EraseTest1) {
-//   LineBuffer lb, erased;
-//   lb.Append('a');
-//   lb.Append('b');
-//   lb.Append('c');
-//   lb.Append('d');
-//   EXPECT_TRUE(lb.CountLines() == 1);
-//   lb.Erase(0, 0, 1, erased);
-//   EXPECT_TRUE(lb.CountLines() == 1);
-// }
+TEST(LineBufferTest, EraseTest1) {
+  LineBuffer lb, erased;
+  lb.Append('a');
+  lb.Append('b');
+  lb.Append('c');
+  lb.Append('d');
+  EXPECT_TRUE(lb.CountLines() == 1);
+  EXPECT_TRUE(lb.Erase(0, 0, 1) == 1);
+  EXPECT_TRUE(lb.CountLines() == 1);
+  EXPECT_TRUE(lb.Verify());
+}
 
-// TEST(LineBufferTest, EraseTest2) {
-//   LineBuffer lb, erased;
-//   lb.Append('a');
-//   lb.Append('\n');
-//   lb.Append('b');
-//   lb.Append('c');
-//   lb.Erase(0, 0, 2, erased);
-//   EXPECT_TRUE(lb.CountLines() == 1);
-//   std::string s;
-//   lb.GetLine(0, 80, s);
-//   EXPECT_TRUE(s == "bc");
-// }
+TEST(LineBufferTest, EraseTest2) {
+  LineBuffer lb, erased;
+  lb.Append('a');
+  lb.Append('\n');
+  lb.Append('b');
+  lb.Append('c');
+  EXPECT_TRUE(lb.Erase(0, 0, 2) == 2);
+  EXPECT_TRUE(lb.CountLines() == 1);
+  std::string s;
+  lb.GetLine(0, 80, s);
+  EXPECT_TRUE(s == "bc");
+  EXPECT_TRUE(lb.Verify());
+}
 
 } // namespace
