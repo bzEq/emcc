@@ -13,7 +13,6 @@ namespace emcc {
 // All lines must end with kNewLine except the last one.
 class LineBuffer {
 private:
-  static constexpr char kNewLine = '\n';
   using Line = Rope<char, std::basic_string>;
   using LineSpan = Rope<Line *, std::vector>;
 
@@ -41,6 +40,8 @@ private:
   }
 
 public:
+  static constexpr char kNewLine = '\n';
+
   static std::unique_ptr<LineBuffer>
   CreateFromFile(const std::string &filename);
 
