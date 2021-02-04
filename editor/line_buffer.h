@@ -17,6 +17,7 @@ private:
   using LineSpan = Rope<Line *, std::vector>;
 
   LineSpan buffer_;
+  size_t size_;
 
   LineBuffer &InsertEmptyLine(size_t i) {
     auto line = new Line();
@@ -53,6 +54,8 @@ public:
       return s - 1;
     return s;
   }
+
+  size_t size() const { return size_; }
 
   size_t GetLine(size_t line, size_t limit, std::string &content);
 

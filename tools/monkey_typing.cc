@@ -39,7 +39,8 @@ int main() {
   };
   size_t it = 0;
   while (true) {
-    printf("Iter #%zu: lines: %zu\n", it++, buffer.CountLines());
+    printf("Iter #%zu: lines: %zu size: %zu\n", it++, buffer.CountLines(),
+           buffer.size());
     auto dice = rnd.Next();
     if (dice < 0.6)
       DoErase();
