@@ -38,7 +38,7 @@ int main() {
   while (true) {
     printf("Iter #%zu: lines: %zu\n", it++, buffer.CountLines());
     auto dice = rnd.Next();
-    if (dice < 0.43)
+    if (dice < 0.42)
       DoErase();
     else if (dice < 0.55)
       DoInsert();
