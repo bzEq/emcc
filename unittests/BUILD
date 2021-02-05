@@ -1,18 +1,27 @@
+COPTS = [
+    "-std=c++17",
+    "-O3",
+    "-Wall",
+    "-flto",
+    "-fblocks",
+]
+
+LINKOPTS = [
+    "-flto",
+    "-pthread",
+    "-fuse-ld=lld",
+    "-lgtest_main",
+    "-lgtest",
+    "-lBlocksRuntime",
+]
+
 cc_test(
     name = "rope_test",
     srcs = [
         "rope_test.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
     ],
@@ -23,16 +32,8 @@ cc_test(
     srcs = [
         "rope_benchmark.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
     ],
@@ -44,16 +45,8 @@ cc_test(
         "result_test.cc",
         "trie_test.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
         "@fmt//:fmt",
@@ -66,17 +59,8 @@ cc_test(
     srcs = [
         "defer_test.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-        "-fblocks",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
     ],
@@ -87,16 +71,8 @@ cc_test(
     srcs = [
         "chan_test.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
     ],
@@ -107,16 +83,8 @@ cc_test(
     srcs = [
         "size_limit_queue_test.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
     ],
@@ -127,16 +95,8 @@ cc_test(
     srcs = [
         "line_buffer_test.cc",
     ],
-    copts = [
-        "-std=c++17",
-        "-O3",
-        "-Wall",
-    ],
-    linkopts = [
-        "-lgtest_main",
-        "-lgtest",
-        "-pthread",
-    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
     deps = [
         "//editor:emcc_editor",
     ],

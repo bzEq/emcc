@@ -7,6 +7,11 @@ cc_library(
         "-O3",
         "-Wall",
         "-Werror",
+        "-flto",
+    ],
+    linkopts = [
+        "-fuse-ld=lld",
+        "-flto",
     ],
     deps = [
         "//support:emcc_support",

@@ -6,12 +6,14 @@ cc_library(
         "-std=c++17",
         "-O3",
         "-Wall",
-        "-Werror",
         "-fblocks",
+        "-flto",
     ],
     linkopts = [
+        "-flto",
         "-lBlocksRuntime",
         "-lre2",
+        "-fuse-ld=lld",
     ],
     deps = [
         "@fmt//:fmt",
