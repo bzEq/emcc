@@ -203,8 +203,7 @@ private:
     size_t relative_index;
   };
 
-  __attribute__((always_inline)) CompareResult Compare(const size_t index,
-                                                       const Node *const node) {
+  CompareResult Compare(const size_t index, const Node *const node) {
     assert(node);
     const size_t left_subtree_size = node->left ? node->left->size : 0;
     if (index < left_subtree_size) {
