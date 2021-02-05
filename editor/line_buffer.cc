@@ -52,7 +52,7 @@ size_t LineBuffer::Erase(size_t l, size_t column, size_t len) {
   assert(~0 - column >= len);
   Line mid = line->Split(column);
   if (len >= mid.size()) {
-    if (l < buffer_.size() - 1) {
+    if (l + 1 < buffer_.size()) {
       auto next_line = buffer_.At(l + 1);
       line->Concat(std::move(*next_line));
       RemoveLine(l + 1);
