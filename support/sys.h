@@ -117,7 +117,19 @@ public:
   struct Block {
     char *data;
     size_t length;
+
     Block() : data(nullptr), length(0) {}
+    Block(char *data, size_t length) : data(data), length(length) {}
+    Block(Block &other) = delete;
+    Block(Block &&other) : data(nullptr), length(0) {
+      std::swap(data, other.data);
+      std::swap(length, other.length);
+    }
+
+    ~Block() {
+      if (data)
+        munmap(data, length);
+    }
 
     bool operator==(Block &other) {
       return data == other.data && length == other.length;
@@ -132,46 +144,48 @@ public:
   };
 
   class iterator {
-  public:
-    iterator &operator++() {
-      assert(block_.data);
-      ::munmap(block_.data, block_.length);
-      offset_ += block_.length;
-      return Advance();
+    int fd_;
+    const size_t total_length_;
+    off_t offset_;
+    size_t length_;
+
+    iterator(int fd, size_t total_length, off_t offset, size_t step)
+        : fd_(fd), total_length_(total_length), offset_(offset), length_(step) {
     }
 
-    Block &operator*() { return block_; }
-
-    Block *operator->() { return &block_; }
-
-    bool operator==(iterator &other) { return block_ == other.block_; }
-
-    bool operator!=(iterator &other) { return block_ != other.block_; }
-
-  private:
-    friend class MMapFile;
-    iterator(int fd, size_t total_length, Block &block)
-        : fd_(fd), total_length_(total_length), offset_(0), block_(block) {}
-
-    iterator &Advance() {
+    iterator &ProbeEnd() {
       if (offset_ >= total_length_) {
-        block_.reset();
+        offset_ = total_length_;
+        length_ = 0;
       } else {
-        if (offset_ + block_.length > total_length_)
-          block_.length = total_length_ - offset_;
-        block_.data =
-            (char *)::mmap(nullptr, block_.length, PROT_READ | PROT_WRITE,
-                           MAP_PRIVATE, fd_, offset_);
-        if (block_.data == MAP_FAILED)
-          block_.reset();
+        if (offset_ + length_ > total_length_)
+          length_ = total_length_ - offset_;
       }
       return *this;
     }
 
-    int fd_;
-    const size_t total_length_;
-    off_t offset_;
-    Block &block_;
+  public:
+    friend class MMapFile;
+
+    iterator &operator++() {
+      offset_ += length_;
+      return ProbeEnd();
+    }
+
+    Block operator*() {
+      char *data = (char *)mmap(nullptr, length_, PROT_READ | PROT_WRITE,
+                                MAP_PRIVATE, fd_, offset_);
+      if (data == MAP_FAILED)
+        return {};
+      return Block(data, length_);
+    }
+
+    bool operator==(iterator &other) {
+      return fd_ == other.fd_ && offset_ == other.offset_ &&
+             length_ == other.length_;
+    }
+
+    bool operator!=(iterator &other) { return !(*this == other); }
   };
 
   MMapFile(const std::string &filename, size_t block_size = kDefaultBlockSize)
@@ -188,20 +202,17 @@ public:
 
   iterator begin() {
     assert(block_size_ % sysconf(_SC_PAGE_SIZE) == 0);
-    block_.length = block_size_;
-    iterator it(fd_, length_, block_);
-    return it.Advance();
+    iterator it(fd_, length_, 0, block_size_);
+    return it.ProbeEnd();
   }
 
-  iterator end() { return iterator(fd_, length_, end_block_); }
+  iterator end() { return iterator(fd_, length_, length_, 0); }
 
   bool IsOpen() const { return fd_ >= 0; }
 
   size_t length() const { return length_; }
 
   ~MMapFile() {
-    if (block_.data)
-      munmap(block_.data, block_.length);
     if (fd_ >= 0)
       ::close(fd_);
   }
@@ -210,7 +221,6 @@ private:
   const size_t block_size_;
   int fd_;
   size_t length_;
-  Block block_, end_block_;
 };
 
 template <typename... Args>
