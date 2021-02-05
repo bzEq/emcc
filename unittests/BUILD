@@ -2,12 +2,10 @@ COPTS = [
     "-std=c++17",
     "-O3",
     "-Wall",
-    "-flto",
     "-fblocks",
 ]
 
 LINKOPTS = [
-    "-flto",
     "-pthread",
     "-fuse-ld=lld",
     "-lgtest_main",

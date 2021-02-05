@@ -7,10 +7,8 @@ cc_library(
         "-O3",
         "-Wall",
         "-fblocks",
-        "-flto",
     ],
     linkopts = [
-        "-flto",
         "-lBlocksRuntime",
         "-lre2",
         "-fuse-ld=lld",
