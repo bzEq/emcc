@@ -9,7 +9,7 @@
 int main(int argc, char *argv[]) {
   if (argc != 2)
     emcc::Die("Usage %s: <filename>", argv[0]);
-  emcc::MMapFile file(argv[1]);
+  emcc::MMapFile file(argv[1], 8UL << 20);
   if (!file.IsOpen())
     emcc::Die("Can't open %s", argv[1]);
   emcc::LineBuffer buffer;

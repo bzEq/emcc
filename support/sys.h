@@ -174,7 +174,8 @@ public:
     Block &block_;
   };
 
-  MMapFile(const std::string &filename) : fd_(-1), length_(0) {
+  MMapFile(const std::string &filename, size_t block_size = kDefaultBlockSize)
+      : block_size_(block_size), fd_(-1), length_(0) {
     fd_ = ::open(filename.c_str(), 0644, O_RDWR);
     if (fd_ < 0)
       return;
@@ -186,8 +187,8 @@ public:
   }
 
   iterator begin() {
-    size_t pgsize = sysconf(_SC_PAGE_SIZE);
-    block_.length = kDefaultBlockSize / pgsize * pgsize;
+    assert(block_size_ % sysconf(_SC_PAGE_SIZE) == 0);
+    block_.length = block_size_;
     iterator it(fd_, length_, block_);
     return it.Advance();
   }
@@ -206,6 +207,7 @@ public:
   }
 
 private:
+  const size_t block_size_;
   int fd_;
   size_t length_;
   Block block_, end_block_;
