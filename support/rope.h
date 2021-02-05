@@ -281,14 +281,12 @@ public:
   Rope(const Rope &other) = delete;
 
   Rope(Rope &&other)
-      : max_piece_size_(kDefaultMaxPieceSize), root_(other.root_) {
-    other.root_ = nullptr;
+      : max_piece_size_(kDefaultMaxPieceSize), root_(nullptr) {
+    std::swap(root_, other.root_);
   }
 
   Rope &swap(Rope &&other) {
-    auto temp = root_;
-    root_ = other.root_;
-    other.root_ = temp;
+    std::swap(root_, other.root_);
     return *this;
   }
 
