@@ -30,6 +30,16 @@ cc_binary(
 )
 
 cc_binary(
+    name = "echo_file",
+    srcs = ["echo_file.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//editor:emcc_editor",
+    ],
+)
+
+cc_binary(
     name = "epoll_stdin",
     srcs = ["epoll_stdin.cc"],
     copts = COPTS,
