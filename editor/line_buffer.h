@@ -36,6 +36,7 @@ public:
   LineBuffer &Append(char c) { return Insert(~0, ~0, c); }
   size_t Erase(size_t line, size_t column, size_t len);
   bool Verify();
+  bool SaveFile(const std::string &filename);
 };
 
 } // namespace emcc

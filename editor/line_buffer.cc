@@ -1,6 +1,9 @@
 #include "editor/line_buffer.h"
 #include "support/sys.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
 
 namespace emcc {
@@ -108,6 +111,23 @@ size_t LineBuffer::Erase(size_t l, size_t column, size_t len) {
   line->Concat(std::move(tail));
   size_ -= mid.size();
   return mid.size();
+}
+
+bool LineBuffer::SaveFile(const std::string &filename) {
+  std::string tempfile = std::tmpnam(nullptr);
+  if (tempfile.empty())
+    return false;
+  std::ofstream out(tempfile, std::ios::binary);
+  if (!out.is_open())
+    return false;
+  std::string line;
+  for (size_t i = 0; i < CountLines(); ++i) {
+    line.clear();
+    GetLine(i, ~0U, line);
+    out << line;
+  }
+  out.close();
+  return !::rename(tempfile.c_str(), filename.c_str());
 }
 
 } // namespace emcc
