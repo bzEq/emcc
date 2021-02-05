@@ -13,8 +13,8 @@ namespace emcc {
 // All lines must end with kNewLine except the last one.
 class LineBuffer {
 private:
-  using Line = Rope<char, std::basic_string>;
-  using LineSpan = Rope<Line *, std::vector>;
+  using Line = Rope<char, std::basic_string, 1UL<<13>;
+  using LineSpan = Rope<Line *, std::vector, 1UL<<10>;
 
   LineSpan buffer_;
   size_t size_;
