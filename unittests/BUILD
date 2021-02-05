@@ -49,8 +49,8 @@ cc_test(
     linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
-        "@fmt//:fmt",
-        "@trie//:trie",
+        "@fmt",
+        "@trie",
     ],
 )
 

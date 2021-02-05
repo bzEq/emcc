@@ -38,7 +38,7 @@ cc_binary(
     deps = [
         "//editor:emcc_editor",
         "//support:emcc_support",
-        "@fmt//:fmt",
+        "@fmt",
     ],
 )
 

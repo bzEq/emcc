@@ -13,9 +13,9 @@ cc_library(
         "-fuse-ld=lld",
         "-flto",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//support:emcc_support",
-        "@fmt//:fmt",
+        "@fmt",
     ],
-    visibility = ["//visibility:public"],
 )

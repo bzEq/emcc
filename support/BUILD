@@ -15,8 +15,8 @@ cc_library(
         "-lre2",
         "-fuse-ld=lld",
     ],
-    deps = [
-        "@fmt//:fmt",
-    ],
     visibility = ["//visibility:public"],
+    deps = [
+        "@fmt",
+    ],
 )
