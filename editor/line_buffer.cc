@@ -5,6 +5,49 @@
 
 namespace emcc {
 
+LineBuffer &LineBuffer::InsertEmptyLine(size_t i) {
+  auto line = new Line();
+  line->Append(kNewLine);
+  buffer_.Insert(i, line);
+  return *this;
+}
+LineBuffer &LineBuffer::InsertLine(size_t i, Line &&line) {
+  buffer_.Insert(i, new Line(std::move(line)));
+  return *this;
+}
+
+LineBuffer &LineBuffer::RemoveLine(size_t i) {
+  if (i >= buffer_.size())
+    return *this;
+  auto line = buffer_.At(i);
+  delete line;
+  buffer_.Erase(i, 1);
+  return *this;
+}
+
+size_t LineBuffer::CountLines() {
+  size_t s = buffer_.size();
+  if (s == 0)
+    return 0;
+  if (buffer_.At(s - 1)->empty())
+    return s - 1;
+  return s;
+}
+
+bool LineBuffer::Verify() {
+  for (size_t i = 0; i < buffer_.size(); ++i) {
+    auto line = buffer_.At(i);
+    for (size_t j = 0; j < line->size(); ++j) {
+      if (j != line->size() - 1 && line->At(j) == kNewLine)
+        return false;
+      if (j == line->size() - 1 && i != buffer_.size() - 1 &&
+          line->At(j) != kNewLine)
+        return false;
+    }
+  }
+  return true;
+}
+
 size_t LineBuffer::GetLine(size_t l, size_t limit, std::string &content) {
   if (l >= buffer_.size())
     return 0;
