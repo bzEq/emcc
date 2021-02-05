@@ -11,6 +11,7 @@ LineBuffer &LineBuffer::InsertEmptyLine(size_t i) {
   buffer_.Insert(i, line);
   return *this;
 }
+
 LineBuffer &LineBuffer::InsertLine(size_t i, Line &&line) {
   buffer_.Insert(i, new Line(std::move(line)));
   return *this;
