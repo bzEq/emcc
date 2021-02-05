@@ -13,11 +13,11 @@
 namespace emcc {
 
 template <typename Char,
-          template <typename...> typename ContainerType = std::basic_string>
+          template <typename...> typename ContainerType = std::basic_string,
+          size_t kDefaultMaxPieceSize = 4096>
 class Rope {
 private:
   using Piece = ContainerType<Char>;
-  static constexpr size_t kDefaultMaxPieceSize = 4096;
 
   struct Node {
     size_t size;
@@ -197,7 +197,6 @@ private:
     }
     return node;
   }
-
 
   struct CompareResult {
     int order;
