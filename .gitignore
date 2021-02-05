@@ -2,3 +2,5 @@ out/
 *~
 bazel-*
 perf.data*
+fuzz_tests/
+fuzz_findings/
