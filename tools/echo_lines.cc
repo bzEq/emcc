@@ -7,8 +7,8 @@
 #include <string>
 
 int main(int argc, char *argv[]) {
-  if (argc < 2)
-    emcc::Die("Expect a file name.");
+  if (argc != 2)
+    emcc::Die("Usage %s: <filename>", argv[0]);
   std::string filename(argv[1]);
   auto membuf = emcc::MemoryBuffer::OpenIfExists(filename);
   auto data = membuf->buffer();
