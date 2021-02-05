@@ -53,15 +53,15 @@ TEST(ChanTest, WaitForWrite) {
 }
 
 TEST(ChanBenchmark, ReadWrite) {
-  const size_t Num = 1 << 20;
-  const size_t Cap = 1 << 16;
+  const size_t Num = 1 << 22;
+  const size_t Cap = 1 << 10;
   Chan<int, Cap> c;
   auto a = std::thread([&] {
-    for (int i = 0; i < (Num << 1); ++i)
+    for (int i = 0; i < Num; ++i)
       c.Pop();
   });
   auto b = std::thread([&] {
-    for (int i = 0; i < (Num << 1); ++i)
+    for (int i = 0; i < Num; ++i)
       c.Push(i);
   });
   a.join();
