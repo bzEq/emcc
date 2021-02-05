@@ -32,7 +32,7 @@ def DoAppend(f):
 
 os.makedirs('fuzz_tests', exist_ok=True)
 with open('fuzz_tests/line_buffer.test', 'w') as f:
-    for i in range(1 << 10):
+    for i in range(1 << 5):
         dice = random.random()
         if dice < 0.6:
             DoErase(f)
