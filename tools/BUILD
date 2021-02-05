@@ -50,3 +50,13 @@ cc_binary(
         "//editor:emcc_editor",
     ],
 )
+
+cc_binary(
+    name = "fuzz_line_buffer",
+    srcs = ["fuzz_line_buffer.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//editor:emcc_editor",
+    ],
+)
