@@ -67,7 +67,7 @@ TEST(LineBufferTest, EraseTest) {
 }
 
 TEST(LineBufferTest, EraseTest1) {
-  LineBuffer lb, erased;
+  LineBuffer lb;
   lb.Append('a');
   lb.Append('b');
   lb.Append('c');
@@ -79,7 +79,7 @@ TEST(LineBufferTest, EraseTest1) {
 }
 
 TEST(LineBufferTest, EraseTest2) {
-  LineBuffer lb, erased;
+  LineBuffer lb;
   lb.Append('a');
   lb.Append('\n');
   lb.Append('b');
@@ -89,6 +89,22 @@ TEST(LineBufferTest, EraseTest2) {
   std::string s;
   lb.GetLine(0, 80, s);
   EXPECT_TRUE(s == "bc");
+  EXPECT_TRUE(lb.Verify());
+}
+
+TEST(LineBufferTest, FuzzFailure) {
+  LineBuffer lb;
+  for (size_t i = 0; i < 4096; ++i) {
+    lb.Insert(0, 0, '0');
+  }
+  lb.Insert(0, ~0, LineBuffer::kNewLine);
+  for (size_t i = 0; i < 4096; ++i) {
+    lb.Insert(1, 0, '0');
+  }
+  lb.Insert(1, ~0, LineBuffer::kNewLine);
+  lb.Erase(0, 4096, 4096);
+  EXPECT_TRUE(lb.Verify());  
+  lb.Erase(0, 4096, 4096);
   EXPECT_TRUE(lb.Verify());
 }
 

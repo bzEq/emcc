@@ -60,7 +60,7 @@ size_t LineBuffer::Erase(size_t l, size_t column, size_t len) {
     size_ -= mid.size();
     return mid.size();
   }
-  Line tail = mid.Split(column + len);
+  Line tail = mid.Split(len);
   line->Concat(std::move(tail));
   size_ -= mid.size();
   return mid.size();
