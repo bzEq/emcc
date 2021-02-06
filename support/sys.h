@@ -208,7 +208,7 @@ public:
 
   iterator end() { return iterator(fd_, length_, length_, 0); }
 
-  bool IsOpen() const { return fd_ >= 0; }
+  bool is_open() const { return fd_ >= 0; }
 
   size_t length() const { return length_; }
 

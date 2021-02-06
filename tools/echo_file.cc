@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   if (argc != 2)
     emcc::Die("Usage %s: <filename>", argv[0]);
   emcc::MMapFile file(argv[1], sysconf(_SC_PAGE_SIZE));
-  if (!file.IsOpen())
+  if (!file.is_open())
     emcc::Die("Can't open %s", argv[1]);
   for (auto block : file)
     std::cout << std::string(block.data, block.length);
