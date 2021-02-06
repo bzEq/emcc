@@ -12,16 +12,20 @@ class StreamInterpreter;
 class Terminal;
 
 class App {
-  Terminal &input_;
-  StreamInterpreter &interpreter_;
-  Shared<Chan<Command, 8>> command_queue_;
-  Terminal &output_;
-
 public:
+  using CommandQueueTy = Shared<Chan<Command, 8>>;
   App(Terminal &input, StreamInterpreter &interpreter, Terminal &output)
       : input_(input), interpreter_(interpreter), output_(output) {}
 
   bool SendCommand(const Command &cmd);
+
+private:
+  void LoopCommand();
+
+  Terminal &input_;
+  StreamInterpreter &interpreter_;
+  CommandQueueTy command_queue_;
+  Terminal &output_;
 };
 
 } // namespace emcc::tui
