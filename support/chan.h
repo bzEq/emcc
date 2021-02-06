@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 
@@ -10,7 +11,7 @@ class Chan {
 private:
   T chan_[Cap];
   size_t r_, w_;
-  bool wrapped_;
+  bool wrapped_, closed_;
 
   std::mutex mu_;
   std::condition_variable cv_;
@@ -34,7 +35,7 @@ private:
   }
 
 public:
-  Chan() : r_(0), w_(0), wrapped_(false) {}
+  Chan() : r_(0), w_(0), wrapped_(false), closed_(false) {}
 
   bool empty() const { return !wrapped_ && r_ == w_; }
 
@@ -48,25 +49,41 @@ public:
     return w_ + Cap - r_;
   }
 
-  T Pop() {
+  bool is_open() {
     std::unique_lock<std::mutex> l(mu_);
-    cv_.wait(l, [this] { return !empty(); });
-    T result(std::move(chan_[r_]));
+    return closed_;
+  }
+
+  void close() {
+    std::unique_lock<std::mutex> l(mu_);
+    closed_ = true;
+  }
+
+  bool get(T &receiver) {
+    std::unique_lock<std::mutex> l(mu_);
+    cv_.wait(l, [this] { return closed_ || !empty(); });
+    if (closed_)
+      return false;
+    receiver = std::move(chan_[r_]);
     AdvanceRead();
     l.unlock();
     cv_.notify_one();
-    return result;
+    return true;
   }
 
-  template<typename E>
-  void Push(E &&e) {
+  template <typename E>
+  bool put(E &&e) {
     std::unique_lock<std::mutex> l(mu_);
-    cv_.wait(l, [this] { return size() != Cap; });
+    cv_.wait(l, [this] { return closed_ || size() != Cap; });
+    if (closed_)
+      return false;
     chan_[w_] = std::forward<E>(e);
     AdvanceWrite();
     l.unlock();
     cv_.notify_one();
+    return true;
   }
+
 };
 
 template <typename T>
