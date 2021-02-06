@@ -12,7 +12,8 @@ namespace emcc {
 class EPoll {
 public:
   EPoll();
-  bool IsValid() { return epfd_ >= 0; };
+  bool is_open() const { return IsValid(); }
+  bool IsValid() const { return epfd_ >= 0; };
   bool AddFD(int fd, uint32_t flags);
   bool ModFD(int fd, uint32_t flags);
   bool DelFD(int fd);

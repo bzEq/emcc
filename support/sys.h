@@ -234,4 +234,14 @@ inline void Die(Args &&...args) {
   exit(1);
 }
 
+  inline bool SetNonBlocking(int fd) {
+  int flags = fcntl(fd, F_GETFL, 0);
+  if (flags < 0)
+    return false;
+  int ret = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+  if (ret < 0)
+    return false;
+  return true;
+}
+
 } // namespace emcc

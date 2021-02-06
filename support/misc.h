@@ -11,6 +11,9 @@ template <typename T>
 using Arc = std::shared_ptr<T>;
 
 template <typename T>
+using Shared = std::shared_ptr<T>;
+
+template <typename T>
 using Owned = std::unique_ptr<T>;
 
 template <class T, std::size_t N>
