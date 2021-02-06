@@ -70,3 +70,13 @@ cc_binary(
         "//editor:emcc_editor",
     ],
 )
+
+cc_binary(
+    name = "play_termios",
+    srcs = ["play_termios.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//support:emcc_support",
+    ],
+)
