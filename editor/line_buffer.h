@@ -30,11 +30,15 @@ public:
   LineBuffer() : size_(0) {}
   size_t CountLines();
   size_t size() const { return size_; }
+  bool empty() const { return size_ == 0; }
   size_t GetLine(size_t line, size_t limit, std::string &content);
   LineBuffer &Insert(size_t line, size_t column, char c);
   LineBuffer &Append(size_t line, char c) { return Insert(line, ~0, c); }
   LineBuffer &Append(char c) { return Insert(~0, ~0, c); }
+  LineBuffer &Concat(LineBuffer &&other);
+  LineBuffer Split(size_t line);
   size_t Erase(size_t line, size_t column, size_t len);
+  size_t Erase(size_t line, size_t column, size_t len, LineBuffer &erased);
   bool Verify();
   bool SaveFile(const std::string &filename);
 };
