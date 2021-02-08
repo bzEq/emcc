@@ -61,6 +61,15 @@ public:
       root_ = new_root;
       return true;
     }
+    Node *right = RotateRightTillEnd(root_->right);
+    assert(right);
+    assert(right->left == nullptr);
+    right->left = root_->left;
+    Release(root_);
+    root_ = right;
+    root_->UpdateSum();
+    root_->UpdateSize();
+    return true;
   }
 
   Num At(size_t i) {
