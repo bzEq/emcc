@@ -8,6 +8,10 @@ class StreamInterpreter {
 public:
   explicit StreamInterpreter(StreamTy input) : input_(input) {}
 
+  void Init();
+
+  void LoopInput();
+
 private:
   StreamTy input_;
 };

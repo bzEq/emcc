@@ -13,7 +13,6 @@ class Terminal;
 
 class App {
 public:
-  using CommandQueueTy = Shared<Chan<Command, 8>>;
   App(Terminal &input, StreamInterpreter &interpreter, Terminal &output)
       : input_(input), interpreter_(interpreter), output_(output) {}
 
