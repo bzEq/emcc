@@ -99,3 +99,15 @@ cc_test(
         "//editor:emcc_editor",
     ],
 )
+
+cc_test(
+    name = "prefix_sum_test",
+    srcs = [
+        "prefix_sum_test.cc",
+    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//support:emcc_support",
+    ],
+)
