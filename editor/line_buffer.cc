@@ -41,6 +41,8 @@ size_t LineBuffer::CountLines() {
 bool LineBuffer::Verify() {
   for (size_t i = 0; i < buffer_.size(); ++i) {
     auto line = buffer_.At(i);
+    if (line->empty() && i != buffer_.size() - 1)
+      return false;
     for (size_t j = 0; j < line->size(); ++j) {
       if (j != line->size() - 1 && line->At(j) == kNewLine)
         return false;
