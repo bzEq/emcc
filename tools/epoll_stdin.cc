@@ -3,10 +3,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "support/epoll.h"
-#include "support/sys.h"
-#include "support/misc.h"
 #include "fmt/format.h"
+#include "support/epoll.h"
+#include "support/misc.h"
+#include "support/sys.h"
 
 #include <errno.h>
 #include <iostream>
@@ -28,16 +28,6 @@ static void EnableRawMode() {
   raw_mode.c_iflag &= ~(ICRNL | IXON);
   raw_mode.c_oflag &= ~(OPOST);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw_mode);
-}
-
-static bool SetNonBlocking(int fd) {
-  int flags = fcntl(fd, F_GETFL, 0);
-  if (flags < 0)
-    return false;
-  int ret = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-  if (ret < 0)
-    return false;
-  return true;
 }
 
 int main() {

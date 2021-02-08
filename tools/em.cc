@@ -1,6 +1,5 @@
 // Copyright (c) 2019 Kai Luo <gluokai@gmail.com>. All rights reserved.
 
-#include "editor/options.h"
 #include "support/sys.h"
 
 using namespace emcc;
