@@ -29,8 +29,7 @@ public:
   CreateFromFile(const std::string &filename);
   LineBuffer() : size_(0) {}
   size_t CountLines();
-  // TODO: Use fenwick tree?
-  size_t accumalte_size(size_t line) const;
+  size_t accumulate_size(size_t line) const;
   size_t size() const { return size_; }
   bool empty() const { return size_ == 0; }
   size_t GetLine(size_t line, size_t limit, std::string &content);
