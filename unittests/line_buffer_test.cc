@@ -121,6 +121,7 @@ TEST(LineBufferTest, Size) {
   EXPECT_TRUE(lb.GetAccumulateChars(1) == 8193);
   EXPECT_TRUE(lb.CountChars() == 8193);
   lb.Erase(0, 0, 193);
+  EXPECT_TRUE(lb.GetAccumulateChars(0) == 4096 + 1 - 193);
   EXPECT_TRUE(lb.GetAccumulateChars(1) == 8000);
   EXPECT_TRUE(lb.CountChars() == 8000);
 }
