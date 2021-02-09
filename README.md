@@ -7,7 +7,7 @@ Bazel can be installed following https://docs.bazel.build/versions/master/instal
 
 ### Packages
 ```
-sudo apt install clang libgtest-dev libre2-dev libblocksruntime-dev
+sudo apt install clang libgtest-dev libre2-dev libblocksruntime-dev libncurses-dev
 ```
 
 ## Run all tests
