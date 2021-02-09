@@ -234,13 +234,23 @@ inline void Die(Args &&...args) {
   exit(1);
 }
 
-  inline bool SetNonBlocking(int fd) {
+inline bool SetNonBlocking(int fd) {
   int flags = fcntl(fd, F_GETFL, 0);
   if (flags < 0)
     return false;
   int ret = fcntl(fd, F_SETFL, flags | O_NONBLOCK);
   if (ret < 0)
     return false;
+  return true;
+}
+
+inline bool GetTerminalSize(int fd, int *width, int height) {
+  struct winsize w;
+  int err = ioctl(fd, TIOCGWINSZ, &w);
+  if (err != 0)
+    return false;
+  *width = w.ws_col;
+  *height = w.ws_row;
   return true;
 }
 
