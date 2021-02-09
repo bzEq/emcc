@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "support/prefix_sum.h"
 #include "support/rope.h"
 
 #include <memory>
@@ -17,7 +18,7 @@ private:
   using LineSpan = Rope<Line *, std::basic_string, 1UL << 10>;
 
   LineSpan buffer_;
-  size_t size_;
+  PrefixSum<long> accumulate_size_;
 
   LineBuffer &InsertEmptyLine(size_t i);
   LineBuffer &InsertLine(size_t i, Line &&line);
@@ -27,11 +28,12 @@ public:
   static constexpr char kNewLine = '\n';
   static std::unique_ptr<LineBuffer>
   CreateFromFile(const std::string &filename);
-  LineBuffer() : size_(0) {}
+  LineBuffer() {}
   size_t CountLines();
-  size_t accumulate_size(size_t line) const;
-  size_t size() const { return size_; }
-  bool empty() const { return size_ == 0; }
+  size_t GetAccumulateChars(size_t line) {
+    return accumulate_size_.GetPrefixSum(line);
+  }
+  size_t CountChars();
   size_t GetLine(size_t line, size_t limit, std::string &content);
   LineBuffer &Insert(size_t line, size_t column, char c);
   LineBuffer &Append(size_t line, char c) { return Insert(line, ~0, c); }

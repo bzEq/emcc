@@ -103,9 +103,23 @@ TEST(LineBufferTest, FuzzFailure) {
   }
   lb.Insert(1, ~0, LineBuffer::kNewLine);
   lb.Erase(0, 4096, 4096);
-  EXPECT_TRUE(lb.Verify());  
+  EXPECT_TRUE(lb.Verify());
   lb.Erase(0, 4096, 4096);
   EXPECT_TRUE(lb.Verify());
+}
+
+TEST(LineBufferTest, Size) {
+  LineBuffer lb;
+  for (size_t i = 0; i < 4096; ++i) {
+    lb.Insert(0, 0, '0');
+  }
+  EXPECT_TRUE(lb.GetAccumulateChars(0) == 4096);
+  lb.Append(LineBuffer::kNewLine);
+  for (size_t i = 0; i < 4096; ++i) {
+    lb.Insert(1, 0, '0');
+  }
+  EXPECT_TRUE(lb.GetAccumulateChars(1) == 8193);
+  EXPECT_TRUE(lb.CountChars() == 8193);
 }
 
 } // namespace
