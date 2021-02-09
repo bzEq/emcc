@@ -13,17 +13,6 @@ namespace emcc {
 
 // All lines must end with kNewLine except the last one.
 class LineBuffer {
-private:
-  using Line = Rope<char, std::basic_string, 1UL << 13>;
-  using LineSpan = Rope<Line *, std::basic_string, 1UL << 10>;
-
-  LineSpan buffer_;
-  PrefixSum<long> accumulate_size_;
-
-  LineBuffer &InsertEmptyLine(size_t i);
-  LineBuffer &InsertLine(size_t i, Line &&line);
-  LineBuffer &RemoveLine(size_t i);
-
 public:
   static constexpr char kNewLine = '\n';
   static std::unique_ptr<LineBuffer>
@@ -44,6 +33,17 @@ public:
   size_t Erase(size_t line, size_t column, size_t len, LineBuffer &erased);
   bool Verify();
   bool SaveFile(const std::string &filename);
+
+private:
+  using Line = Rope<char, std::basic_string, 1UL << 13>;
+  using LineSpan = Rope<Line *, std::basic_string, 1UL << 10>;
+
+  LineBuffer &InsertEmptyLine(size_t i);
+  LineBuffer &InsertLine(size_t i, Line &&line);
+  LineBuffer &RemoveLine(size_t i);
+
+  LineSpan buffer_;
+  PrefixSum<long> accumulate_size_;
 };
 
 } // namespace emcc
