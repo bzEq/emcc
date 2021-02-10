@@ -1,5 +1,7 @@
 #pragma once
 
+#include "support/prefix_sum.h"
+
 #include <assert.h>
 #include <iostream>
 
@@ -47,5 +49,30 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
       origin.y + dy,
   };
 }
+
+// Used to map char's logical index to view cursor.
+// TODO: By using binary search can we find index via cursor.
+class Block {
+public:
+  // Get start cursor of char indexed by i.
+  Cursor GetLoc(size_t i) {
+    if (i == 0)
+      return anchor_;
+    int distance = index_.GetPrefixSum(i - 1);
+    return JumpTo(width_, anchor_, distance);
+  }
+
+  bool Insert(size_t i, int width) {
+    assert(width > 0);
+    return index_.Insert(i, width);
+  }
+
+  size_t GetIndex(Cursor c);
+
+private:
+  const int width_;
+  const Cursor anchor_;
+  PrefixSum<int> index_;
+};
 
 } // namespace emcc::tui
