@@ -208,10 +208,9 @@ private:
     }
     const size_t left_size = left_subtree_size;
     if (index > left_size) {
-      return {1, index - left_size};
+      return {1, index - (left_size + 1)};
     }
     return {0, 0};
-
   }
 
   Node *Splay(Node *node, const size_t index) {
