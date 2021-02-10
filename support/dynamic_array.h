@@ -4,6 +4,10 @@
 
 #include <cassert>
 
+#include <stddef.h>
+#include <utility>
+#include <vector>
+
 namespace emcc {
 
 template <typename Value>
@@ -21,16 +25,16 @@ public:
     if (i >= root_->size) {
       assert(root_->right == nullptr);
       root_->right = CreateNode(std::forward<Args>(args)...);
-      root_->Update();
+      Update(root_);
       return true;
     }
     assert(i == root_->GetLeftSize());
     Node *const old_left_subtree = root_->left;
     Node *const new_left_subtree = CreateNode(std::forward<Args>(args)...);
     new_left_subtree->left = old_left_subtree;
-    new_left_subtree->Update();
+    Update(new_left_subtree);
     root_->left = new_left_subtree;
-    root_->Update();
+    Update(root_);
     root_ = Splay(root_, i);
     return true;
   }
@@ -52,7 +56,7 @@ public:
     right->left = root_->left;
     Release(root_);
     root_ = right;
-    root_->Update();
+    Update(root_);
     return true;
   }
 
@@ -95,7 +99,7 @@ protected:
     Node *left, *right;
     size_t size;
 
-    virtual void Update() {
+    void UpdateSize() {
       size = 1 + (left ? left->size : 0) + (right ? right->size : 0);
     }
 
@@ -107,14 +111,11 @@ protected:
 
     template <typename... Args>
     Node(Args &&...args)
-        : value(std::forward<Args>(args)...), left(nullptr), right(nullptr) {
-      Update();
-    }
-
-    virtual ~Node() {}
+        : value(std::forward<Args>(args)...), left(nullptr), right(nullptr) {}
   };
 
-private:
+  virtual void Update(Node *const node) { node->UpdateSize(); }
+
   Node *AtOrNull(size_t i) {
     root_ = Splay(root_, i);
     if (!root_)
@@ -126,9 +127,11 @@ private:
     return root_;
   }
 
+private:
   template <typename... Args>
   Node *CreateNode(Args &&...args) {
     Node *n = new Node(std::forward<Args>(args)...);
+    Update(n);
     return n;
   }
 
@@ -144,8 +147,8 @@ private:
     Node *const parent = node->right;
     node->right = parent->left;
     parent->left = node;
-    node->Update();
-    parent->Update();
+    Update(node);
+    Update(parent);
     return parent;
   };
 
@@ -159,8 +162,8 @@ private:
     Node *const parent = node->left;
     node->left = parent->right;
     parent->right = node;
-    node->Update();
-    parent->Update();
+    Update(node);
+    Update(parent);
     return parent;
   }
 
