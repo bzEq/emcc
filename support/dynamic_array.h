@@ -3,7 +3,6 @@
 #pragma once
 
 #include <cassert>
-
 #include <stddef.h>
 #include <utility>
 #include <vector>
