@@ -51,9 +51,10 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
 }
 
 // Used to map char's logical index to view cursor.
-// TODO: By using binary search can we find index via cursor.
 class Block {
 public:
+  Block(int width, Cursor anchor) : width_(width), anchor_(base) {}
+
   // Get start cursor of char indexed by i.
   Cursor GetLoc(size_t i) {
     if (i == 0)
@@ -62,11 +63,16 @@ public:
     return JumpTo(width_, anchor_, distance);
   }
 
+  int GetWidth(size_t i) { return index_.At(i); }
+
+  int width() const { return width(); }
+
   bool Insert(size_t i, int width) {
     assert(width > 0);
     return index_.Insert(i, width);
   }
 
+  // TODO: By using binary search can we find index via cursor.
   size_t GetIndex(Cursor c);
 
 private:
