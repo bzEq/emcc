@@ -111,3 +111,15 @@ cc_test(
         "//support:emcc_support",
     ],
 )
+
+cc_test(
+    name = "view_test",
+    srcs = [
+        "view_test.cc",
+    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//tui:emcc_tui",
+    ],
+)

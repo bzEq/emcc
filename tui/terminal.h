@@ -8,10 +8,6 @@
 
 namespace emcc::tui {
 
-struct Cursor {
-  int x, y;
-};
-
 class Terminal {
 public:
   Terminal(int in, int out, int w, int h, StreamTy input_receiver)
