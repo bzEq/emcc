@@ -93,7 +93,7 @@ TEST(PrefixSumTest, SearchTest1) {
 TEST(PrefixSumTest, Benchmark) {
   PrefixSum<int> s;
   Random rnd;
-  const size_t N = 1 << 12;
+  const size_t N = 1 << 16;
   for (size_t i = 0; i < N; ++i)
     s.Insert(i, 0);
   for (size_t i = 0; i < N; ++i) {
