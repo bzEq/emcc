@@ -93,6 +93,8 @@ public:
 
   virtual ~DynamicArray() { clear(); }
 
+  size_t CountHeight() const { return CountHeight(root_); }
+
 protected:
   struct Node {
     Value value;
@@ -125,6 +127,12 @@ protected:
       return nullptr;
     assert(i == j);
     return root_;
+  }
+
+  size_t CountHeight(Node *const node) const {
+    if (!node)
+      return 0;
+    return std::max(CountHeight(node->left), CountHeight(node->right)) + 1;
   }
 
 private:
@@ -189,15 +197,21 @@ private:
 
   struct CompareResult {
     int order;
+    size_t relative_index;
   };
 
   CompareResult Compare(const size_t index, const Node *const node) {
     assert(node);
-    if (index < node->GetLeftSize())
-      return {-1};
-    if (index > node->GetLeftSize())
-      return {1};
-    return {0};
+    const size_t left_subtree_size = node->left ? node->left->size : 0;
+    if (index < left_subtree_size) {
+      return {-1, index};
+    }
+    const size_t left_size = left_subtree_size;
+    if (index > left_size) {
+      return {1, index - left_size};
+    }
+    return {0, 0};
+
   }
 
   Node *Splay(Node *node, const size_t index) {
@@ -210,7 +224,7 @@ private:
       if (cmp.order < 0) {
         if (node->left == nullptr)
           break;
-        cmp = Compare(index, node->left);
+        cmp = Compare(cmp.relative_index, node->left);
         if (cmp.order == 0) {
           node = RotateRight(node);
           break;
@@ -233,7 +247,7 @@ private:
       } else {
         if (node->right == nullptr)
           break;
-        cmp = Compare(index, node->right);
+        cmp = Compare(cmp.relative_index, node->right);
         if (cmp.order == 0) {
           node = RotateLeft(node);
           break;
