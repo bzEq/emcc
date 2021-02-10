@@ -76,7 +76,7 @@ public:
 
   size_t GetIndex(Cursor c) {
     int distance = WrapDistance(width_, anchor_, c);
-    return index_.UpperBound(distance);
+    return index_.LowerBound(distance);
   }
 
 private:
