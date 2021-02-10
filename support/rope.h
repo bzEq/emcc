@@ -14,7 +14,7 @@ namespace emcc {
 
 template <typename Char,
           template <typename...> typename ContainerType = std::basic_string,
-          size_t kDefaultMaxPieceSize = 4096>
+          size_t kMaxPieceSize = 4096>
 class Rope {
 private:
   using Piece = ContainerType<Char>;
@@ -39,7 +39,6 @@ private:
     }
   };
 
-  const size_t max_piece_size_;
   Node *root_;
 
   template <typename... Args>
@@ -129,7 +128,7 @@ private:
     Node *const l = RotateLeftTillEnd(lhs);
     assert(l->right == nullptr);
     Node *const r = RotateRightTillEnd(rhs);
-    if (r != nullptr && l->piece.size() + r->piece.size() <= max_piece_size_) {
+    if (r != nullptr && l->piece.size() + r->piece.size() <= kMaxPieceSize) {
       assert(r->left == nullptr);
       // Compress the piece.
       l->piece.insert(l->piece.end(), r->piece.begin(), r->piece.end());
@@ -228,7 +227,7 @@ private:
     node = Splay(node, index);
     auto cmp = Compare(index, node);
     assert(cmp.order >= 0);
-    if (node->piece.size() < max_piece_size_) {
+    if (node->piece.size() < kMaxPieceSize) {
       if (cmp.order > 0) {
         assert(cmp.relative_index == 0);
         node->piece.push_back(c);
@@ -250,20 +249,19 @@ private:
     }
     assert(cmp.order == 0);
     assert(cmp.relative_index < node->piece.size());
-    assert(node->piece.size() == max_piece_size_);
-    Piece right_piece(node->piece.begin() + max_piece_size_ / 2,
+    assert(node->piece.size() == kMaxPieceSize);
+    Piece right_piece(node->piece.begin() + kMaxPieceSize / 2,
                       node->piece.end());
     Node *right_subtree = CreateNode(std::move(right_piece));
     right_subtree->right = node->right;
-    node->piece.resize(max_piece_size_ / 2);
+    node->piece.resize(kMaxPieceSize / 2);
     node->right = right_subtree;
-    if (cmp.relative_index < max_piece_size_ / 2) {
+    if (cmp.relative_index < kMaxPieceSize / 2) {
       node->piece.insert(node->piece.begin() + cmp.relative_index, c);
     } else {
-      right_subtree->piece.insert(
-          right_subtree->piece.begin() +
-              (cmp.relative_index - max_piece_size_ / 2),
-          c);
+      right_subtree->piece.insert(right_subtree->piece.begin() +
+                                      (cmp.relative_index - kMaxPieceSize / 2),
+                                  c);
     }
     right_subtree->UpdateSize();
     node->UpdateSize();
@@ -271,17 +269,13 @@ private:
   }
 
 public:
-  Rope() : max_piece_size_(kDefaultMaxPieceSize), root_(nullptr) {}
+  Rope() : root_(nullptr) {}
 
-  Rope(const Piece &p) : max_piece_size_(kDefaultMaxPieceSize), root_(nullptr) {
-    Append(p);
-  }
+  Rope(const Piece &p) : root_(nullptr) { Append(p); }
 
   Rope(const Rope &other) = delete;
 
-  Rope(Rope &&other) : max_piece_size_(kDefaultMaxPieceSize), root_(nullptr) {
-    std::swap(root_, other.root_);
-  }
+  Rope(Rope &&other) : root_(nullptr) { std::swap(root_, other.root_); }
 
   Rope &swap(Rope &&other) {
     std::swap(root_, other.root_);
