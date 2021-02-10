@@ -163,7 +163,7 @@ private:
             node = RotateRight(node);
             break;
           }
-          node = RotateRight(node);
+          node->left = RotateRight(node->left);
           node = RotateRight(node);
         } else {
           if (node->left->right == nullptr) {
@@ -189,7 +189,7 @@ private:
           node->right = RotateRight(node->right);
           node = RotateLeft(node);
         } else {
-          node = RotateLeft(node);
+          node->right = RotateLeft(node->right);
           node = RotateLeft(node);
         }
       }
@@ -279,8 +279,7 @@ public:
 
   Rope(const Rope &other) = delete;
 
-  Rope(Rope &&other)
-      : max_piece_size_(kDefaultMaxPieceSize), root_(nullptr) {
+  Rope(Rope &&other) : max_piece_size_(kDefaultMaxPieceSize), root_(nullptr) {
     std::swap(root_, other.root_);
   }
 
