@@ -50,6 +50,20 @@ public:
     return GetLeftSum(node) + node->value.value;
   }
 
+  // Find first i, GetPrefixSum(i) >= x.
+  size_t Search(Num x) {
+    size_t l = 0, r = Super::size(), mid = l + (r - l) / 2;
+    while (l < r) {
+      if (GetPrefixSum(mid) >= x) {
+        r = mid;
+      } else {
+        l = mid + 1;
+      }
+      mid = l + (r - l) / 2;
+    }
+    return r;
+  }
+
 private:
   using ElementTy = PrefixSumInfo<Num>;
   using Super = DynamicArray<ElementTy>;

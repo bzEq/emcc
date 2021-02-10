@@ -23,7 +23,7 @@ TEST(PrefixSumTest, OneToN) {
     EXPECT_TRUE(s.At(i) == i);
   EXPECT_TRUE(s.size() == 101);
   for (int i = 0; i <= 100; ++i)
-    EXPECT_TRUE(s.GetPrefixSum(i) == i * (i+1) / 2);
+    EXPECT_TRUE(s.GetPrefixSum(i) == i * (i + 1) / 2);
 }
 
 TEST(PrefixSumTest, OneToN1) {
@@ -71,6 +71,14 @@ TEST(PrefixSumTest, EraseTest1) {
   EXPECT_TRUE(s.size() == 101);
   for (int i = 0; i <= 100; ++i)
     EXPECT_TRUE(s.Remove(0));
+}
+
+TEST(PrefixSumTest, SearchTest) {
+  PrefixSum<int> s;
+  for (int i = 0; i <= 100; ++i)
+    s.Insert(i, i);
+  EXPECT_TRUE(s.Search(6) == 3);
+  EXPECT_TRUE(s.Search(7) == 4);
 }
 
 } // namespace
