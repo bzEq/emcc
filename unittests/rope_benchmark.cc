@@ -55,4 +55,16 @@ TEST(RopeBenchmark, StringAppend) {
     s.push_back('0');
 }
 
+TEST(RopeBenchmark, SmallPiece) {
+  emcc::Rope<int, std::vector, 1UL> s;
+  emcc::Random rnd;
+  const size_t N = 1 << 14;
+  for (size_t i = 0; i < N; ++i)
+    s.Insert(i, 0);
+  for (size_t i = 0; i < N; ++i) {
+    size_t n = rnd.Next() * s.size();
+    s.At(n);
+  }
+}
+
 } // namespace
