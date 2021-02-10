@@ -65,15 +65,19 @@ public:
 
   int GetWidth(size_t i) { return index_.At(i); }
 
-  int width() const { return width(); }
+  int width() const { return width_; }
 
   bool Insert(size_t i, int width) {
     assert(width > 0);
     return index_.Insert(i, width);
   }
 
-  // TODO: By using binary search can we find index via cursor.
-  size_t GetIndex(Cursor c);
+  size_t size() const { return index_.size(); }
+
+  size_t GetIndex(Cursor c) {
+    int distance = WrapDistance(width_, anchor_, c);
+    return index_.UpperBound(distance);
+  }
 
 private:
   const int width_;
