@@ -5,6 +5,7 @@
 #include "fmt/format.h"
 
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -244,7 +245,7 @@ inline bool SetNonBlocking(int fd) {
   return true;
 }
 
-inline bool GetTerminalSize(int fd, int *width, int height) {
+inline bool GetTerminalSize(int fd, int *width, int *height) {
   struct winsize w;
   int err = ioctl(fd, TIOCGWINSZ, &w);
   if (err != 0)
