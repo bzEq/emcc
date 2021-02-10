@@ -93,7 +93,9 @@ public:
 
   virtual ~DynamicArray() { clear(); }
 
+#ifdef EMCC_DEBUG
   size_t CountHeight() const { return CountHeight(root_); }
+#endif
 
 protected:
   struct Node {
@@ -129,11 +131,13 @@ protected:
     return root_;
   }
 
+#ifdef EMCC_DEBUG
   size_t CountHeight(Node *const node) const {
     if (!node)
       return 0;
     return std::max(CountHeight(node->left), CountHeight(node->right)) + 1;
   }
+#endif
 
 private:
   template <typename... Args>
