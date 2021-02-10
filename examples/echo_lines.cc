@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   for (size_t i = 0; i < len; ++i)
     lb.Append(data[i]);
   std::string line;
-  std::cerr << lb.CountLines() << " " << lb.size() << std::endl;
+  std::cerr << lb.CountLines() << " " << lb.CountChars() << std::endl;
   for (size_t i = 0; i < lb.CountLines(); ++i) {
     line.clear();
     lb.GetLine(i, ~0, line);
