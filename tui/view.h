@@ -53,7 +53,7 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
 // Used to map char's logical index to view cursor.
 class Block {
 public:
-  Block(int width, Cursor anchor) : width_(width), anchor_(base) {}
+  Block(int width, Cursor anchor) : width_(width), anchor_(anchor) {}
 
   // Get start cursor of char indexed by i.
   Cursor GetLoc(size_t i) {
