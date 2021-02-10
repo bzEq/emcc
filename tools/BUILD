@@ -70,3 +70,16 @@ cc_binary(
         "//editor:emcc_editor",
     ],
 )
+
+cc_binary(
+    name = "display_poc",
+    srcs = ["display_poc.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS + [
+        '-lncurses',
+    ],
+    deps = [
+        "//editor:emcc_editor",
+        "//support:emcc_support",
+    ],
+)
