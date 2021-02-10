@@ -22,7 +22,8 @@ TEST(PrefixSumTest, OneToN) {
   for (int i = 0; i <= 100; ++i)
     EXPECT_TRUE(s.At(i) == i);
   EXPECT_TRUE(s.size() == 101);
-  EXPECT_TRUE(s.GetPrefixSum(100) == 5050);
+  for (int i = 0; i <= 100; ++i)
+    EXPECT_TRUE(s.GetPrefixSum(i) == i * (i+1) / 2);
 }
 
 TEST(PrefixSumTest, OneToN1) {
