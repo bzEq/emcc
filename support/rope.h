@@ -411,7 +411,8 @@ inline std::ostream &operator<<(std::ostream &out,
   return out;
 }
 
-inline bool operator==(Rope<char, std::basic_string> &rope,
+template <size_t N>
+inline bool operator==(Rope<char, std::basic_string, N> &rope,
                        const std::string &s) {
   if (rope.size() != s.size())
     return false;
@@ -421,7 +422,8 @@ inline bool operator==(Rope<char, std::basic_string> &rope,
   return true;
 }
 
-inline bool operator==(Rope<char, std::basic_string> &rope, const char *s) {
+template <size_t N>
+inline bool operator==(Rope<char, std::basic_string, N> &rope, const char *s) {
   if (rope.size() != ::strlen(s))
     return false;
   for (size_t i = 0; i != rope.size(); ++i)
