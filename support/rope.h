@@ -141,7 +141,6 @@ private:
     return l;
   }
 
-  // ftp://ftp.cs.cmu.edu/usr/ftp/usr/sleator/splaying/top-down-splay.c
   Node *Splay(Node *node, const size_t index) {
     if (node == nullptr)
       return nullptr;
