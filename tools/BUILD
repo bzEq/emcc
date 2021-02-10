@@ -72,14 +72,10 @@ cc_binary(
 )
 
 cc_binary(
-    name = "display_poc",
-    srcs = ["display_poc.cc"],
+    name = "play_ncurses",
+    srcs = ["play_ncurses.cc"],
     copts = COPTS,
     linkopts = LINKOPTS + [
         '-lncurses',
-    ],
-    deps = [
-        "//editor:emcc_editor",
-        "//support:emcc_support",
     ],
 )

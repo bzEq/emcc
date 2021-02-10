@@ -1,16 +1,10 @@
 #include <unistd.h>
 
-#include "editor/line_buffer.h"
-#include "support/sys.h"
-
 #include <ncurses.h>
 #include <stdio.h>
-
-using namespace emcc;
+#include <stdlib.h>
 
 int main(int argc, char *argv[]) {
-  if (argc != 2)
-    emcc::Die("Usage %s: <filename>", argv[0]);
   int width, height;
   initscr();
   atexit([]() { endwin(); });
@@ -27,7 +21,7 @@ int main(int argc, char *argv[]) {
     getyx(stdscr, y, x);
     move(height - 1, 0);
     clrtoeol();
-    printw("%d %d", y, x);
+    printw("%d %d: %d", y, x, c);
     move(y, x);
   }
   return 0;
