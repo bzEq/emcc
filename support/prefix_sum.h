@@ -28,6 +28,7 @@ public:
     if (node == nullptr)
       return false;
     node->value.value += delta;
+    Update(node);
     return true;
   }
 
@@ -38,10 +39,8 @@ public:
   }
 
   Num At(size_t i) {
-    Node *const node = Super::AtOrNull(i);
-    if (node == nullptr)
-      return Num();
-    return node->value.value;
+    ElementTy value = Super::At(i);
+    return value.value;
   }
 
   Num GetPrefixSum(size_t i) {
