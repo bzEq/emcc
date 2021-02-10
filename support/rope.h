@@ -107,7 +107,6 @@ private:
     if (cmp.order != 0) {
       return std::make_tuple(node, nullptr);
     }
-    // FIXME: Use iterator_range to reduce copies.
     Piece left_piece(node->piece.begin(),
                      node->piece.begin() + cmp.relative_index);
     Node *const left = left_piece.empty() ? node->left
