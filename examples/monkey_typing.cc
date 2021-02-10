@@ -38,9 +38,9 @@ int main() {
     buffer.Erase(line, column, len);
   };
   size_t it = 0;
-  while (buffer.size() < (16UL<<30)) {
+  while (buffer.CountChars() < (16UL << 30)) {
     printf("Iter #%zu: lines: %zu size: %zu\n", it++, buffer.CountLines(),
-           buffer.size());
+           buffer.CountLines());
     auto dice = rnd.Next();
     if (dice < 0.6)
       DoErase();
