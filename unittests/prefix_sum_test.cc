@@ -1,4 +1,5 @@
 #include "support/prefix_sum.h"
+#include "support/random.h"
 
 #include <gtest/gtest.h>
 
@@ -87,6 +88,18 @@ TEST(PrefixSumTest, SearchTest1) {
     s.Insert(i, i);
   EXPECT_TRUE(s.UpperBound(6) == 4);
   EXPECT_TRUE(s.UpperBound(7) == 4);
+}
+
+TEST(PrefixSumTest, Benchmark) {
+  PrefixSum<int> s;
+  Random rnd;
+  const size_t N = 1 << 12;
+  for (size_t i = 0; i < N; ++i)
+    s.Insert(i, 0);
+  for (size_t i = 0; i < N; ++i) {
+    size_t n = rnd.Next() * s.size();
+    s.At(n);
+  }
 }
 
 } // namespace
