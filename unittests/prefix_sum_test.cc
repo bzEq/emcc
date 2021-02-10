@@ -77,8 +77,16 @@ TEST(PrefixSumTest, SearchTest) {
   PrefixSum<int> s;
   for (int i = 0; i <= 100; ++i)
     s.Insert(i, i);
-  EXPECT_TRUE(s.Search(6) == 3);
-  EXPECT_TRUE(s.Search(7) == 4);
+  EXPECT_TRUE(s.LowerBound(6) == 3);
+  EXPECT_TRUE(s.LowerBound(7) == 4);
+}
+
+TEST(PrefixSumTest, SearchTest1) {
+  PrefixSum<int> s;
+  for (int i = 0; i <= 100; ++i)
+    s.Insert(i, i);
+  EXPECT_TRUE(s.UpperBound(6) == 4);
+  EXPECT_TRUE(s.UpperBound(7) == 4);
 }
 
 } // namespace

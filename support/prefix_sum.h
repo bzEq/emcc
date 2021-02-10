@@ -51,10 +51,23 @@ public:
   }
 
   // Find first i, GetPrefixSum(i) >= x.
-  size_t Search(Num x) {
+  size_t LowerBound(Num x) {
     size_t l = 0, r = Super::size(), mid = l + (r - l) / 2;
     while (l < r) {
       if (GetPrefixSum(mid) >= x) {
+        r = mid;
+      } else {
+        l = mid + 1;
+      }
+      mid = l + (r - l) / 2;
+    }
+    return r;
+  }
+
+  size_t UpperBound(Num x) {
+    size_t l = 0, r = Super::size(), mid = l + (r - l) / 2;
+    while (l < r) {
+      if (GetPrefixSum(mid) > x) {
         r = mid;
       } else {
         l = mid + 1;
