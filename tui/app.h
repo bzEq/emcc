@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "editor/line_buffer.h"
 #include "support/chan.h"
 #include "support/misc.h"
 #include "tui/basis.h"
@@ -13,8 +14,10 @@ class Terminal;
 
 class App {
 public:
-  App(Terminal &input, StreamInterpreter &interpreter, Terminal &output)
-      : input_(input), interpreter_(interpreter), output_(output) {}
+  App(Terminal &input, StreamInterpreter &interpreter, Terminal &output,
+      LineBuffer &buffer)
+      : input_(input), interpreter_(interpreter), output_(output),
+        buffer_(buffer) {}
 
   bool SendCommand(const Command &cmd);
 
@@ -25,6 +28,7 @@ private:
   StreamInterpreter &interpreter_;
   CommandQueueTy command_queue_;
   Terminal &output_;
+  LineBuffer &buffer_;
 };
 
 } // namespace emcc::tui
