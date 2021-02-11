@@ -59,3 +59,16 @@ cc_binary(
         "-lncurses",
     ],
 )
+
+cc_binary(
+    name = "play_editor",
+    srcs = ["play_editor.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS + [
+        "-lncurses",
+    ],
+    deps = [
+        "//editor:emcc_editor",
+        "//tui:emcc_tui",
+    ],
+)

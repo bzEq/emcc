@@ -6,6 +6,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <ncurses.h>
 
 namespace emcc::tui {
 
@@ -55,6 +56,7 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
 struct LogicalLocation {
   size_t line, col;
   LogicalLocation() : line(~0), col(~0) {}
+  LogicalLocation(size_t line, size_t col) : line(line), col(col) {}
 };
 
 class Viewport {
@@ -66,6 +68,12 @@ public:
     locator_.resize(height_);
     for (size_t i = 0; i < height_; ++i)
       locator_[i].resize(width_);
+  }
+
+  template <typename... Args>
+  Viewport &Set(int y, int x, Args &&...args) {
+    locator_[y][x] = LogicalLocation(std::forward<Args>(args)...);
+    return *this;
   }
 
   int width() const { return width_; }
@@ -80,8 +88,8 @@ private:
 
 class WYSIWYGEditor {
 public:
-  WYSIWYGEditor(Viewport *view, LineBuffer *buffer)
-      : view_(view), x_(0), y_(0), buffer_(buffer) {}
+  WYSIWYGEditor(WINDOW *curse_win, Viewport *view, LineBuffer *buffer)
+      : curse_win_(curse_win), view_(view), x_(0), y_(0), buffer_(buffer) {}
 
   WYSIWYGEditor &ChangeView(Viewport *view) {
     view_ = view;
@@ -99,7 +107,7 @@ public:
 
   // Write c at (y, x).
   // TODO: Support character occupying multiple boxes.
-  WYSIWYGEditor &Write(int c);
+  bool Write(int c);
 
   WYSIWYGEditor &Insert(int c);
 
@@ -108,6 +116,7 @@ public:
   WYSIWYGEditor &Backspace();
 
 private:
+  WINDOW *curse_win_;
   Viewport *view_;
   int x_, y_;
   LineBuffer *buffer_;

@@ -9,6 +9,7 @@ cc_library(
     ],
     linkopts = [
         "-fuse-ld=lld",
+        "-lncurses",
     ],
     visibility = ["//visibility:public"],
     deps = [
