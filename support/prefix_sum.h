@@ -14,40 +14,42 @@ namespace {
 template <typename Num>
 struct PrefixSumInfo {
   Num value, sum;
-  PrefixSumInfo() = default;
 };
 } // namespace
 
 template <typename Num>
 class PrefixSum : public DynamicArray<PrefixSumInfo<Num>> {
 public:
-  PrefixSum() = default;
+  using ElementTy = PrefixSumInfo<Num>;
+  using Super = DynamicArray<ElementTy>;
+  using DynamicArrayElementTy = DynamicArrayElement<ElementTy>;
 
   bool Add(size_t i, Num delta) {
     Node *const node = Super::AtOrNull(i);
     if (node == nullptr)
       return false;
-    node->value.value += delta;
+    node->value.array_element.value += delta;
     Update(node);
     return true;
   }
 
-  bool Insert(size_t i, Num x) {
+  PrefixSum &Insert(size_t i, Num x) {
     ElementTy value;
     value.value = x;
-    return Super::Insert(i, std::move(value));
+    Super::Insert(i, std::move(value));
+    return *this;
   }
 
   Num At(size_t i) {
-    ElementTy value = Super::At(i);
-    return value.value;
+    DynamicArrayElementTy &value = Super::At(i);
+    return value.array_element.value;
   }
 
   Num GetPrefixSum(size_t i) {
     Node *const node = Super::AtOrNull(i);
     if (!node)
       return Num();
-    return GetLeftSum(node) + node->value.value;
+    return GetLeftSum(node) + node->value.array_element.value;
   }
 
   // Find first i, GetPrefixSum(i) >= x.
@@ -78,21 +80,21 @@ public:
   }
 
 private:
-  using ElementTy = PrefixSumInfo<Num>;
-  using Super = DynamicArray<ElementTy>;
   using Node = typename Super::Node;
+
   Num GetLeftSum(Node *const node) {
     assert(node);
     if (node->left == nullptr)
       return Num();
-    return node->left->value.sum;
+    return node->left->value.array_element.sum;
   }
 
-  virtual void Update(Node *const node) {
-    ElementTy &info = node->value;
-    info.sum = info.value + (node->left ? node->left->value.sum : Num()) +
-               (node->right ? node->right->value.sum : Num());
+  virtual void Update(Node *const node) override {
     Super::Update(node);
+    ElementTy &element = node->value.array_element;
+    element.sum = element.value +
+                  (node->left ? node->left->value.array_element.sum : Num()) +
+                  (node->right ? node->right->value.array_element.sum : Num());
   }
 };
 

@@ -123,3 +123,15 @@ cc_test(
         "//tui:emcc_tui",
     ],
 )
+
+cc_test(
+    name = "splay_rope_test",
+    srcs = [
+        "splay_rope_test.cc",
+    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//support:emcc_support",
+    ],
+)

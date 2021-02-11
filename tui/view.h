@@ -67,9 +67,10 @@ public:
 
   int width() const { return width_; }
 
-  bool Insert(size_t i, int width) {
+  Block &Insert(size_t i, int width) {
     assert(width > 0);
-    return index_.Insert(i, width);
+    index_.Insert(i, width);
+    return *this;
   }
 
   size_t size() const { return index_.size(); }
