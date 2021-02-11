@@ -19,12 +19,12 @@ struct SplayRopeNode {
   Piece piece;
   SplayRopeNode *left, *right;
   template <typename... Args>
-  SplayRopeNode(Args &&...arg)
+  SplayRopeNode(Args &&...args)
       : piece(std::forward<Args>(args)...), left(nullptr), right(nullptr) {}
-  void Update() { Piece::UpdateSize(this); }
-  size_t size() const { Piece::GetSize(this); }
-  size_t GetLeftSize() const { return left ? Piece::GetSize(left) : 0; }
-  size_t GetRightSize() const { return right ? Piece::GetSize(right) : 0; }
+  void update() { Piece::UpdateNode(this); }
+  size_t size() const { return Piece::GetSize(this); }
+  size_t left_size() const { return left ? Piece::GetSize(left) : 0; }
+  size_t right_size() const { return right ? Piece::GetSize(right) : 0; }
 };
 
 struct DefaultPiece {
@@ -32,21 +32,22 @@ struct DefaultPiece {
   DefaultPiece() : size(0) {}
   static constexpr size_t kSinglePieceSize = 1;
 
-  static void UpdateSize(SplayRopeNode<DefaultPiece> *node) {
+  template <typename T>
+  static void UpdateNode(SplayRopeNode<T> *node) {
     assert(node);
-    node->piece.size = kSinglePieceSize +
-                       (node->left ? node->left->piece.size : 0) +
-                       (node->right ? node->right->piece.size : 0);
+    node->piece.size =
+        kSinglePieceSize + node->left_size() + node->right_size();
   }
 
-  static size_t GetSize(const SplayRopeNode<DefaultPiece> *node) {
-    assert(node);
-    return node->piece.size;
+  template <typename T>
+  static size_t GetSize(const SplayRopeNode<T> *node) {
+    return node ? node->piece.size : 0;
   }
 
+  template <typename T>
   static CompareResult Compare(const size_t index,
-                               const SplayRopeNode<DefaultPiece> *node) {
-    size_t left_size = node->GetLeftSize();
+                               const SplayRopeNode<T> *node) {
+    size_t left_size = node->left_size();
     static const size_t mid_size = kSinglePieceSize;
     if (index < left_size)
       return {-1, index};
@@ -59,6 +60,7 @@ struct DefaultPiece {
 template <typename Piece = DefaultPiece>
 class SplayRope {
 public:
+  using PieceTy = Piece;
   using Node = SplayRopeNode<Piece>;
   SplayRope() : root_(nullptr) {}
   SplayRope(const SplayRope &) = delete;
@@ -76,6 +78,7 @@ public:
     assert(i < size());
     Node *const node = AtOrNull(i);
     assert(node);
+    node->update();
     return node->piece;
   }
   bool Remove(size_t i) {
@@ -95,7 +98,7 @@ public:
     right->left = root_->left;
     Release(root_);
     root_ = right;
-    Update(root_);
+    root_->update();
     return true;
   }
   bool Erase(size_t index, size_t len, SplayRope *erased = nullptr);
@@ -108,23 +111,23 @@ public:
       root_ = CreateNode(std::forward<Args>(args)...);
       return *this;
     }
-    if (i >= root_->size) {
+    if (i >= root_->size()) {
       assert(root_->right == nullptr);
       root_->right = CreateNode(std::forward<Args>(args)...);
-      Update(root_);
+      root_->update();
       return *this;
     }
-    assert(i == root_->GetLeftSize());
+    assert(i == root_->left_size());
     Node *const old_left_subtree = root_->left;
     Node *const new_left_subtree = CreateNode(std::forward<Args>(args)...);
     new_left_subtree->left = old_left_subtree;
-    Update(new_left_subtree);
+    new_left_subtree->update();
     root_->left = new_left_subtree;
-    Update(root_);
+    root_->update();
     root_ = Splay(root_, i);
     return *this;
   }
-  virtual ~SplayRope() { Clear(); }
+  ~SplayRope() { Clear(); }
 
 #ifdef EMCC_DEBUG
   size_t CountHeight() const { return CountHeight(root_); }
@@ -135,7 +138,7 @@ private:
     root_ = Splay(root_, i);
     if (!root_)
       return nullptr;
-    size_t j = root_->GetLeftSize();
+    size_t j = root_->left_size();
     if (i > j)
       return nullptr;
     assert(i == j);
@@ -159,9 +162,9 @@ private:
     }
     Node *const parent = node->right;
     node->right = parent->left;
-    Update(node);
+    node->update();
     parent->left = node;
-    Update(parent);
+    parent->update();
     return parent;
   };
 
@@ -174,16 +177,16 @@ private:
     }
     Node *const parent = node->left;
     node->left = parent->right;
-    Update(node);
+    node->update();
     parent->right = node;
-    Update(parent);
+    parent->update();
     return parent;
   }
 
   template <typename... Args>
   Node *CreateNode(Args &&...args) {
     Node *n = new Node(std::forward<Args>(args)...);
-    Update(n);
+    n->update();
     return n;
   }
 
@@ -228,13 +231,13 @@ private:
     if (node == nullptr)
       return nullptr;
     while (true) {
-      auto cmp = Compare(index, node);
+      auto cmp = Piece::Compare(index, node);
       if (cmp.order == 0)
         break;
       if (cmp.order < 0) {
         if (node->left == nullptr)
           break;
-        cmp = Compare(cmp.relative_index, node->left);
+        cmp = Piece::Compare(cmp.relative_index, node->left);
         if (cmp.order == 0) {
           node = RotateRight(node);
           break;
@@ -257,7 +260,7 @@ private:
       } else {
         if (node->right == nullptr)
           break;
-        cmp = Compare(cmp.relative_index, node->right);
+        cmp = Piece::Compare(cmp.relative_index, node->right);
         if (cmp.order == 0) {
           node = RotateLeft(node);
           break;

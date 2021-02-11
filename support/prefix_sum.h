@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "support/dynamic_array.h"
+#include "support/splay_rope.h"
 
 #include <cassert>
 #include <iostream>
@@ -10,46 +10,57 @@
 
 namespace emcc {
 
-namespace {
 template <typename Num>
-struct PrefixSumInfo {
-  Num value, sum;
+struct PrefixSumPiece : public DefaultPiece {
+  Num value, prefix_sum, sum;
+  using Super = DefaultPiece;
+  PrefixSumPiece() = default;
+
+  template <typename T>
+  static void UpdateNode(SplayRopeNode<T> *node) {
+    assert(node);
+    Super::UpdateNode(node);
+    PrefixSumPiece &piece = node->piece;
+    piece.prefix_sum =
+        piece.value + (node->left ? node->left->piece.sum : Num());
+    piece.sum =
+        piece.prefix_sum + (node->right ? node->right->piece.sum : Num());
+  }
 };
-} // namespace
 
 template <typename Num>
-class PrefixSum : public DynamicArray<PrefixSumInfo<Num>> {
+class PrefixSum : public SplayRope<PrefixSumPiece<Num>> {
 public:
-  using ElementTy = PrefixSumInfo<Num>;
-  using Super = DynamicArray<ElementTy>;
-  using DynamicArrayElementTy = DynamicArrayElement<ElementTy>;
+  using Super = SplayRope<PrefixSumPiece<Num>>;
+  using PieceTy = typename Super::PieceTy;
 
-  bool Add(size_t i, Num delta) {
-    Node *const node = Super::AtOrNull(i);
-    if (node == nullptr)
-      return false;
-    node->value.array_element.value += delta;
-    Update(node);
-    return true;
+  Num At(size_t i) {
+    if (i >= Super::size())
+      return Num();
+    PieceTy &piece = Super::At(i);
+    return piece.value;
   }
 
   PrefixSum &Insert(size_t i, Num x) {
-    ElementTy value;
-    value.value = x;
-    Super::Insert(i, std::move(value));
+    PieceTy piece;
+    piece.value = x;
+    Super::Insert(i, std::move(piece));
     return *this;
   }
 
-  Num At(size_t i) {
-    DynamicArrayElementTy &value = Super::At(i);
-    return value.array_element.value;
+  Num GetPrefixSum(size_t i) {
+    if (i >= Super::size())
+      return Num();
+    PieceTy &piece = Super::At(i);
+    return piece.prefix_sum;
   }
 
-  Num GetPrefixSum(size_t i) {
-    Node *const node = Super::AtOrNull(i);
-    if (!node)
-      return Num();
-    return GetLeftSum(node) + node->value.array_element.value;
+  bool Add(size_t i, Num delta) {
+    if (i >= Super::size())
+      return false;
+    PieceTy &piece = Super::At(i);
+    piece.value += delta;
+    return true;
   }
 
   // Find first i, GetPrefixSum(i) >= x.
@@ -77,24 +88,6 @@ public:
       mid = l + (r - l) / 2;
     }
     return r;
-  }
-
-private:
-  using Node = typename Super::Node;
-
-  Num GetLeftSum(Node *const node) {
-    assert(node);
-    if (node->left == nullptr)
-      return Num();
-    return node->left->value.array_element.sum;
-  }
-
-  virtual void Update(Node *const node) override {
-    Super::Update(node);
-    ElementTy &element = node->value.array_element;
-    element.sum = element.value +
-                  (node->left ? node->left->value.array_element.sum : Num()) +
-                  (node->right ? node->right->value.array_element.sum : Num());
   }
 };
 
