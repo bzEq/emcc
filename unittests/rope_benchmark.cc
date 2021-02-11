@@ -11,7 +11,7 @@
 
 namespace {
 
-using Rope = emcc::Rope<char, std::basic_string, 1UL << 13>;
+using Rope = emcc::Rope<char, std::basic_string, 1UL << 12>;
 
 TEST(RopeBenchmark, ExtRopeRandomInsert) {
   emcc::Random rnd(std::time(nullptr));
