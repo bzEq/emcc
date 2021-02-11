@@ -74,7 +74,7 @@ public:
       }
       mid = l + (r - l) / 2;
     }
-    return r;
+    return r < Super::size() ? r : ~0;
   }
 
   size_t UpperBound(Num x) {
@@ -87,7 +87,7 @@ public:
       }
       mid = l + (r - l) / 2;
     }
-    return r;
+    return r < Super::size() ? r : ~0;
   }
 };
 
