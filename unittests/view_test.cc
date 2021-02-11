@@ -19,4 +19,11 @@ TEST(ViewTest, Jump) {
   EXPECT_TRUE(JumpTo(80, {40, 1}, -100) == Cursor(20, 0));
 }
 
+TEST(ViewTest, ResetViewPort) {
+  Viewport v(120, 40);
+  const size_t N = 1UL << 10;
+  for (size_t i = 0; i < N; ++i)
+    v.Reset();
+}
+
 } // namespace

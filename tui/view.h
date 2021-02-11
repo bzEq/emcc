@@ -1,5 +1,6 @@
 #pragma once
 
+#include "editor/line_buffer.h"
 #include "support/dynamic_array.h"
 #include "support/prefix_sum.h"
 
@@ -51,54 +52,65 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
   };
 }
 
-// Used to map char's logical index to view cursor.
-class LineShape {
-public:
-  LineShape(int width) : width_(width) {}
-
-  int GetWidth(size_t i) { return index_.At(i); }
-
-  int width() const { return width_; }
-
-  LineShape &Insert(size_t i, int width) {
-    assert(width > 0);
-    index_.Insert(i, width);
-    return *this;
-  }
-
-  // Given offset find index.
-  size_t FindIndex(int distance) { return index_.UpperBound(distance); }
-
-  size_t size() const { return index_.size(); }
-
-private:
-  const int width_;
-  PrefixSum<int> index_;
+struct LogicalLocation {
+  size_t line, col;
+  LogicalLocation() : line(~0), col(~0) {}
 };
 
 class Viewport {
 public:
-  Viewport(int width) : width_(width), start_line_(0) {}
+  Viewport(int width, int height) : width_(width), height_(height) { Reset(); }
 
-  bool GetLineColumn(Cursor cursor, size_t &line, size_t &col) {
-    size_t index = SearchLineShape(cursor);
-    if (index == ~0)
-      return false;
-    line = start_line_ + index;
-    Cursor start = GetStartCursor(index);
-    LineShape &ls = view_.At(index);
-    int distance = WrapDistance(width_, start, cursor);
-    col = ls.FindIndex(distance);
-    if (col == ~0)
-      return false;
-    return true;
+  void Reset() {
+    locator_.clear();
+    locator_.resize(height_);
+    for (size_t i = 0; i < height_; ++i)
+      locator_[i].resize(width_);
   }
 
+  int width() const { return width_; }
+
+  int height() const { return height_; }
+
 private:
-  const int width_;
-  size_t start_line_;
-  DynamicArray<LineShape> view_;
-  PrefixSum<int> line_span_;
+  const int width_, height_;
+  // Mapping cursor to logical location in LineBuffer.
+  std::vector<std::vector<LogicalLocation>> locator_;
+};
+
+class WYSIWYGEditor {
+public:
+  WYSIWYGEditor(Viewport *view, LineBuffer *buffer)
+      : view_(view), x_(0), y_(0), buffer_(buffer) {}
+
+  WYSIWYGEditor &ChangeView(Viewport *view) {
+    view_ = view;
+    return *this;
+  }
+
+  WYSIWYGEditor &ReloadView(size_t start_line);
+
+  WYSIWYGEditor &Move(int y, int x) {
+    assert(x >= 0 && y >= 0);
+    y_ = std::min(y, view_->height() - 1);
+    x_ = std::min(x, view_->width() - 1);
+    return *this;
+  }
+
+  // Write c at (y, x).
+  // TODO: Support character occupying multiple boxes.
+  WYSIWYGEditor &Write(int c);
+
+  WYSIWYGEditor &Insert(int c);
+
+  WYSIWYGEditor &Delete();
+
+  WYSIWYGEditor &Backspace();
+
+private:
+  Viewport *view_;
+  int x_, y_;
+  LineBuffer *buffer_;
 };
 
 } // namespace emcc::tui
