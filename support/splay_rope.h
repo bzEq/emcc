@@ -9,9 +9,57 @@
 
 namespace emcc {
 
-template <typename Value>
+struct CompareResult {
+  int order;
+  size_t relative_index;
+};
+
+template <typename Piece>
+struct SplayRopeNode {
+  Piece piece;
+  SplayRopeNode *left, *right;
+  template <typename... Args>
+  SplayRopeNode(Args &&...arg)
+      : piece(std::forward<Args>(args)...), left(nullptr), right(nullptr) {}
+  void Update() { Piece::UpdateSize(this); }
+  size_t size() const { Piece::GetSize(this); }
+  size_t GetLeftSize() const { return left ? Piece::GetSize(left) : 0; }
+  size_t GetRightSize() const { return right ? Piece::GetSize(right) : 0; }
+};
+
+struct DefaultPiece {
+  size_t size;
+  DefaultPiece() : size(0) {}
+  static constexpr size_t kSinglePieceSize = 1;
+
+  static void UpdateSize(SplayRopeNode<DefaultPiece> *node) {
+    assert(node);
+    node->piece.size = kSinglePieceSize +
+                       (node->left ? node->left->piece.size : 0) +
+                       (node->right ? node->right->piece.size : 0);
+  }
+
+  static size_t GetSize(const SplayRopeNode<DefaultPiece> *node) {
+    assert(node);
+    return node->piece.size;
+  }
+
+  static CompareResult Compare(const size_t index,
+                               const SplayRopeNode<DefaultPiece> *node) {
+    size_t left_size = node->GetLeftSize();
+    static const size_t mid_size = kSinglePieceSize;
+    if (index < left_size)
+      return {-1, index};
+    if (index >= left_size && index < left_size + mid_size)
+      return {0, index - left_size};
+    return {1, index - (left_size + mid_size)};
+  }
+};
+
+template <typename Piece = DefaultPiece>
 class SplayRope {
 public:
+  using Node = SplayRopeNode<Piece>;
   SplayRope() : root_(nullptr) {}
   SplayRope(const SplayRope &) = delete;
   SplayRope(SplayRope &&other) : root_(nullptr) {
@@ -22,13 +70,13 @@ public:
     return *this;
   }
   void clear() { Clear(); }
-  size_t size() const { return root_ ? root_->size : 0; }
+  size_t size() const { return root_ ? root_->size() : 0; }
   bool empty() const { return size() == 0; }
-  Value &At(size_t i) {
+  Piece &At(size_t i) {
     assert(i < size());
     Node *const node = AtOrNull(i);
     assert(node);
-    return node->value;
+    return node->piece;
   }
   bool Remove(size_t i) {
     Node *const node = AtOrNull(i);
@@ -82,39 +130,7 @@ public:
   size_t CountHeight() const { return CountHeight(root_); }
 #endif
 
-protected:
-  struct Node {
-    Value value;
-    size_t size;
-    Node *left, *right;
-    template <typename... Args>
-    Node(Args &&...args)
-        : value(std::forward<Args>(args)...), size(0), left(nullptr),
-          right(nullptr) {}
-    size_t GetLeftSize() const { return left ? left->size : 0; }
-    size_t GetRightSize() const { return right ? right->size : 0; }
-    Node &UpdateSize() {
-      size = 1 + GetLeftSize() + GetRightSize();
-      return *this;
-    }
-  };
-
-  struct CompareResult {
-    int order;
-    size_t relative_index;
-  };
-
-  virtual CompareResult Compare(const size_t index, Node *const node) const {
-    size_t left_size = node->GetLeftSize();
-    if (index == left_size)
-      return {0, 0};
-    if (index < left_size)
-      return {-1, index};
-    return {1, index - (left_size + 1)};
-  }
-
-  virtual void Update(Node *const node) { node->UpdateSize(); }
-
+private:
   Node *AtOrNull(size_t i) {
     root_ = Splay(root_, i);
     if (!root_)
@@ -126,11 +142,6 @@ protected:
     return root_;
   }
 
-  virtual InsertNode(Node *const node, size_t index);
-
-  virtual SplitNode(Node *const node, size_t index);
-
-private:
 #ifdef EMCC_DEBUG
   size_t CountHeight(Node *const node) const {
     if (!node)
