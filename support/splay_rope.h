@@ -104,7 +104,7 @@ protected:
     size_t relative_index;
   };
 
-  virtual CompareResult Compare(size_t index, Node *const node) {
+  virtual CompareResult Compare(const size_t index, Node *const node) const {
     size_t left_size = node->GetLeftSize();
     if (index == left_size)
       return {0, 0};
@@ -125,6 +125,10 @@ protected:
     assert(i == j);
     return root_;
   }
+
+  virtual InsertNode(Node *const node, size_t index);
+
+  virtual SplitNode(Node *const node, size_t index);
 
 private:
 #ifdef EMCC_DEBUG
