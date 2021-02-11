@@ -11,10 +11,11 @@ struct DynamicArrayPiece : public DefaultPiece {
   DynamicArrayPiece(Args &&...args) : value(std::forward<Args>(args)...) {}
 };
 
-class DynamicArray : public SplayRope<DynamicArrayPiece> {
+template <typename Value>
+class DynamicArray : public SplayRope<DynamicArrayPiece<Value>> {
 public:
-  using Super = SplayRope<DynamicArrayPiece>;
-  using PieceTy = Super::PieceTy;
+  using Super = SplayRope<DynamicArrayPiece<Value>>;
+  using PieceTy = typename Super::PieceTy;
 
   Value &At(size_t i) {
     assert(i < Super::size());
