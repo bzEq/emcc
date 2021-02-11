@@ -1,5 +1,6 @@
 #pragma once
 
+#include "support/dynamic_array.h"
 #include "support/prefix_sum.h"
 
 #include <assert.h>
@@ -51,39 +52,53 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
 }
 
 // Used to map char's logical index to view cursor.
-class Block {
+class LineShape {
 public:
-  Block(int width, Cursor anchor) : width_(width), anchor_(anchor) {}
-
-  // Get start cursor of char indexed by i.
-  Cursor GetLoc(size_t i) {
-    if (i == 0)
-      return anchor_;
-    int distance = index_.GetPrefixSum(i - 1);
-    return JumpTo(width_, anchor_, distance);
-  }
+  LineShape(int width) : width_(width) {}
 
   int GetWidth(size_t i) { return index_.At(i); }
 
   int width() const { return width_; }
 
-  Block &Insert(size_t i, int width) {
+  LineShape &Insert(size_t i, int width) {
     assert(width > 0);
     index_.Insert(i, width);
     return *this;
   }
 
+  // Given offset find index.
+  size_t FindIndex(int distance) { return index_.UpperBound(distance); }
+
   size_t size() const { return index_.size(); }
 
-  size_t GetIndex(Cursor c) {
-    int distance = WrapDistance(width_, anchor_, c);
-    return index_.LowerBound(distance);
+private:
+  const int width_;
+  PrefixSum<int> index_;
+};
+
+class Viewport {
+public:
+  Viewport(int width) : width_(width), start_line_(0) {}
+
+  bool GetLineColumn(Cursor cursor, size_t &line, size_t &col) {
+    size_t index = SearchLineShape(cursor);
+    if (index == ~0)
+      return false;
+    line = start_line_ + index;
+    Cursor start = GetStartCursor(index);
+    LineShape &ls = view_.At(index);
+    int distance = WrapDistance(width_, start, cursor);
+    col = ls.FindIndex(distance);
+    if (col == ~0)
+      return false;
+    return true;
   }
 
 private:
   const int width_;
-  const Cursor anchor_;
-  PrefixSum<int> index_;
+  size_t start_line_;
+  DynamicArray<LineShape> view_;
+  PrefixSum<int> line_span_;
 };
 
 } // namespace emcc::tui
