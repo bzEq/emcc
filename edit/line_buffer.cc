@@ -149,7 +149,7 @@ bool LineBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
   return true;
 }
 
-bool LineBuffer::ComputeOffset(size_t &offset, size_t line, size_t col) {
+bool LineBuffer::ComputeOffset(size_t line, size_t col, size_t &offset) {
   if (line >= CountLines())
     return false;
   if (line == 0) {
@@ -158,6 +158,18 @@ bool LineBuffer::ComputeOffset(size_t &offset, size_t line, size_t col) {
   }
   offset = accumulate_size_.GetPrefixSum(line - 1) + col;
   return true;
+}
+
+std::unique_ptr<LineBuffer> CreateFromFile(const std::string &filename) {
+  MMapFile file(filename, 64UL << 20);
+  if (!file.is_open())
+    return nullptr;
+  auto buffer = std::make_unique<LineBuffer>();
+  for (auto block : file) {
+    for (size_t i = 0; i < block.size(); ++i)
+      buffer->Append(block.data[i]);
+  }
+  return buffer;
 }
 
 } // namespace emcc

@@ -127,6 +127,8 @@ public:
       std::swap(length, other.length);
     }
 
+    size_t size() const { return length; }
+
     ~Block() {
       if (data)
         munmap(data, length);
