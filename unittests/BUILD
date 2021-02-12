@@ -123,3 +123,15 @@ cc_test(
         "//tui:emcc_tui",
     ],
 )
+
+cc_test(
+    name = "mono_buffer_test",
+    srcs = [
+        "mono_buffer_test.cc",
+    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//edit:emcc_edit",
+    ],
+)
