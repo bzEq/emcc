@@ -19,6 +19,10 @@ public:
 
   void RenderRange(const Framebuffer &fb, Cursor begin, Cursor end);
 
+  void DrawCursor(Cursor c);
+
+  void Refresh() { wrefresh(window_); }
+
 private:
   WINDOW *window_;
 };

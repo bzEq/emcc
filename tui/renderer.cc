@@ -23,4 +23,12 @@ void NcursesRenderer::RenderFull(const Framebuffer &fb) {
   RenderRange(fb, begin, end);
 }
 
+void NcursesRenderer::DrawCursor(Cursor c) {
+  int max_y, max_x;
+  GetMaxYX(max_y, max_x);
+  Cursor boundary(max_y, max_x);
+  if (c < boundary)
+    wmove(window_, c.y, c.x);
+}
+
 } // namespace emcc::tui
