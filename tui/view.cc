@@ -76,9 +76,8 @@ void Page::FillFrame(Cursor begin, Cursor end) {
   // std::cout << end.y << " " << end.x << std::endl;
   for (Cursor current = begin; !Cursor::IsBeyond(current, end);
        current = JumpTo(width(), current, 1)) {
-    if (Cursor::IsBeyond(current, GetBoundary()))
-      break;
-    if (Cursor::IsBeyond(current, framebuffer_->GetBoundary()))
+    if (Cursor::IsBeyond(current, GetBoundary()) ||
+        Cursor::IsBeyond(current, framebuffer_->GetBoundary()))
       break;
     Point p = Get(current.y, current.x);
     Pixel pixel;
