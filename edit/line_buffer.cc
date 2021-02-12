@@ -141,4 +141,23 @@ bool LineBuffer::SaveFile(const std::string &filename) {
   return !::rename(tempfile.c_str(), filename.c_str());
 }
 
+bool LineBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
+  line = accumulate_size_.UpperBound(offset);
+  if (line == decltype(accumulate_size_)::npos)
+    return false;
+  col = offset - accumulate_size_.GetPrefixSum(line);
+  return true;
+}
+
+bool LineBuffer::ComputeOffset(size_t &offset, size_t line, size_t col) {
+  if (line >= CountLines())
+    return false;
+  if (line == 0) {
+    offset = col;
+    return true;
+  }
+  offset = accumulate_size_.GetPrefixSum(line - 1) + col;
+  return true;
+}
+
 } // namespace emcc
