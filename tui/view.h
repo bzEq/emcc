@@ -34,7 +34,10 @@ public:
   void ScrollUp(size_t);
   void ScrollDown(size_t);
 
+  const Point &Get(int y, int x) const;
+
 private:
+  std::vector<std::vector<Point>> page_;
 };
 
 // Graphical representation of a point.
@@ -69,6 +72,10 @@ public:
     line.emplace(line.begin() + x, std::forward<Args>(args)...);
     return *this;
   }
+
+  void FillRange(const Page &page, Cursor begin, Cursor end);
+
+  void FillFull(const Page &page);
 
 private:
   size_t width_, height_;
