@@ -53,73 +53,48 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
   };
 }
 
-struct LogicalLocation {
-  size_t line, col;
-  LogicalLocation() : line(~0), col(~0) {}
-  LogicalLocation(size_t line, size_t col) : line(line), col(col) {}
+// Map a character graphical position to logical position.
+struct Point {
+  uint8_t offset; // A character might span multiple points.
+  struct {
+    size_t line, col;
+  } position; // Position at text buffer.
+  Point() : offset(0), position{~0, ~0} {}
 };
 
-class Viewport {
+class Page {};
+
+// Graphical representation of a point.
+struct Pixel {
+  int character;
+  Pixel(int c) : character(c) {}
+};
+
+// Graphical representation of a page.
+class Framebuffer {
 public:
-  Viewport(int width, int height) : width_(width), height_(height) { Reset(); }
+  Framebuffer(size_t width, size_t height) : width_(width), height_(height) {
+    Reset();
+  }
 
   void Reset() {
-    locator_.clear();
-    locator_.resize(height_);
-    for (size_t i = 0; i < height_; ++i)
-      locator_[i].resize(width_);
+    frame_.resize(height_);
+    for (size_t i = 0; i < frame_.size(); ++i)
+      frame_[i].resize(width_);
   }
+
+  const Pixel &Get(size_t y, size_t x) const { return frame_[y][x]; }
 
   template <typename... Args>
-  Viewport &Set(int y, int x, Args &&...args) {
-    locator_[y][x] = LogicalLocation(std::forward<Args>(args)...);
+  Framebuffer &Set(size_t y, size_t x, Args &&...args) {
+    auto &line = frame_[y];
+    line.emplace(line.begin() + x, std::forward<Args>(args)...);
     return *this;
   }
-
-  int width() const { return width_; }
-
-  int height() const { return height_; }
 
 private:
-  const int width_, height_;
-  // Mapping cursor to logical location in LineBuffer.
-  std::vector<std::vector<LogicalLocation>> locator_;
-};
-
-class WYSIWYGEditor {
-public:
-  WYSIWYGEditor(WINDOW *curse_win, Viewport *view, LineBuffer *buffer)
-      : curse_win_(curse_win), view_(view), x_(0), y_(0), buffer_(buffer) {}
-
-  WYSIWYGEditor &ChangeView(Viewport *view) {
-    view_ = view;
-    return *this;
-  }
-
-  WYSIWYGEditor &ReloadView(size_t start_line);
-
-  WYSIWYGEditor &Move(int y, int x) {
-    assert(x >= 0 && y >= 0);
-    y_ = std::min(y, view_->height() - 1);
-    x_ = std::min(x, view_->width() - 1);
-    return *this;
-  }
-
-  // Write c at (y, x).
-  // TODO: Support character occupying multiple boxes.
-  bool Write(int c);
-
-  WYSIWYGEditor &Insert(int c);
-
-  WYSIWYGEditor &Delete();
-
-  WYSIWYGEditor &Backspace();
-
-private:
-  WINDOW *curse_win_;
-  Viewport *view_;
-  int x_, y_;
-  LineBuffer *buffer_;
+  size_t width_, height_;
+  std::vector<std::vector<Pixel>> frame_;
 };
 
 } // namespace emcc::tui
