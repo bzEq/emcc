@@ -12,10 +12,10 @@ namespace emcc::tui {
 class StreamInterpreter;
 class Terminal;
 
-class App {
+class WYSIWYGEditor {
 public:
-  App(Terminal &input, StreamInterpreter &interpreter, Terminal &output,
-      LineBuffer &buffer)
+  WYSIWYGEditor(Terminal &input, StreamInterpreter &interpreter,
+                Terminal &output, LineBuffer &buffer)
       : input_(input), interpreter_(interpreter), output_(output),
         buffer_(buffer) {}
 
