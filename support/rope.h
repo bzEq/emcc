@@ -268,6 +268,7 @@ private:
   }
 
 public:
+  static constexpr size_t npos = ~0UL;
   Rope() : root_(nullptr) {}
 
   Rope(const Piece &p) : root_(nullptr) { Append(p); }

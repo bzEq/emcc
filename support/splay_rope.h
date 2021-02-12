@@ -60,8 +60,10 @@ struct DefaultPiece {
 template <typename Piece = DefaultPiece>
 class SplayRope {
 public:
+  static constexpr size_t npos = ~0UL;
   using PieceTy = Piece;
   using Node = SplayRopeNode<Piece>;
+
   SplayRope() : root_(nullptr) {}
   SplayRope(const SplayRope &) = delete;
   SplayRope(SplayRope &&other) : root_(nullptr) {
