@@ -50,8 +50,8 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
     dy -= 1;
   }
   return Cursor{
-      origin.x + dx,
       origin.y + dy,
+      origin.x + dx,
   };
 }
 

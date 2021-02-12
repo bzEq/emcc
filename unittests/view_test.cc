@@ -1,4 +1,4 @@
-#include "tui/view.h"
+#include "tui/basis.h"
 
 #include <gtest/gtest.h>
 
@@ -6,17 +6,17 @@ namespace {
 using namespace emcc::tui;
 
 TEST(ViewTest, Distance) {
-  EXPECT_TRUE(WrapDistance(80, {0, 0}, {0, 1}) == 80);
-  EXPECT_TRUE(WrapDistance(80, {0, 1}, {0, 0}) == -80);
-  EXPECT_TRUE(WrapDistance(80, {40, 0}, {20, 1}) == 60);
-  EXPECT_TRUE(WrapDistance(80, {20, 1}, {40, 0}) == -60);
-  EXPECT_TRUE(WrapDistance(80, {20, 0}, {40, 1}) == 100);
-  EXPECT_TRUE(WrapDistance(80, {40, 1}, {20, 0}) == -100);
+  EXPECT_TRUE(WrapDistance(80, {0, 0}, {1, 0}) == 80);
+  EXPECT_TRUE(WrapDistance(80, {1, 0}, {0, 0}) == -80);
+  EXPECT_TRUE(WrapDistance(80, {0, 40}, {1, 20}) == 60);
+  EXPECT_TRUE(WrapDistance(80, {1, 20}, {0, 40}) == -60);
+  EXPECT_TRUE(WrapDistance(80, {0, 20}, {1, 40}) == 100);
+  EXPECT_TRUE(WrapDistance(80, {1, 40}, {0, 20}) == -100);
 }
 
 TEST(ViewTest, Jump) {
-  EXPECT_TRUE(JumpTo(80, {20, 1}, -60) == Cursor(40, 0));
-  EXPECT_TRUE(JumpTo(80, {40, 1}, -100) == Cursor(20, 0));
+  EXPECT_TRUE(JumpTo(80, {1, 20}, -60) == Cursor(0, 40));
+  EXPECT_TRUE(JumpTo(80, {1, 40}, -100) == Cursor(0, 20));
 }
 
 } // namespace
