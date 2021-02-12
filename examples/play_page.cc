@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   page.Reload(0);
   page.FillFrame(Cursor(0, 0), page.GetBoundary());
   renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
-  // renderer.DrawCursor(Cursor(0, 0));
+  renderer.DrawCursor(Cursor(0, 0));
   renderer.Refresh();
   while (true) {
     if (getch() == 27)
