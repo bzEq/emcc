@@ -73,3 +73,17 @@ cc_binary(
         "//tui:emcc_tui",
     ],
 )
+
+cc_binary(
+    name = "fill_page",
+    srcs = ["fill_page.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS + [
+        "-lncurses",
+    ],
+    deps = [
+        "//edit:emcc_edit",
+        "//support:emcc_support",
+        "//tui:emcc_tui",
+    ],
+)
