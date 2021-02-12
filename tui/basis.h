@@ -6,9 +6,9 @@
 namespace emcc::tui {
 
 struct Cursor {
-  int x, y;
-  Cursor() : x(), y() {}
-  Cursor(int x, int y) : x(x), y(y) {}
+  int y, x;
+  Cursor() : y(), x() {}
+  Cursor(int y, int x) : y(y), x(x) {}
   bool operator<(const Cursor &other) const {
     if (y < other.y)
       return true;
@@ -19,12 +19,19 @@ struct Cursor {
   bool operator==(const Cursor &other) const {
     return x == other.x && y == other.y;
   }
+  bool operator!=(const Cursor &other) const { return !(*this == other); }
   bool operator>(const Cursor &other) const {
     if (y > other.y)
       return true;
     if (y == other.y)
       return x > other.x;
     return false;
+  }
+  bool operator>=(const Cursor &other) const {
+    return *this == other || *this > other;
+  }
+  bool operator<=(const Cursor &other) const {
+    return *this == other || *this < other;
   }
 };
 

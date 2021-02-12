@@ -11,11 +11,22 @@ namespace emcc::tui {
 
 // Map a character graphical position to logical position.
 struct Point {
-  uint8_t offset; // A character might span multiple points.
-  struct {
-    size_t line, col;
-  } position; // Position at text buffer.
-  Point() : offset(0), position{~0U, ~0U} {}
+  uint8_t offset;   // A character might span multiple points.
+  size_t line, col; // Position at text buffer.
+  Point() : offset(~0), line(~0U), col(~0U) {}
+  bool operator==(const Point &other) {
+    return memcmp(this, &other, sizeof(*this)) == 0;
+  }
+  Point &operator=(const Point &other) {
+    memcpy(this, &other, sizeof(*this));
+    return *this;
+  }
+  bool CompareAndUpdate(const Point &other) {
+    if (*this == other)
+      return false;
+    *this = other;
+    return true;
+  }
 };
 
 class Page {
@@ -39,6 +50,10 @@ public:
   Framebuffer(size_t width, size_t height) : width_(width), height_(height) {
     Reset();
   }
+
+  size_t width() const { return width_; }
+
+  size_t height() const { return height_; }
 
   void Reset() {
     frame_.resize(height_);
