@@ -172,4 +172,13 @@ std::unique_ptr<LineBuffer> CreateFromFile(const std::string &filename) {
   return buffer;
 }
 
+bool LineBuffer::Get(size_t line, size_t col, char &c) {
+  if (line >= CountLines())
+    return false;
+  auto l = buffer_.At(line);
+  if (col >= l->size())
+    return false;
+  return l->At(col);
+}
+
 } // namespace emcc

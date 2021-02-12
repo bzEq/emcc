@@ -4,21 +4,35 @@
 
 namespace emcc::tui {
 
+Cursor Page::GetBoundary() const { return Cursor(height(), width()); }
+
 void Page::Reload(size_t start_line) {
   Reset();
-  Cursor c(0, 0);
-  for (size_t i = start_line; i < buffer_->CountLines(); ++i) {
+  Cursor pos(0, 0);
+  for (size_t i = start_line; i < buffer_->CountLines() && pos < GetBoundary();
+       ++i) {
+    size_t n = 0;
     std::string content;
     buffer_->GetLine(i, ~0, content);
-    for (size_t j = 0; j < content.size(); ++j) {
-      char c = content[j];
+    for (size_t j = 0; j < content.size() && pos < GetBoundary(); ++j) {
+      n = WriteTo(i, j, pos);
+      if (n == 0)
+        break;
+      if (content[j] == LineBuffer::kNewLine) {
+        pos.y++;
+        pos.x = 0;
+      } else {
+        pos = JumpTo(width(), pos, n);
+      }
     }
+    if (n == 0)
+      break;
   }
 }
 
 bool Page::Erase(Cursor pos) {
   Cursor current = pos;
-  Cursor boundary(height(), width());
+  Cursor boundary(GetBoundary());
   if (current >= boundary)
     return false;
   Point point = page_[current.y][current.x];
@@ -35,21 +49,21 @@ bool Page::Erase(Cursor pos) {
   return true;
 }
 
-size_t Page::WriteAt(Cursor pos, char c) {
-  // Erase content first.
+size_t Page::WriteTo(size_t line, size_t col, Cursor pos) {
+  Cursor boundary(GetBoundary());
+  if (pos >= boundary || pos.y < 0)
+    return 0;
+  Point point = page_[pos.y][pos.x];
+  // Avoid writing at the middle of a character.
+  if (!point.is_start())
+    return 0;
+  // Erase this point first.
   if (!Erase(pos))
     return 0;
-  switch (c) {
-  case LineBuffer::kNewLine: {
-    break;
-  }
-  case '\t': {
-    break;
-  }
-  default: {
-    break;
-  }
-  }
+  Point new_point = Point::MakeStartPoint(line, col, 1);
+  if (new_point == point)
+    return 0;
+  page_[pos.y][pos.x] = std::move(new_point);
   return 1;
 }
 

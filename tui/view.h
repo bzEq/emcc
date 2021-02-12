@@ -89,7 +89,8 @@ public:
   size_t width() const { return width_; }
   size_t height() const { return height_; }
   bool Erase(Cursor pos);
-  size_t WriteAt(Cursor pos, char c);
+  size_t WriteTo(size_t line, size_t col, Cursor pos);
+  Cursor GetBoundary() const;
 
 private:
   LineBuffer *buffer_;

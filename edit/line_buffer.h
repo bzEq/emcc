@@ -23,6 +23,7 @@ public:
     return accumulate_size_.GetPrefixSum(line);
   }
   size_t CountChars();
+  bool Get(size_t line, size_t col, char &c);
   size_t GetLine(size_t line, size_t limit, std::string &content);
   LineBuffer &Insert(size_t line, size_t column, char c);
   LineBuffer &Append(size_t line, char c) { return Insert(line, ~0, c); }
