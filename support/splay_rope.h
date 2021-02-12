@@ -57,6 +57,7 @@ struct DefaultPiece {
   }
 };
 
+// TODO: Support non-trivial Piece.
 template <typename Piece = DefaultPiece>
 class SplayRope {
 public:
