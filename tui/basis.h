@@ -9,30 +9,10 @@ struct Cursor {
   int y, x;
   Cursor() : y(), x() {}
   Cursor(int y, int x) : y(y), x(x) {}
-  bool operator<(const Cursor &other) const {
-    if (y < other.y)
-      return true;
-    if (y == other.y)
-      return x < other.x;
-    return false;
-  }
   bool operator==(const Cursor &other) const {
     return x == other.x && y == other.y;
   }
   bool operator!=(const Cursor &other) const { return !(*this == other); }
-  bool operator>(const Cursor &other) const {
-    if (y > other.y)
-      return true;
-    if (y == other.y)
-      return x > other.x;
-    return false;
-  }
-  bool operator>=(const Cursor &other) const {
-    return *this == other || *this > other;
-  }
-  bool operator<=(const Cursor &other) const {
-    return *this == other || *this < other;
-  }
   static bool IsBeyond(Cursor pos, Cursor boundary) {
     if (pos.y < 0 || pos.x < 0)
       return true;

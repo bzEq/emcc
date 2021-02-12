@@ -35,7 +35,7 @@ void Page::Reload(size_t start_line) {
 bool Page::Erase(Cursor pos) {
   Cursor current = pos;
   Cursor boundary(GetBoundary());
-  if (current >= boundary)
+  if (Cursor::IsBeyond(current, boundary))
     return false;
   Point point = page_[current.y][current.x];
   if (!point.is_start()) {
@@ -45,7 +45,8 @@ bool Page::Erase(Cursor pos) {
   if (pos.y < 0) {
     current.y = current.x = 0;
   }
-  for (; current <= pos; current = JumpTo(width(), current, 1)) {
+  for (; !Cursor::IsBeyond(current, JumpTo(width(), pos, 1));
+       current = JumpTo(width(), current, 1)) {
     page_[current.y][current.x].Reset();
   }
   return true;
