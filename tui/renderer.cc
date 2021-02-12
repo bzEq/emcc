@@ -10,7 +10,7 @@ void NcursesRenderer::RenderRange(const Framebuffer &fb, Cursor begin,
   GetMaxYX(max_y, max_x);
   Cursor boundary(max_y, max_x);
   for (Cursor c = begin; c != end; c = JumpTo(fb.width(), c, 1)) {
-    if (c >= boundary)
+    if (Cursor::IsBeyond(c, boundary) || Cursor::IsBeyond(c, fb.GetBoundary()))
       break;
     Pixel p = fb.Get(c.y, c.x);
     mvwaddch(window_, c.y, c.x, p.character);
@@ -27,7 +27,7 @@ void NcursesRenderer::DrawCursor(Cursor c) {
   int max_y, max_x;
   GetMaxYX(max_y, max_x);
   Cursor boundary(max_y, max_x);
-  if (c < boundary)
+  if (!Cursor::IsBeyond(c, boundary))
     wmove(window_, c.y, c.x);
 }
 

@@ -33,6 +33,11 @@ struct Cursor {
   bool operator<=(const Cursor &other) const {
     return *this == other || *this < other;
   }
+  static bool IsBeyond(Cursor pos, Cursor boundary) {
+    if (pos.y < 0 || pos.x < 0)
+      return true;
+    return pos.y >= boundary.y || pos.x >= boundary.x;
+  }
 };
 
 inline int WrapDistance(const int wrap_width, Cursor a, Cursor b) {
@@ -48,10 +53,12 @@ inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
   if (origin.x + dx < 0) {
     dx += wrap_width;
     dy -= 1;
+  } else if (origin.x + dx >= wrap_width) {
+    dy += 1;
   }
   return Cursor{
       origin.y + dy,
-      origin.x + dx,
+      (origin.x + dx) % wrap_width,
   };
 }
 

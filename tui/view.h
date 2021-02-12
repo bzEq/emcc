@@ -70,11 +70,15 @@ struct Point {
   }
 };
 
+class Framebuffer;
+
 class Page {
 public:
   static constexpr size_t kTabWidth = 2;
-  Page(LineBuffer *buffer, size_t width, size_t height)
-      : buffer_(buffer), width_(width), height_(height) {
+  Page(LineBuffer *buffer, Framebuffer *framebuffer, size_t width,
+       size_t height)
+      : buffer_(buffer), framebuffer_(framebuffer), width_(width),
+        height_(height) {
     Reset();
   }
   void Reset() {
@@ -84,16 +88,18 @@ public:
   }
   void ScrollUp(size_t);
   void ScrollDown(size_t);
-  const Point &Get(int y, int x) const;
+  const Point &Get(int y, int x) const { return page_[y][x]; }
   void Reload(size_t start_line);
   size_t width() const { return width_; }
   size_t height() const { return height_; }
   bool Erase(Cursor pos);
   size_t WriteTo(size_t line, size_t col, Cursor pos);
   Cursor GetBoundary() const;
+  void FillFrame(Cursor begin, Cursor end);
 
 private:
   LineBuffer *buffer_;
+  Framebuffer *framebuffer_;
   size_t width_, height_;
   std::vector<std::vector<Point>> page_;
 };
@@ -131,9 +137,7 @@ public:
     return *this;
   }
 
-  void FillRange(const Page &page, Cursor begin, Cursor end);
-
-  void FillFull(const Page &page);
+  Cursor GetBoundary() const { return Cursor(height(), width()); }
 
 private:
   size_t width_, height_;

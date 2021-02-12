@@ -160,7 +160,8 @@ bool LineBuffer::ComputeOffset(size_t line, size_t col, size_t &offset) {
   return true;
 }
 
-std::unique_ptr<LineBuffer> CreateFromFile(const std::string &filename) {
+std::unique_ptr<LineBuffer>
+LineBuffer::CreateFromFile(const std::string &filename) {
   MMapFile file(filename, 64UL << 20);
   if (!file.is_open())
     return nullptr;
@@ -178,7 +179,8 @@ bool LineBuffer::Get(size_t line, size_t col, char &c) {
   auto l = buffer_.At(line);
   if (col >= l->size())
     return false;
-  return l->At(col);
+  c = l->At(col);
+  return true;
 }
 
 } // namespace emcc
