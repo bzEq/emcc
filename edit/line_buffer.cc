@@ -143,7 +143,7 @@ bool LineBuffer::SaveFile(const std::string &filename) {
 
 bool LineBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
   line = accumulate_size_.UpperBound(offset);
-  if (line == decltype(accumulate_size_)::npos)
+  if (line == accumulate_size_.size())
     return false;
   col = offset - accumulate_size_.GetPrefixSum(line);
   return true;
