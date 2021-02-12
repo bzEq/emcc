@@ -1,4 +1,4 @@
-#include "editor/line_buffer.h"
+#include "edit/line_buffer.h"
 #include "support/sys.h"
 
 #include <cstdio>
@@ -120,7 +120,7 @@ size_t LineBuffer::Erase(size_t l, size_t column, size_t len) {
   }
   Line tail = mid.Split(len);
   line->Concat(std::move(tail));
-  accumulate_size_.Add(l, -mid.size());  
+  accumulate_size_.Add(l, -mid.size());
   return mid.size();
 }
 

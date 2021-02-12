@@ -1,8 +1,9 @@
 #pragma once
 
-#include "editor/line_buffer.h"
+#include "edit/line_buffer.h"
 #include "support/dynamic_array.h"
 #include "support/prefix_sum.h"
+#include "tui/basis.h"
 
 #include <assert.h>
 #include <iostream>

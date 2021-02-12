@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "editor/line_buffer.h"
+#include "edit/line_buffer.h"
 #include "support/chan.h"
 #include "support/misc.h"
 #include "tui/basis.h"

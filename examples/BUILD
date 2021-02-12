@@ -15,7 +15,7 @@ cc_binary(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//editor:emcc_editor",
+        "//edit:emcc_edit",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_binary(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//editor:emcc_editor",
+        "//edit:emcc_edit",
     ],
 )
 
@@ -35,7 +35,7 @@ cc_binary(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//editor:emcc_editor",
+        "//edit:emcc_edit",
         "//support:emcc_support",
         "@fmt",
     ],
@@ -47,7 +47,7 @@ cc_binary(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//editor:emcc_editor",
+        "//edit:emcc_edit",
     ],
 )
 

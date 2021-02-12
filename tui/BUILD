@@ -13,7 +13,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//editor:emcc_editor",
+        "//edit:emcc_edit",
         "//support:emcc_support",
     ],
 )

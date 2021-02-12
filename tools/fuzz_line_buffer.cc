@@ -1,4 +1,4 @@
-#include "editor/line_buffer.h"
+#include "edit/line_buffer.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -12,7 +12,7 @@ int main() {
     switch (cmd) {
     case 'i':
       scanf("%zu %zu %zu", &l, &c, &len);
-      printf("i %zu %zu %zu\n", l, c, len);      
+      printf("i %zu %zu %zu\n", l, c, len);
       for (size_t i = 0; i < len; ++i)
         buffer.Insert(l, c, '0');
       buffer.Insert(l, ~0, '\n');

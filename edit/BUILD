@@ -1,5 +1,5 @@
 cc_library(
-    name = "emcc_editor",
+    name = "emcc_edit",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     copts = [

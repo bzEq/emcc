@@ -1,4 +1,4 @@
-#include "editor/line_buffer.h"
+#include "edit/line_buffer.h"
 #include "support/random.h"
 
 #include <cassert>
