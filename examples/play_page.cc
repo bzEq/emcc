@@ -17,13 +17,15 @@ int main(int argc, char *argv[]) {
   raw();
   noecho();
   NcursesRenderer renderer(stdscr);
-  size_t height = 40, width = 120;
+  int height, width;
+  renderer.GetMaxYX(height, width);
+  height -= 8;
   Framebuffer framebuffer(width, height);
   Page page(buffer.get(), &framebuffer, width, height);
   page.Reload(0);
   page.FillFrame(Cursor(0, 0), page.GetBoundary());
   renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
-  renderer.DrawCursor(Cursor(0, 0));
+  // renderer.DrawCursor(Cursor(0, 0));
   renderer.Refresh();
   while (true) {
     if (getch() == 27)
