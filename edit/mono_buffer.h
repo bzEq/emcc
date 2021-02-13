@@ -17,7 +17,6 @@ public:
   MonoBuffer() {}
   size_t CountLines();
   size_t CountChars() { return buffer_.size(); }
-  size_t GetAccumulateChars(size_t line);
   bool Get(size_t line, size_t col, char &c);
   bool Get(size_t offset, char &c);
   size_t GetLine(size_t line, size_t limit, std::string &content);
@@ -26,7 +25,7 @@ public:
   MonoBuffer &Append(size_t line, char c) { return Insert(line, ~0, c); }
   MonoBuffer &Append(char c);
   MonoBuffer &Concat(MonoBuffer &&other);
-  MonoBuffer Split(size_t line);
+  MonoBuffer Split(size_t offset);
   size_t Erase(size_t line, size_t column, size_t len);
   size_t Erase(size_t line, size_t column, size_t len, MonoBuffer &erased);
   bool SaveFile(const std::string &filename);

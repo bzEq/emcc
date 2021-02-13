@@ -1,6 +1,5 @@
 #pragma once
 
-#include "edit/line_buffer.h"
 #include "edit/mono_buffer.h"
 #include "support/dynamic_array.h"
 #include "support/prefix_sum.h"

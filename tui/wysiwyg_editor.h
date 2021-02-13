@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "edit/line_buffer.h"
+#include "edit/mono_buffer.h"
 #include "support/chan.h"
 #include "support/misc.h"
 #include "tui/basis.h"
@@ -15,7 +15,7 @@ class Terminal;
 class WYSIWYGEditor {
 public:
   WYSIWYGEditor(Terminal &input, StreamInterpreter &interpreter,
-                Terminal &output, LineBuffer &buffer)
+                Terminal &output, MonoBuffer &buffer)
       : input_(input), interpreter_(interpreter), output_(output),
         buffer_(buffer) {}
 
@@ -28,7 +28,7 @@ private:
   StreamInterpreter &interpreter_;
   CommandQueueTy command_queue_;
   Terminal &output_;
-  LineBuffer &buffer_;
+  MonoBuffer &buffer_;
 };
 
 } // namespace emcc::tui

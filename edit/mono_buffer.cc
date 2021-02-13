@@ -18,6 +18,12 @@ bool MonoBuffer::Get(size_t line, size_t col, char &c) {
   return Get(offset, c);
 }
 
+MonoBuffer &MonoBuffer::Insert(size_t line, size_t col, char c) {
+  size_t offset;
+  ComputeOffset(line, col, offset);
+  return Insert(offset, c);
+}
+
 MonoBuffer &MonoBuffer::Insert(size_t offset, char c) {
   offset = std::min(buffer_.size(), offset);
   size_t line, col;
