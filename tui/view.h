@@ -38,7 +38,7 @@ struct Point {
     return true;
   }
   bool is_start() const {
-    return type_offset_pair >> (sizeof(type_offset_pair) - 1);
+    return type_offset_pair >> (sizeof(type_offset_pair) * 8 - 1);
   }
   size_t offset() const {
     return type_offset_pair &
@@ -97,8 +97,6 @@ public:
     for (size_t i = 0; i < page_.size(); ++i)
       page_[i].resize(width_);
   }
-  void ScrollUp(size_t);
-  void ScrollDown(size_t);
   const Point &Get(int y, int x) const { return page_[y][x]; }
   void Reload(size_t start_line);
   size_t width() const { return width_; }
