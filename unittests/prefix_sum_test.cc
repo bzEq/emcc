@@ -113,6 +113,7 @@ TEST(PrefixSumTest, Benchmark1) {
     size_t n = rnd.Next() * s.size();
     s.At(n);
   }
+  EXPECT_TRUE(s.height() < 200);
 }
 
 } // namespace

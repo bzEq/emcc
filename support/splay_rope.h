@@ -18,10 +18,22 @@ template <typename Piece>
 struct SplayRopeNode {
   Piece piece;
   SplayRopeNode *left, *right;
+#ifdef EMCC_DEBUG
+  size_t height;
+#endif
   template <typename... Args>
   SplayRopeNode(Args &&...args)
-      : piece(std::forward<Args>(args)...), left(nullptr), right(nullptr) {}
-  void update() { Piece::UpdateNode(this); }
+      : piece(std::forward<Args>(args)...), left(nullptr), right(nullptr) {
+#ifdef EMCC_DEBUG
+    height = 1;
+#endif
+  }
+  void update() {
+#ifdef EMCC_DEBUG
+    height = 1 + std::max(left ? left->height : 0, right ? right->height : 0);
+#endif
+    Piece::UpdateNode(this);
+  }
   size_t size() const { return Piece::GetSize(this); }
   size_t left_size() const { return left ? Piece::GetSize(left) : 0; }
   size_t right_size() const { return right ? Piece::GetSize(right) : 0; }
@@ -133,10 +145,14 @@ public:
   ~SplayRope() { Clear(); }
 
 #ifdef EMCC_DEBUG
-  size_t CountHeight() const { return CountHeight(root_); }
+  size_t height() const { return GetHeight(root_); }
 #endif
 
 private:
+#ifdef EMCC_DEBUG
+  size_t GetHeight(Node *const node) const { return node ? node->height : 0; }
+#endif
+
   Node *AtOrNull(size_t i) {
     root_ = Splay(root_, i);
     if (!root_)
@@ -147,14 +163,6 @@ private:
     assert(i == j);
     return root_;
   }
-
-#ifdef EMCC_DEBUG
-  size_t CountHeight(Node *const node) const {
-    if (!node)
-      return 0;
-    return std::max(CountHeight(node->left), CountHeight(node->right)) + 1;
-  }
-#endif
 
   Node *RotateLeft(Node *const node) {
     if (node == nullptr) {

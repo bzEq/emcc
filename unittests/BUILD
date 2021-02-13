@@ -105,7 +105,9 @@ cc_test(
     srcs = [
         "prefix_sum_test.cc",
     ],
-    copts = COPTS,
+    copts = COPTS + [
+        "-DEMCC_DEBUG",
+    ],
     linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
