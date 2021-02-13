@@ -19,6 +19,10 @@ MonoBuffer &MonoBuffer::Insert(size_t offset, char c) {
     assert(line == line_size_.size());
     line_size_.Insert(line, 0);
   }
+  if (offset != 0 && buffer_.At(offset - 1) == kNewLine) {
+    ++line;
+    col = 0;
+  }
   buffer_.Insert(offset, c);
   line_size_.Add(line, 1);
   if (c == kNewLine) {
@@ -35,12 +39,9 @@ void MonoBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
   line = line_size_.LowerBound(offset);
   if (line == line_size_.size()) {
     col = 0;
-    return;
-  }
-  if (line == 0)
-    col = offset;
-  else
+  } else {
     col = offset - line_size_.GetPrefixSum(line - 1);
+  }
 }
 
 size_t MonoBuffer::CountLines() {
