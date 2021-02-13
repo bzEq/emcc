@@ -28,3 +28,13 @@ cc_binary(
         "//edit:emcc_edit",
     ],
 )
+
+cc_binary(
+    name = "fuzz_mono_buffer",
+    srcs = ["fuzz_mono_buffer.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//edit:emcc_edit",
+    ],
+)
