@@ -67,4 +67,15 @@ TEST(RopeBenchmark, SmallPiece) {
   }
 }
 
+TEST(RopeBenchmark, RopeAppendAndRandomInsert) {
+  emcc::Random rnd(std::time(nullptr));
+  Rope rope;
+  for (size_t i = 0; i < 10000000; ++i) {
+    rope.Append('0');
+  }
+  for (size_t i = 0; i < 100000; ++i) {
+    rope.At(rnd.NextInt() % rope.size());
+  }
+}
+
 } // namespace
