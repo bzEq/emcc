@@ -26,6 +26,7 @@ public:
   MonoBuffer &Append(char c);
   MonoBuffer &Concat(MonoBuffer &&other);
   MonoBuffer Split(size_t offset);
+  size_t Erase(size_t offset, size_t len);
   size_t Erase(size_t line, size_t column, size_t len);
   size_t Erase(size_t line, size_t column, size_t len, MonoBuffer &erased);
   bool SaveFile(const std::string &filename);

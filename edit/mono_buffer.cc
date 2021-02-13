@@ -87,4 +87,51 @@ MonoBuffer::CreateFromFile(const std::string &filename) {
   return buffer;
 }
 
+size_t MonoBuffer::Erase(size_t line, size_t col, size_t len) {
+  size_t offset;
+  ComputeOffset(line, col, offset);
+  return Erase(offset, len);
+}
+
+size_t MonoBuffer::Erase(size_t offset, size_t len) {
+  if (offset >= buffer_.size())
+    return 0;
+  len = std::min(buffer_.size() - offset, len);
+  size_t begin_line, begin_col;
+  ComputePosition(offset, begin_line, begin_col);
+  size_t end_line, end_col;
+  ComputePosition(offset + len, end_line, end_col);
+  for (size_t complete_line = begin_line + 1; complete_line < end_line;
+       ++complete_line) {
+    line_size_.Remove(begin_line + 1);
+  }
+  if (begin_line == end_line) {
+    line_size_.Add(begin_line, -(end_col - begin_col));
+  } else {
+    size_t old_current_size = line_size_.At(begin_line);
+    line_size_.Add(begin_line, -(old_current_size - begin_col));
+    // Now end_line is supposed to be (begin_line + 1).
+    if (begin_line + 1 < line_size_.size()) {
+      line_size_.Add(begin_line + 1, -end_col);
+      line_size_.Add(begin_line, line_size_.At(begin_line + 1));
+      line_size_.Remove(begin_line + 1);
+    }
+  }
+  return buffer_.Erase(offset, len);
+}
+
+size_t MonoBuffer::GetLine(size_t line, size_t limit, std::string &content) {
+  if (line >= line_size_.size())
+    return 0;
+  size_t offset;
+  ComputeOffset(line, 0, offset);
+  size_t i = offset;
+  for (; i < offset + std::min(limit, static_cast<decltype(limit)>(
+                                          line_size_.At(line)));
+       ++i) {
+    content.push_back(buffer_.At(i));
+  }
+  return i - offset;
+}
+
 } // namespace emcc
