@@ -34,8 +34,7 @@ public:
   size_t Erase(size_t line, size_t column, size_t len, LineBuffer &erased);
   bool Verify();
   bool SaveFile(const std::string &filename);
-  bool ComputePosition(size_t offset, size_t &line, size_t &col);
-  bool ComputeOffset(size_t line, size_t col, size_t &offset);
+  void ComputeOffset(size_t line, size_t col, size_t &offset);
 
 private:
   using Line = Rope<char, std::basic_string, 1UL << 13>;

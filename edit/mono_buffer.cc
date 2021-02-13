@@ -15,10 +15,6 @@ MonoBuffer &MonoBuffer::Insert(size_t offset, char c) {
   offset = std::min(buffer_.size(), offset);
   size_t line, col;
   ComputePosition(offset, line, col);
-  if (offset != 0 && buffer_.At(offset - 1) == kNewLine) {
-    ++line;
-    col = 0;
-  }
   if (line >= line_size_.size()) {
     assert(line == line_size_.size());
     line_size_.Insert(line, 0);
@@ -42,6 +38,18 @@ void MonoBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
   } else {
     col = offset - line_size_.GetPrefixSum(line - 1);
   }
+  if (offset != 0 && buffer_.At(offset - 1) == kNewLine) {
+    ++line;
+    col = 0;
+  }
+}
+
+void MonoBuffer::ComputeOffset(size_t line, size_t col, size_t &offset) {
+  line = std::min(line, line_size_.size());
+  col = line < line_size_.size()
+            ? std::min(col, static_cast<decltype(col)>(line_size_.At(line)))
+            : 0;
+  offset = line_size_.GetPrefixSum(line - 1) + col;
 }
 
 size_t MonoBuffer::CountLines() {
