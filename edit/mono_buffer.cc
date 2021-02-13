@@ -1,4 +1,5 @@
 #include "edit/mono_buffer.h"
+#include "support/sys.h"
 
 #include <iostream>
 
@@ -9,6 +10,12 @@ bool MonoBuffer::Get(size_t offset, char &c) {
     return false;
   c = buffer_.At(offset);
   return true;
+}
+
+bool MonoBuffer::Get(size_t line, size_t col, char &c) {
+  size_t offset;
+  ComputeOffset(line, col, offset);
+  return Get(offset, c);
 }
 
 MonoBuffer &MonoBuffer::Insert(size_t offset, char c) {
@@ -59,6 +66,19 @@ size_t MonoBuffer::CountLines() {
   if (line_size_.At(s - 1) == 0)
     return s - 1;
   return s;
+}
+
+std::unique_ptr<MonoBuffer>
+MonoBuffer::CreateFromFile(const std::string &filename) {
+  MMapFile file(filename, 64UL << 20);
+  if (!file.is_open())
+    return nullptr;
+  auto buffer = std::make_unique<MonoBuffer>();
+  for (auto block : file) {
+    for (size_t i = 0; i < block.size(); ++i)
+      buffer->Append(block.data[i]);
+  }
+  return buffer;
 }
 
 } // namespace emcc

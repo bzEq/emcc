@@ -1,6 +1,7 @@
 #pragma once
 
 #include "edit/line_buffer.h"
+#include "edit/mono_buffer.h"
 #include "support/dynamic_array.h"
 #include "support/prefix_sum.h"
 #include "tui/basis.h"
@@ -13,7 +14,11 @@ namespace emcc::tui {
 // Map a character graphical position to logical position.
 struct Point {
   uint8_t type_offset_pair; // A character might span multiple points.
-  size_t line, col;         // Position at text buffer.
+  union {
+    size_t line;
+    size_t point; // Offset at text buffer.
+  };
+  size_t col; // (line, column) at text buffer.
   Point() : type_offset_pair(~0), line(~0U), col(~0U) {}
   void Reset() {
     type_offset_pair = ~0;
@@ -75,7 +80,7 @@ class Framebuffer;
 class Page {
 public:
   static constexpr size_t kTabWidth = 2;
-  Page(LineBuffer *buffer, Framebuffer *framebuffer, size_t width,
+  Page(MonoBuffer *buffer, Framebuffer *framebuffer, size_t width,
        size_t height)
       : buffer_(buffer), framebuffer_(framebuffer), width_(width),
         height_(height) {
@@ -98,7 +103,7 @@ public:
   void FillFrame(Cursor begin, Cursor end);
 
 private:
-  LineBuffer *buffer_;
+  MonoBuffer *buffer_;
   Framebuffer *framebuffer_;
   size_t width_, height_;
   std::vector<std::vector<Point>> page_;

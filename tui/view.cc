@@ -9,26 +9,24 @@ Cursor Page::GetBoundary() const { return Cursor(height(), width()); }
 void Page::Reload(size_t start_line) {
   Reset();
   Cursor pos(0, 0);
-  for (size_t i = start_line;
-       i < buffer_->CountLines() && !Cursor::IsBeyond(pos, GetBoundary());
+  size_t start_offset;
+  buffer_->ComputeOffset(start_line, 0, start_offset);
+  for (size_t i = start_offset;
+       i < buffer_->CountChars() && !Cursor::IsBeyond(pos, GetBoundary());
        ++i) {
-    size_t n = 0;
-    std::string content;
-    buffer_->GetLine(i, ~0, content);
-    for (size_t j = 0;
-         j < content.size() && !Cursor::IsBeyond(pos, GetBoundary()); ++j) {
-      n = WriteTo(i, j, pos);
-      if (n == 0)
-        break;
-      if (content[j] == LineBuffer::kNewLine) {
-        ++pos.y;
-        pos.x = 0;
-      } else {
-        pos = JumpTo(width(), pos, n);
-      }
-    }
+    size_t line, col;
+    buffer_->ComputePosition(i, line, col);
+    size_t n = WriteTo(line, col, pos);
     if (n == 0)
       break;
+    char c;
+    buffer_->Get(i, c);
+    if (c == MonoBuffer::kNewLine) {
+      ++pos.y;
+      pos.x = 0;
+    } else {
+      pos = JumpTo(width(), pos, n);
+    }
   }
 }
 

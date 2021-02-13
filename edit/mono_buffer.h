@@ -16,7 +16,7 @@ public:
   CreateFromFile(const std::string &filename);
   MonoBuffer() {}
   size_t CountLines();
-  size_t CountChars();
+  size_t CountChars() { return buffer_.size(); }
   size_t GetAccumulateChars(size_t line);
   bool Get(size_t line, size_t col, char &c);
   bool Get(size_t offset, char &c);

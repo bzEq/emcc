@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   if (argc != 2)
     Die("Usage: %s <filename>", argv[0]);
   std::string filename(argv[1]);
-  auto buffer = LineBuffer::CreateFromFile(filename);
+  auto buffer = MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename);
   initscr();
