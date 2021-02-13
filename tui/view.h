@@ -106,6 +106,7 @@ public:
   size_t WriteTo(size_t offset, Cursor pos);
   Cursor GetBoundary() const;
   void FillFrame(Cursor begin, Cursor end);
+  const Framebuffer &GetFrameBuffer() const { return *framebuffer_; }
 
 private:
   MonoBuffer *buffer_;
