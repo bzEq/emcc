@@ -33,4 +33,9 @@ inline ResultError<std::string> Err(Args &&...args) {
   };
 }
 
+template <typename Num>
+inline Num abs_diff(Num a, Num b) {
+  return a > b ? a - b : b - a;
+}
+
 } // namespace emcc
