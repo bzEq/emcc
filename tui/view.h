@@ -57,6 +57,13 @@ struct Point {
     p.col = col;
     return p;
   }
+  static Point MakeStartPoint(size_t offset, size_t len) {
+    Point p;
+    assert(len < (1 << (sizeof(p.type_offset_pair) * 8 - 1)));
+    p.type_offset_pair = (1 << (sizeof(p.type_offset_pair) * 8 - 1)) | len;
+    p.point = offset;
+    return p;
+  }
   static Point MakeTailPoint(size_t line, size_t col, size_t offset) {
     Point p;
     assert(offset > 0 && offset < (1 << (sizeof(p.type_offset_pair) * 8 - 1)));
@@ -99,6 +106,7 @@ public:
   size_t height() const { return height_; }
   bool Erase(Cursor pos);
   size_t WriteTo(size_t line, size_t col, Cursor pos);
+  size_t WriteTo(size_t offset, Cursor pos);
   Cursor GetBoundary() const;
   void FillFrame(Cursor begin, Cursor end);
 

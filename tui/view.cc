@@ -14,9 +14,7 @@ void Page::Reload(size_t start_line) {
   for (size_t i = start_offset;
        i < buffer_->CountChars() && !Cursor::IsBeyond(pos, GetBoundary());
        ++i) {
-    size_t line, col;
-    buffer_->ComputePosition(i, line, col);
-    size_t n = WriteTo(line, col, pos);
+    size_t n = WriteTo(i, pos);
     if (n == 0)
       break;
     char c;
@@ -50,7 +48,7 @@ bool Page::Erase(Cursor pos) {
   return true;
 }
 
-size_t Page::WriteTo(size_t line, size_t col, Cursor pos) {
+size_t Page::WriteTo(size_t offset, Cursor pos) {
   Cursor boundary(GetBoundary());
   if (Cursor::IsBeyond(pos, boundary))
     return 0;
@@ -61,7 +59,7 @@ size_t Page::WriteTo(size_t line, size_t col, Cursor pos) {
   // Erase this point first.
   if (!Erase(pos))
     return 0;
-  Point new_point = Point::MakeStartPoint(line, col, 1);
+  Point new_point = Point::MakeStartPoint(offset, 1);
   if (new_point == point)
     return 0;
   // std::cout << "b: " << new_point.line << " " << new_point.col << std::endl;
@@ -81,7 +79,7 @@ void Page::FillFrame(Cursor begin, Cursor end) {
     Pixel pixel;
     char ch;
     if (p.is_start()) {
-      if (!buffer_->Get(p.line, p.col, ch)) {
+      if (!buffer_->Get(p.point, ch)) {
         ch = ' ';
       }
     } else {
