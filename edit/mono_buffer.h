@@ -32,6 +32,7 @@ public:
   bool SaveFile(const std::string &filename);
   void ComputePosition(size_t offset, size_t &line, size_t &col);
   void ComputeOffset(size_t line, size_t col, size_t &offset);
+  bool Verify();
 
 private:
   using StorageTy = Rope<char, std::basic_string, 1UL << 12>;

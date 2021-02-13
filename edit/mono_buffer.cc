@@ -134,4 +134,24 @@ size_t MonoBuffer::GetLine(size_t line, size_t limit, std::string &content) {
   return i - offset;
 }
 
+bool MonoBuffer::Verify() {
+  std::vector<long> stats;
+  long current = 0;
+  for (size_t i = 0; i < buffer_.size(); ++i) {
+    ++current;
+    if (buffer_.At(i) == kNewLine) {
+      stats.push_back(current);
+      current = 0;
+    }
+  }
+  stats.push_back(current);
+  if (std::abs((long)stats.size() - (long)line_size_.size()) > 1)
+    return false;
+  for (size_t i = 0; i < std::min(stats.size(), line_size_.size()); ++i) {
+    if (stats[i] != line_size_.At(i))
+      return false;
+  }
+  return true;
+}
+
 } // namespace emcc

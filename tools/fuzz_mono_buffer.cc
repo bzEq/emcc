@@ -32,6 +32,7 @@ int main() {
     default:
       break;
     }
+    assert(buffer.Verify());
   }
   return 0;
 }
