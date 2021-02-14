@@ -57,7 +57,7 @@ TEST(RopeBenchmark, StringAppend) {
 
 TEST(RopeBenchmark, SmallPiece) {
   emcc::Rope<int, 1UL> s;
-  emcc::Random rnd;
+  emcc::Random rnd(std::time(nullptr));
   const size_t N = 1 << 16;
   for (size_t i = 0; i < N; ++i)
     s.Insert(i, 0);

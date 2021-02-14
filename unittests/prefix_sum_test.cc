@@ -93,7 +93,7 @@ TEST(PrefixSumTest, SearchTest1) {
 
 TEST(PrefixSumTest, Benchmark) {
   PrefixSum<int> s;
-  Random rnd;
+  Random rnd(std::time(nullptr));
   const size_t N = 120 * 40;
   for (size_t i = 0; i < N; ++i)
     s.Insert(i, 0);
@@ -105,7 +105,7 @@ TEST(PrefixSumTest, Benchmark) {
 
 TEST(PrefixSumTest, Benchmark1) {
   PrefixSum<int> s;
-  Random rnd;
+  Random rnd(std::time(nullptr));
   const size_t N = 1 << 16;
   for (size_t i = 0; i < N; ++i)
     s.Insert(i, 0);
