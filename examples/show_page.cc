@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
     size_t total_lines = buffer->CountLines();
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
+      renderer.GetMaxYX(height, width);
+      page.Resize(width, height);
       page.Reload(i);
       renderer.Clear();
       renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
