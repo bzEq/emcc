@@ -11,7 +11,7 @@
 
 namespace {
 
-using Rope = emcc::Rope<char, std::basic_string, 1UL << 12>;
+using Rope = emcc::Rope<char, 1UL << 12>;
 
 TEST(RopeBenchmark, ExtRopeRandomInsert) {
   emcc::Random rnd(std::time(nullptr));
@@ -56,7 +56,7 @@ TEST(RopeBenchmark, StringAppend) {
 }
 
 TEST(RopeBenchmark, SmallPiece) {
-  emcc::Rope<int, std::vector, 1UL> s;
+  emcc::Rope<int, 1UL> s;
   emcc::Random rnd;
   const size_t N = 1 << 16;
   for (size_t i = 0; i < N; ++i)

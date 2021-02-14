@@ -11,7 +11,7 @@
 
 namespace {
 
-using Rope = emcc::Rope<char, std::basic_string, 2>;
+using Rope = emcc::Rope<char, 2>;
 
 std::string GenerateRandomString(size_t size) {
   static size_t offset = 0;

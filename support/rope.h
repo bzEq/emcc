@@ -12,12 +12,10 @@
 
 namespace emcc {
 
-template <typename Char,
-          template <typename...> typename ContainerType = std::basic_string,
-          size_t kMaxPieceSize = 4096>
+template <typename Char, size_t kMaxPieceSize = 4096>
 class Rope {
 private:
-  using Piece = ContainerType<Char>;
+  using Piece = std::basic_string<Char>;
 
   struct Node {
     size_t size;
@@ -398,16 +396,14 @@ public:
   bool empty() const { return size() == 0; }
 };
 
-inline std::ostream &operator<<(std::ostream &out,
-                                Rope<char, std::basic_string> &rope) {
+inline std::ostream &operator<<(std::ostream &out, Rope<char> &rope) {
   for (size_t i = 0; i < rope.size(); ++i)
     out << rope.At(i);
   return out;
 }
 
 template <size_t N>
-inline bool operator==(Rope<char, std::basic_string, N> &rope,
-                       const std::string &s) {
+inline bool operator==(Rope<char, N> &rope, const std::string &s) {
   if (rope.size() != s.size())
     return false;
   for (size_t i = 0; i != rope.size(); ++i)
@@ -417,7 +413,7 @@ inline bool operator==(Rope<char, std::basic_string, N> &rope,
 }
 
 template <size_t N>
-inline bool operator==(Rope<char, std::basic_string, N> &rope, const char *s) {
+inline bool operator==(Rope<char, N> &rope, const char *s) {
   if (rope.size() != ::strlen(s))
     return false;
   for (size_t i = 0; i != rope.size(); ++i)
