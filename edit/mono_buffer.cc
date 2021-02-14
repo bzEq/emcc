@@ -114,6 +114,7 @@ MonoBuffer::CreateFromFile(const std::string &filename) {
   for (auto block : file) {
     buffer->Append(block.data, block.size());
   }
+  buffer->set_filename(filename);
   return buffer;
 }
 

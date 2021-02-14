@@ -34,12 +34,15 @@ public:
   void ComputePosition(size_t offset, size_t &line, size_t &col);
   void ComputeOffset(size_t line, size_t col, size_t &offset);
   bool Verify();
+  void set_filename(const std::string &filename) { filename_ = filename; }
+  const std::string &filename() const { return filename_; }
 
 private:
   using StorageTy = Rope<char, 1UL << 12>;
 
   StorageTy buffer_;
   PrefixSum<long> line_size_;
+  std::string filename_;
 };
 
 } // namespace emcc
