@@ -63,7 +63,7 @@ cc_binary(
 cc_binary(
     name = "show_page",
     srcs = ["show_page.cc"],
-    copts = COPTS + ['-fblocks'],
+    copts = COPTS + ["-fblocks"],
     linkopts = LINKOPTS + [
         "-lncurses",
     ],
