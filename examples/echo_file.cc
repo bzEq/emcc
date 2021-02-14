@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Kai Luo <gluokai@gmail.com>. All rights reserved.
 
-#include "edit/line_buffer.h"
+#include "edit/mono_buffer.h"
 #include "support/sys.h"
 
 #include <iostream>
@@ -12,7 +12,16 @@ int main(int argc, char *argv[]) {
   emcc::MMapFile file(argv[1], sysconf(_SC_PAGE_SIZE));
   if (!file.is_open())
     emcc::Die("Can't open %s", argv[1]);
-  for (auto block : file)
-    std::cout << std::string(block.data, block.length);
+  emcc::MonoBuffer mb;
+  for (auto block : file) {
+    for (size_t i = 0; i < block.size(); ++i)
+      mb.Append(block.data[i]);
+  }
+  std::cerr << mb.CountLines() << " " << mb.CountChars() << std::endl;
+  for (size_t i = 0; i < mb.CountChars(); ++i) {
+    char c;
+    mb.Get(i, c);
+    std::cout << c;
+  }
   return 0;
 }

@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
   NcursesRenderer renderer(stdscr);
   int height, width;
   renderer.GetMaxYX(height, width);
-  height -= 8;
   Framebuffer framebuffer(width, height);
   Page page(buffer.get(), &framebuffer, width, height);
   page.Reload(0);
