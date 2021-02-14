@@ -226,14 +226,13 @@ private:
   size_t length_;
 };
 
-template <typename... Args>
-inline void Report(const char *prefix, Args &&...args) {
-  std::cerr << fmt::format("{}{}", prefix, std::forward<Args>(args)...) << "\n";
+inline void Report(const char *prefix, const char *message) {
+  std::cerr << prefix << message << "\n";
 }
 
 template <typename... Args>
 inline void Die(Args &&...args) {
-  Report("fatal: ", std::forward<Args>(args)...);
+  Report("fatal: ", fmt::format(std::forward<Args>(args)...).c_str());
   exit(1);
 }
 

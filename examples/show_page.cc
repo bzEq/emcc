@@ -4,17 +4,21 @@
 #include "tui/renderer.h"
 #include "tui/view.h"
 
+#include <chrono>
+#include <thread>
+
 int main(int argc, char *argv[]) {
   using namespace emcc;
   using namespace emcc::tui;
   if (argc != 4)
-    Die("Usage: %s <filename> <start_line> <end_line>", argv[0]);
+    Die("Usage: {} <filename> <start_line> <end_line>", argv[0]);
   std::string filename(argv[1]);
   size_t start_line = std::stoul(argv[2]);
   size_t end_line = std::stoul(argv[3]);
   auto buffer = MonoBuffer::CreateFromFile(filename);
   if (!buffer)
-    Die("Failed to open {}", filename);
+    Die("Failed to open {}", filename.c_str());
+  using namespace std::chrono_literals;
   auto start = std::chrono::high_resolution_clock::now();
   auto end = std::chrono::high_resolution_clock::now();
   size_t nr_frames = 0;
@@ -40,6 +44,7 @@ int main(int argc, char *argv[]) {
       renderer.DrawCursor(Cursor(0, 0));
       renderer.Refresh();
       ++nr_frames;
+      std::this_thread::sleep_for(16ms);
     }
     end = std::chrono::high_resolution_clock::now();
   }
