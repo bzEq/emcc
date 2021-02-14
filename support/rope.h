@@ -129,7 +129,7 @@ private:
     if (r != nullptr && l->piece.size() + r->piece.size() <= kMaxPieceSize) {
       assert(r->left == nullptr);
       // Compress the piece.
-      l->piece.insert(l->piece.end(), r->piece.begin(), r->piece.end());
+      l->piece.append(r->piece);
       l->right = r->right;
       Release(r);
     } else {
