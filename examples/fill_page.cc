@@ -8,9 +8,10 @@
 int main(int argc, char *argv[]) {
   using namespace emcc;
   using namespace emcc::tui;
-  if (argc != 2)
+  if (argc != 3)
     Die("Usage: %s <filename>", argv[0]);
   std::string filename(argv[1]);
+  size_t start_line = std::stoul(argv[2]);
   auto buffer = MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename);
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
   Framebuffer framebuffer(width, height);
   Page page(buffer.get(), &framebuffer, width, height);
   auto start = std::chrono::high_resolution_clock::now();
-  page.Reload(0);
+  page.Reload(start_line);
   page.FillFrame(Cursor(0, 0), page.GetBoundary());
   auto end = std::chrono::high_resolution_clock::now();
   std::cout << "Elapsed time in microseconds : "

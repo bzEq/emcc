@@ -61,9 +61,9 @@ cc_binary(
 )
 
 cc_binary(
-    name = "play_page",
-    srcs = ["play_page.cc"],
-    copts = COPTS,
+    name = "show_page",
+    srcs = ["show_page.cc"],
+    copts = COPTS + ['-fblocks'],
     linkopts = LINKOPTS + [
         "-lncurses",
     ],
