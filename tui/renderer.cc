@@ -12,7 +12,7 @@ void NcursesRenderer::RenderRange(const Framebuffer &fb, Cursor begin,
   for (Cursor c = begin; c != end; c = JumpTo(fb.width(), c, 1)) {
     if (Cursor::IsBeyond(c, boundary) || Cursor::IsBeyond(c, fb.GetBoundary()))
       break;
-    Pixel p = fb.Get(c.y, c.x);
+    const Pixel &p = fb.Get(c.y, c.x);
     mvwaddch(window_, c.y, c.x, p.shade.character);
   }
 }
