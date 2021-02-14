@@ -37,8 +37,8 @@ public:
   void ComputeOffset(size_t line, size_t col, size_t &offset);
 
 private:
-  using Line = Rope<char, std::basic_string, 1UL << 13>;
-  using LineSpan = Rope<Line *, std::basic_string, 1UL << 10>;
+  using Line = Rope<char, 1UL << 13>;
+  using LineSpan = Rope<Line *, 1UL << 10>;
 
   LineBuffer &InsertEmptyLine(size_t i);
   LineBuffer &InsertLine(size_t i, Line &&line);

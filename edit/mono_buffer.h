@@ -35,7 +35,7 @@ public:
   bool Verify();
 
 private:
-  using StorageTy = Rope<char, std::basic_string, 1UL << 12>;
+  using StorageTy = Rope<char, 1UL << 12>;
 
   StorageTy buffer_;
   PrefixSum<long> line_size_;

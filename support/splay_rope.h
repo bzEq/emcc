@@ -18,6 +18,7 @@ template <typename Piece>
 struct SplayRopeNode {
   Piece piece;
   SplayRopeNode *left, *right;
+  size_t size;
 #ifdef EMCC_DEBUG
   size_t height;
 #endif
@@ -32,44 +33,19 @@ struct SplayRopeNode {
 #ifdef EMCC_DEBUG
     height = 1 + std::max(left ? left->height : 0, right ? right->height : 0);
 #endif
+    size = 1 + left_size() + right_size();
     Piece::UpdateNode(this);
   }
-  size_t size() const { return Piece::GetSize(this); }
-  size_t left_size() const { return left ? Piece::GetSize(left) : 0; }
-  size_t right_size() const { return right ? Piece::GetSize(right) : 0; }
+  size_t left_size() const { return left ? left->size : 0; }
+  size_t right_size() const { return right ? right->size : 0; }
 };
 
 struct DefaultPiece {
-  size_t size;
-  DefaultPiece() : size(0) {}
-  static constexpr size_t kSinglePieceSize = 1;
-
+  DefaultPiece() = default;
   template <typename T>
-  static void UpdateNode(SplayRopeNode<T> *node) {
-    assert(node);
-    node->piece.size =
-        kSinglePieceSize + node->left_size() + node->right_size();
-  }
-
-  template <typename T>
-  static size_t GetSize(const SplayRopeNode<T> *node) {
-    return node ? node->piece.size : 0;
-  }
-
-  template <typename T>
-  static CompareResult Compare(const size_t index,
-                               const SplayRopeNode<T> *node) {
-    size_t left_size = node->left_size();
-    static const size_t mid_size = kSinglePieceSize;
-    if (index < left_size)
-      return {-1, index};
-    if (index >= left_size && index < left_size + mid_size)
-      return {0, index - left_size};
-    return {1, index - (left_size + mid_size)};
-  }
+  static void UpdateNode(SplayRopeNode<T> *node) {}
 };
 
-// TODO: Support non-trivial Piece.
 template <typename Piece = DefaultPiece>
 class SplayRope {
 public:
@@ -87,7 +63,7 @@ public:
     return *this;
   }
   void clear() { Clear(); }
-  size_t size() const { return root_ ? root_->size() : 0; }
+  size_t size() const { return root_ ? root_->size : 0; }
   bool empty() const { return size() == 0; }
   Piece &At(size_t i) {
     assert(i < size());
@@ -126,7 +102,7 @@ public:
       root_ = CreateNode(std::forward<Args>(args)...);
       return *this;
     }
-    if (i >= root_->size()) {
+    if (i >= root_->size) {
       assert(root_->right == nullptr);
       root_->right = CreateNode(std::forward<Args>(args)...);
       root_->update();
@@ -152,6 +128,17 @@ private:
 #ifdef EMCC_DEBUG
   size_t GetHeight(Node *const node) const { return node ? node->height : 0; }
 #endif
+  template <typename T>
+  static CompareResult Compare(const size_t index,
+                               const SplayRopeNode<T> *node) {
+    size_t left_size = node->left_size();
+    static constexpr size_t mid_size = 1;
+    if (index < left_size)
+      return {-1, index};
+    if (index >= left_size && index < left_size + mid_size)
+      return {0, index - left_size};
+    return {1, index - (left_size + mid_size)};
+  }
 
   Node *AtOrNull(size_t i) {
     root_ = Splay(root_, i);
@@ -242,13 +229,13 @@ private:
     if (node == nullptr)
       return nullptr;
     while (true) {
-      auto cmp = Piece::Compare(index, node);
+      auto cmp = Compare(index, node);
       if (cmp.order == 0)
         break;
       if (cmp.order < 0) {
         if (node->left == nullptr)
           break;
-        cmp = Piece::Compare(cmp.relative_index, node->left);
+        cmp = Compare(cmp.relative_index, node->left);
         if (cmp.order == 0) {
           node = RotateRight(node);
           break;
@@ -271,7 +258,7 @@ private:
       } else {
         if (node->right == nullptr)
           break;
-        cmp = Piece::Compare(cmp.relative_index, node->right);
+        cmp = Compare(cmp.relative_index, node->right);
         if (cmp.order == 0) {
           node = RotateLeft(node);
           break;
