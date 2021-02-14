@@ -33,7 +33,6 @@ int main(int argc, char *argv[]) {
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       page.Reload(i);
-      page.FillFramebuffer(Cursor(0, 0), page.GetBoundary());
       renderer.Clear();
       renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
       renderer.DrawCursor(Cursor(0, 0));

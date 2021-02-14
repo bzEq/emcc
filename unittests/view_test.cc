@@ -20,13 +20,13 @@ TEST(ViewTest, Jump) {
   EXPECT_TRUE(JumpTo(80, {1, 40}, -100) == Cursor(0, 20));
 }
 
-TEST(ViewTest, PointTest) {
-  auto vec = Point::MakeSeries(0, 0, 16);
+TEST(ViewTest, PixelTest) {
+  auto vec = Pixel::MakeSeries(0, 16);
   EXPECT_TRUE(vec.size() == 16);
-  EXPECT_TRUE(vec.front().is_start());
+  EXPECT_TRUE(vec.front().is_head());
   EXPECT_TRUE(vec.front().length() == 16);
   for (size_t i = 1; i < vec.size(); ++i) {
-    EXPECT_TRUE(!vec[i].is_start());
+    EXPECT_TRUE(!vec[i].is_head());
   }
   for (size_t i = 1; i < vec.size(); ++i) {
     EXPECT_TRUE(vec[i].offset() == i);

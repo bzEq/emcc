@@ -113,6 +113,7 @@ TEST(PrefixSumTest, Benchmark1) {
     size_t n = rnd.Next() * s.size();
     s.At(n);
   }
+  s.At(s.size() / 2);
   EXPECT_TRUE(s.height() < 200);
 }
 

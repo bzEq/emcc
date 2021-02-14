@@ -10,117 +10,78 @@
 
 namespace emcc::tui {
 
-// Map a character graphical position to logical position.
-struct Point {
-  uint8_t type_offset_pair; // A character might span multiple points.
-  union {
-    size_t line;
-    size_t point; // Offset at text buffer.
-  };
-  size_t col; // (line, column) at text buffer.
-  Point() : type_offset_pair(~0), line(~0U), col(~0U) {}
+// Graphical representation of a charater, also offers map to character's
+// logical position.
+struct Pixel {
+  struct {
+    int character;
+  } shade;
+
+  struct {
+    uint8_t head_tail_pair; // A character might span multiple points.
+    size_t point;           // Offset at text buffer.
+  } position;
+
+  Pixel() { Reset(); }
+
   void Reset() {
-    type_offset_pair = ~0;
-    line = ~0U;
-    col = ~0U;
+    shade.character = ' ';
+    memset(&position, -1, sizeof(position));
   }
-  bool operator==(const Point &other) {
+
+  bool operator==(const Pixel &other) {
     return memcmp(this, &other, sizeof(*this)) == 0;
   }
-  Point &operator=(const Point &other) {
+
+  Pixel &operator=(const Pixel &other) {
     memcpy(this, &other, sizeof(*this));
     return *this;
   }
-  bool CompareAndUpdate(const Point &other) {
-    if (*this == other)
-      return false;
-    *this = other;
-    return true;
+
+  bool is_same_position(const Pixel &other) const {
+    return memcmp(&this->position, &other.position, sizeof(this->position)) ==
+           0;
   }
-  bool is_start() const {
-    return type_offset_pair >> (sizeof(type_offset_pair) * 8 - 1);
+
+  bool is_same_shade(const Pixel &other) const {
+    return memcmp(&this->shade, &other.shade, sizeof(this->shade)) == 0;
+  }
+
+  bool is_head() const {
+    return position.head_tail_pair >> (sizeof(position.head_tail_pair) * 8 - 1);
   }
   size_t offset() const {
-    return type_offset_pair &
-           (static_cast<decltype(type_offset_pair)>(~0U) >> 1);
+    return position.head_tail_pair &
+           (static_cast<decltype(position.head_tail_pair)>(~0U) >> 1);
   }
   size_t length() const {
-    assert(is_start());
+    assert(is_head());
     return offset();
   }
-  static Point MakeStartPoint(size_t line, size_t col, size_t len) {
-    Point p;
-    assert(len < (1 << (sizeof(p.type_offset_pair) * 8 - 1)));
-    p.type_offset_pair = (1 << (sizeof(p.type_offset_pair) * 8 - 1)) | len;
-    p.line = line;
-    p.col = col;
+  static Pixel MakeHeadPixel(size_t point, size_t len) {
+    Pixel p;
+    assert(len < (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)));
+    p.position.head_tail_pair =
+        (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)) | len;
+    p.position.point = point;
     return p;
   }
-  static Point MakeStartPoint(size_t offset, size_t len) {
-    Point p;
-    assert(len < (1 << (sizeof(p.type_offset_pair) * 8 - 1)));
-    p.type_offset_pair = (1 << (sizeof(p.type_offset_pair) * 8 - 1)) | len;
-    p.point = offset;
+  static Pixel MakeTailPixel(size_t point, size_t offset) {
+    Pixel p;
+    assert(offset > 0 &&
+           offset < (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)));
+    p.position.head_tail_pair = offset;
+    p.position.point = point;
     return p;
   }
-  static Point MakeTailPoint(size_t line, size_t col, size_t offset) {
-    Point p;
-    assert(offset > 0 && offset < (1 << (sizeof(p.type_offset_pair) * 8 - 1)));
-    p.type_offset_pair = offset;
-    p.line = line;
-    p.col = col;
-    return p;
-  }
-  static std::vector<Point> MakeSeries(size_t line, size_t col, size_t len) {
+  static std::vector<Pixel> MakeSeries(size_t offset, size_t len) {
     assert(len > 0);
-    std::vector<Point> ret;
-    ret.emplace_back(MakeStartPoint(line, col, len));
+    std::vector<Pixel> ret;
+    ret.emplace_back(MakeHeadPixel(offset, len));
     for (size_t i = 1; i < len; ++i)
-      ret.emplace_back(MakeTailPoint(line, col, i));
+      ret.emplace_back(MakeTailPixel(offset, i));
     return ret;
   }
-};
-
-class Framebuffer;
-
-class Page {
-public:
-  static constexpr size_t kTabWidth = 2;
-  Page(MonoBuffer *buffer, Framebuffer *framebuffer, size_t width,
-       size_t height)
-      : buffer_(buffer), framebuffer_(framebuffer), width_(width),
-        height_(height) {
-    Reset();
-  }
-  void Reset() {
-    page_.clear();
-    page_.resize(height_);
-    for (size_t i = 0; i < page_.size(); ++i)
-      page_[i].resize(width_);
-  }
-  const Point &Get(int y, int x) const { return page_[y][x]; }
-  void Reload(size_t start_line);
-  size_t width() const { return width_; }
-  size_t height() const { return height_; }
-  bool Erase(Cursor pos);
-  size_t WriteTo(size_t line, size_t col, Cursor pos);
-  size_t WriteTo(size_t offset, Cursor pos);
-  Cursor GetBoundary() const;
-  void FillFramebuffer(Cursor begin, Cursor end);
-  const Framebuffer &GetFrameBuffer() const { return *framebuffer_; }
-
-private:
-  MonoBuffer *buffer_;
-  Framebuffer *framebuffer_;
-  size_t width_, height_;
-  std::vector<std::vector<Point>> page_;
-};
-
-// Graphical representation of a point.
-struct Pixel {
-  int character;
-  Pixel() = default;
-  Pixel(int c) : character(c) {}
 };
 
 // Graphical representation of a page.
@@ -128,6 +89,11 @@ class Framebuffer {
 public:
   Framebuffer(size_t width, size_t height) : width_(width), height_(height) {
     Reset();
+  }
+
+  void Resize(size_t width, size_t height) {
+    width_ = width;
+    height_ = height;
   }
 
   size_t width() const { return width_; }
@@ -157,6 +123,33 @@ public:
 private:
   size_t width_, height_;
   std::vector<std::vector<Pixel>> frame_;
+};
+
+class Page {
+public:
+  static constexpr size_t kTabWidth = 2;
+  Page(MonoBuffer *buffer, Framebuffer *framebuffer, size_t width,
+       size_t height)
+      : buffer_(buffer), framebuffer_(framebuffer) {
+    Reset();
+    framebuffer_->Resize(width, height);
+  }
+  void Resize(size_t width, size_t height) {
+    framebuffer_->Resize(width, height);
+  }
+  void Reset() { framebuffer_->Reset(); }
+  void Reload(size_t start_line);
+  size_t width() const { return framebuffer_->width(); }
+  size_t height() const { return framebuffer_->height(); }
+  Cursor GetBoundary() const { return framebuffer_->GetBoundary(); }
+  const Framebuffer &framebuffer() const { return *framebuffer_; }
+  Framebuffer &framebuffer() { return *framebuffer_; }
+
+private:
+  std::tuple<char, size_t> FillPixelAt(Cursor at, size_t offset);
+
+  MonoBuffer *buffer_;
+  Framebuffer *framebuffer_;
 };
 
 } // namespace emcc::tui
