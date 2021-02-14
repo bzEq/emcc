@@ -76,7 +76,7 @@ void Page::FillFrame(Cursor begin, Cursor end) {
         Cursor::IsBeyond(current, framebuffer_->GetBoundary()))
       break;
     Point p = Get(current.y, current.x);
-    Pixel pixel;
+    Pixel &pixel = framebuffer_->Get(current.y, current.x);
     char ch;
     if (p.is_start()) {
       if (!buffer_->Get(p.point, ch)) {
@@ -88,7 +88,6 @@ void Page::FillFrame(Cursor begin, Cursor end) {
     // std::cout << current.y << " " << current.x << " " << (int)ch <<
     // std::endl;
     pixel.character = ch;
-    framebuffer_->Set(current.y, current.x, std::move(pixel));
   }
 }
 

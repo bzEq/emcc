@@ -143,6 +143,8 @@ public:
 
   const Pixel &Get(size_t y, size_t x) const { return frame_[y][x]; }
 
+  Pixel &Get(size_t y, size_t x) { return frame_[y][x]; }
+
   template <typename... Args>
   Framebuffer &Set(size_t y, size_t x, Args &&...args) {
     auto &line = frame_[y];
