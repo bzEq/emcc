@@ -37,12 +37,43 @@ MonoBuffer &MonoBuffer::Insert(size_t offset, char c) {
   if (c == kNewLine) {
     size_t new_line_size = line_size_.At(line) - (col + 1);
     line_size_.Add(line, -new_line_size);
-    line_size_.Insert(line + 1, new_line_size);
+    if (new_line_size)
+      line_size_.Insert(line + 1, new_line_size);
   }
   return *this;
 }
 
 MonoBuffer &MonoBuffer::Append(char c) { return Insert(buffer_.size(), c); }
+
+MonoBuffer &MonoBuffer::Append(const char *data, size_t len) {
+  size_t i = 0;
+  if (!buffer_.empty() && buffer_.At(buffer_.size() - 1) != kNewLine) {
+    for (; i < len; ++i) {
+      Append(data[i]);
+      if (data[i] == kNewLine) {
+        ++i;
+        break;
+      }
+    }
+  }
+  if (i >= len) {
+    return *this;
+  }
+  assert(buffer_.empty() || buffer_.At(buffer_.size() - 1) == kNewLine);
+  buffer_.Append(data + i, len - i);
+  size_t current = 0;
+  for (; i < len; ++i) {
+    ++current;
+    if (data[i] == kNewLine) {
+      assert(current);
+      line_size_.Insert(CountLines(), current);
+      current = 0;
+    }
+  }
+  if (current)
+    line_size_.Insert(CountLines(), current);
+  return *this;
+}
 
 void MonoBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
   line = line_size_.LowerBound(offset);
@@ -81,8 +112,7 @@ MonoBuffer::CreateFromFile(const std::string &filename) {
     return nullptr;
   auto buffer = std::make_unique<MonoBuffer>();
   for (auto block : file) {
-    for (size_t i = 0; i < block.size(); ++i)
-      buffer->Append(block.data[i]);
+    buffer->Append(block.data, block.size());
   }
   return buffer;
 }

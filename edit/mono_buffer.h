@@ -23,6 +23,7 @@ public:
   MonoBuffer &Insert(size_t offset, char c);
   MonoBuffer &Insert(size_t line, size_t column, char c);
   MonoBuffer &Append(size_t line, char c) { return Insert(line, ~0, c); }
+  MonoBuffer &Append(const char *data, size_t len);
   MonoBuffer &Append(char c);
   MonoBuffer &Concat(MonoBuffer &&other);
   MonoBuffer Split(size_t offset);

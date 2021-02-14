@@ -14,8 +14,7 @@ int main(int argc, char *argv[]) {
     emcc::Die("Can't open %s", argv[1]);
   emcc::MonoBuffer mb;
   for (auto block : file) {
-    for (size_t i = 0; i < block.size(); ++i)
-      mb.Append(block.data[i]);
+    mb.Append(block.data, block.size());
   }
   std::cerr << mb.CountLines() << " " << mb.CountChars() << std::endl;
   for (size_t i = 0; i < mb.CountChars(); ++i) {

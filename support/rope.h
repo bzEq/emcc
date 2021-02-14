@@ -355,6 +355,11 @@ public:
       root_ = Insert(root_, root_->size, c);
   }
 
+  void Append(const Char *data, size_t len) {
+    Node *node = FillNode(data, len);
+    root_ = Concat(root_, node);
+  }
+
   template <typename Iterator>
   size_t Append(Iterator begin, Iterator end) {
     size_t count = 0;
@@ -367,6 +372,22 @@ public:
 
   size_t Append(const Piece &piece) {
     return Append(piece.begin(), piece.end());
+  }
+
+  Node *FillNode(const Char *data, size_t len) {
+    size_t i = 0;
+    Node *left = nullptr;
+    while (i < len) {
+      Node *node = CreateNode();
+      size_t piece_size = len - i >= kMaxPieceSize ? kMaxPieceSize : len - i;
+      node->piece.append(data + i, piece_size);
+      node->left = left;
+      node->UpdateSize();
+      left = node;
+      i += piece_size;
+    }
+    assert(i == len);
+    return left;
   }
 
   void clear() {
