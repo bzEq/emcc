@@ -68,7 +68,7 @@ size_t Page::WriteTo(size_t offset, Cursor pos) {
   return new_point.length();
 }
 
-void Page::FillFrame(Cursor begin, Cursor end) {
+void Page::FillFramebuffer(Cursor begin, Cursor end) {
   // std::cout << end.y << " " << end.x << std::endl;
   for (Cursor current = begin; !Cursor::IsBeyond(current, end);
        current = JumpTo(width(), current, 1)) {

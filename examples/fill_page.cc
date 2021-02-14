@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   Page page(buffer.get(), &framebuffer, width, height);
   auto start = std::chrono::high_resolution_clock::now();
   page.Reload(start_line);
-  page.FillFrame(Cursor(0, 0), page.GetBoundary());
+  page.FillFramebuffer(Cursor(0, 0), page.GetBoundary());
   auto end = std::chrono::high_resolution_clock::now();
   std::cout << "Elapsed time in microseconds : "
             << std::chrono::duration_cast<std::chrono::microseconds>(end -
