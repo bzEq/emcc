@@ -7,10 +7,11 @@
 int main(int argc, char *argv[]) {
   using namespace emcc;
   using namespace emcc::tui;
-  if (argc != 3)
-    Die("Usage: %s <filename> <line>", argv[0]);
+  if (argc != 4)
+    Die("Usage: %s <filename> <start_line> <end_line>", argv[0]);
   std::string filename(argv[1]);
   size_t start_line = std::stoul(argv[2]);
+  size_t end_line = std::stoul(argv[3]);
   auto buffer = MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename);
@@ -28,7 +29,9 @@ int main(int argc, char *argv[]) {
     Framebuffer framebuffer(width, height);
     Page page(buffer.get(), &framebuffer, width, height);
     start = std::chrono::high_resolution_clock::now();
-    for (size_t i = start_line; i < buffer->CountLines(); ++i) {
+    size_t total_lines = buffer->CountLines();
+    for (size_t i = std::min(total_lines - 1, start_line);
+         i < std::min(total_lines, end_line); ++i) {
       page.Reload(i);
       page.FillFrame(Cursor(0, 0), page.GetBoundary());
       renderer.Clear();
