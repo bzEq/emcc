@@ -93,6 +93,7 @@ public:
     Reset();
   }
   void Reset() {
+    page_.clear();
     page_.resize(height_);
     for (size_t i = 0; i < page_.size(); ++i)
       page_[i].resize(width_);
@@ -134,6 +135,7 @@ public:
   size_t height() const { return height_; }
 
   void Reset() {
+    frame_.clear();
     frame_.resize(height_);
     for (size_t i = 0; i < frame_.size(); ++i)
       frame_[i].resize(width_);
