@@ -24,6 +24,17 @@ void Page::Reload(size_t start_line) {
       pos = JumpTo(width(), pos, w);
     }
   }
+  // Draw status line.
+  std::string content = fmt::format("---- {} of {} ({}, {}) ", start_offset,
+                                    buffer_->CountChars(), start_line, 0);
+  auto &status_line = framebuffer_->frame_[height() - 1];
+  for (size_t i = 0; i < status_line.size(); ++i) {
+    if (i < content.size()) {
+      status_line[i].shade.character = content[i];
+    } else {
+      status_line[i].shade.character = '-';
+    }
+  }
 }
 
 std::tuple<char, size_t> Page::FillPixelAt(Cursor at, size_t offset) {

@@ -87,6 +87,7 @@ struct Pixel {
 // Graphical representation of a page.
 class Framebuffer {
 public:
+  friend class Page;
   Framebuffer(size_t width, size_t height) : width_(width), height_(height) {
     Reset();
   }
