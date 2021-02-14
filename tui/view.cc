@@ -36,8 +36,6 @@ std::tuple<char, size_t> Page::FillPixelAt(Cursor at, size_t offset) {
     return std::make_tuple(0, 0);
   }
   Pixel new_pixel = Pixel::MakeHeadPixel(offset, 1);
-  if (new_pixel.is_same_position(pixel))
-    return std::make_tuple(0, 0);
   pixel.position = new_pixel.position;
   pixel.shade.character = c;
   return std::make_tuple(c, pixel.length());
