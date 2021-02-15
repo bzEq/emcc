@@ -38,7 +38,8 @@ int main(int argc, char *argv[]) {
          i < std::min(total_lines, end_line); ++i) {
       renderer.GetMaxYX(height, width);
       page.Resize(width, height);
-      page.Reload(i);
+      page.set_baseline(i);
+      page.Reload();
       renderer.Clear();
       renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
       renderer.DrawCursor(Cursor(0, 0));

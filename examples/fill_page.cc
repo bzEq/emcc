@@ -19,7 +19,8 @@ int main(int argc, char *argv[]) {
   Framebuffer framebuffer(width, height);
   Page page(buffer.get(), &framebuffer, width, height);
   auto start = std::chrono::high_resolution_clock::now();
-  page.Reload(start_line);
+  page.set_baseline(start_line);
+  page.Reload();
   auto end = std::chrono::high_resolution_clock::now();
   std::cout << "Elapsed time in microseconds : "
             << std::chrono::duration_cast<std::chrono::microseconds>(end -

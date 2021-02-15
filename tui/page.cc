@@ -4,11 +4,11 @@
 
 namespace emcc::tui {
 
-void Page::Reload(size_t start_line) {
+void Page::Reload() {
   Reset();
   Cursor pos(0, 0);
   size_t start_offset;
-  buffer_->ComputeOffset(start_line, 0, start_offset);
+  buffer_->ComputeOffset(baseline_, 0, start_offset);
   for (size_t i = start_offset;
        i < buffer_->CountChars() && !Cursor::IsBeyond(pos, GetBoundary());
        ++i) {
@@ -27,7 +27,7 @@ void Page::Reload(size_t start_line) {
   // Draw status line.
   std::string content = fmt::format(
       "----  {}    Offset: {} of {} Line: {} of {}  ", buffer_->filename(),
-      start_offset, buffer_->CountChars(), start_line, buffer_->CountLines());
+      start_offset, buffer_->CountChars(), baseline_, buffer_->CountLines());
   auto &status_line = framebuffer_->frame_[height() - 1];
   for (size_t i = 0; i < status_line.size(); ++i) {
     if (i < content.size()) {

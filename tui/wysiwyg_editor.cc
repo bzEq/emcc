@@ -4,7 +4,7 @@ namespace emcc::tui {
 
 void WYSIWYGEditor::Show() {
   if (changed_) {
-    page_->Reload(base_line_);
+    page_->Reload();
     renderer_->RenderRange(page_->framebuffer(), Cursor(0, 0),
                            page_->GetBoundary());
     changed_ = false;

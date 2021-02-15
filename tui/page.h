@@ -139,7 +139,9 @@ public:
     framebuffer_->Resize(width, height);
   }
   void Reset() { framebuffer_->Reset(); }
-  void Reload(size_t start_line);
+  void set_baseline(size_t baseline) { baseline_ = baseline; }
+  size_t baseline() const { return baseline_; }
+  void Reload();
   size_t width() const { return framebuffer_->width(); }
   size_t height() const { return framebuffer_->height(); }
   Cursor GetBoundary() const { return framebuffer_->GetBoundary(); }
@@ -149,6 +151,7 @@ public:
 private:
   std::tuple<char, size_t> FillPixelAt(Cursor at, size_t offset);
 
+  size_t baseline_;
   MonoBuffer *buffer_;
   Framebuffer *framebuffer_;
 };
