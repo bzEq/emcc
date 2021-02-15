@@ -449,9 +449,7 @@ public:
     return count;
   }
 
-  size_t Append(const Piece &piece) {
-    return Append(piece.begin(), piece.end());
-  }
+  void Append(const Piece &piece) { return Append(piece.data(), piece.size()); }
 
   Rope Copy(size_t offset, size_t len) {
     Rope result;
