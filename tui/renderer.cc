@@ -1,5 +1,5 @@
 #include "tui/renderer.h"
-#include "tui/basis.h"
+#include "tui/cursor.h"
 
 namespace emcc::tui {
 

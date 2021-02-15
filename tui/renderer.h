@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tui/basis.h"
+#include "tui/cursor.h"
 #include "tui/page.h"
 
 #include <ncurses.h>

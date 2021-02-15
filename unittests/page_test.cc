@@ -1,4 +1,4 @@
-#include "tui/basis.h"
+#include "tui/cursor.h"
 #include "tui/page.h"
 
 #include <gtest/gtest.h>
@@ -6,7 +6,7 @@
 namespace {
 using namespace emcc::tui;
 
-TEST(PageTest, Distance) {
+TEST(CursorTest, Distance) {
   EXPECT_TRUE(Cursor::ComputeDistance(80, {0, 0}, {1, 0}) == 80);
   EXPECT_TRUE(Cursor::ComputeDistance(80, {1, 0}, {0, 0}) == -80);
   EXPECT_TRUE(Cursor::ComputeDistance(80, {0, 40}, {1, 20}) == 60);
@@ -15,7 +15,7 @@ TEST(PageTest, Distance) {
   EXPECT_TRUE(Cursor::ComputeDistance(80, {1, 40}, {0, 20}) == -100);
 }
 
-TEST(PageTest, Goto) {
+TEST(Cursor, Goto) {
   EXPECT_TRUE(Cursor::Goto(80, {1, 20}, -60) == Cursor(0, 40));
   EXPECT_TRUE(Cursor::Goto(80, {1, 40}, -100) == Cursor(0, 20));
 }

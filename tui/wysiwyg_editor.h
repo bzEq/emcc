@@ -5,7 +5,7 @@
 #include "edit/mono_buffer.h"
 #include "support/chan.h"
 #include "support/misc.h"
-#include "tui/basis.h"
+#include "tui/cursor.h"
 #include "tui/page.h"
 #include "tui/renderer.h"
 
