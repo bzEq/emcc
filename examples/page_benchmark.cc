@@ -1,8 +1,8 @@
 #include "support/defer.h"
 #include "support/misc.h"
 #include "support/sys.h"
+#include "tui/page.h"
 #include "tui/renderer.h"
-#include "tui/view.h"
 
 #include <chrono>
 #include <thread>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tui/basis.h"
-#include "tui/view.h"
+#include "tui/page.h"
 
 #include <ncurses.h>
 

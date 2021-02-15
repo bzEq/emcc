@@ -6,8 +6,8 @@
 #include "support/chan.h"
 #include "support/misc.h"
 #include "tui/basis.h"
+#include "tui/page.h"
 #include "tui/renderer.h"
-#include "tui/view.h"
 
 namespace emcc::tui {
 

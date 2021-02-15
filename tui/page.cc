@@ -1,4 +1,4 @@
-#include "tui/view.h"
+#include "tui/page.h"
 
 #include <ctype.h>
 

@@ -115,9 +115,9 @@ cc_test(
 )
 
 cc_test(
-    name = "view_test",
+    name = "page_test",
     srcs = [
-        "view_test.cc",
+        "page_test.cc",
     ],
     copts = COPTS,
     linkopts = LINKOPTS,
