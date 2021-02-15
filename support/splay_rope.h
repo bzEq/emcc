@@ -234,9 +234,10 @@ private:
   Node *CanonicalSplay(Node *node, const size_t index) {
     if (node == nullptr)
       return nullptr;
+    size_t key = index;
+    std::vector<Node *> update_stack;
     Node N, *l, *r;
     l = r = &N;
-    size_t key = index;
     while (true) {
       auto cmp = Compare(key, node);
       key = cmp.relative_index;
@@ -254,6 +255,7 @@ private:
         }
         r->left = node;
         r = node;
+        update_stack.emplace_back(node);
         node = node->left;
       } else {
         if (node->right == nullptr)
@@ -267,6 +269,7 @@ private:
         }
         l->right = node;
         l = node;
+        update_stack.emplace_back(node);
         node = node->right;
       }
     }
@@ -274,16 +277,6 @@ private:
     l->update();
     r->left = node->right;
     r->update();
-    std::vector<Node *> update_stack;
-    for (Node *tmp = N.right; tmp != node->left; tmp = tmp->right)
-      update_stack.emplace_back(tmp);
-    while (!update_stack.empty()) {
-      Node *tmp = update_stack.back();
-      tmp->update();
-      update_stack.pop_back();
-    }
-    for (Node *tmp = N.left; tmp != node->right; tmp = tmp->left)
-      update_stack.emplace_back(tmp);
     while (!update_stack.empty()) {
       Node *tmp = update_stack.back();
       tmp->update();
