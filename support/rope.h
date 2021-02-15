@@ -149,7 +149,7 @@ private:
     if (node == nullptr)
       return nullptr;
     size_t key = index;
-    std::vector<Node *> UpdateSize_stack;
+    std::vector<Node *> update_stack;
     Node N, *l, *r;
     l = r = &N;
     while (true) {
@@ -169,7 +169,7 @@ private:
         }
         r->left = node;
         r = node;
-        UpdateSize_stack.emplace_back(node);
+        update_stack.emplace_back(node);
         node = node->left;
       } else {
         if (node->right == nullptr)
@@ -183,7 +183,7 @@ private:
         }
         l->right = node;
         l = node;
-        UpdateSize_stack.emplace_back(node);
+        update_stack.emplace_back(node);
         node = node->right;
       }
     }
@@ -191,9 +191,9 @@ private:
     l->UpdateSize();
     r->left = node->right;
     r->UpdateSize();
-    while (!UpdateSize_stack.empty()) {
-      UpdateSize_stack.back()->UpdateSize();
-      UpdateSize_stack.pop_back();
+    while (!update_stack.empty()) {
+      update_stack.back()->UpdateSize();
+      update_stack.pop_back();
     }
     node->left = N.right;
     node->right = N.left;
