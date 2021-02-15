@@ -1,0 +1,6 @@
+[submodule "third_party/LuaJIT"]
+	path = third_party/LuaJIT
+	url = git@github.com:bzEq/LuaJIT.git
+[submodule "third_party/sol2"]
+	path = third_party/sol2
+	url = git@github.com:ThePhD/sol2.git
