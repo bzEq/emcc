@@ -453,6 +453,25 @@ public:
     return Append(piece.begin(), piece.end());
   }
 
+  Rope Copy(size_t offset, size_t len) {
+    Rope result;
+    if (offset >= size())
+      return result;
+    assert(root_);
+    while (len) {
+      assert(offset < size());
+      size_t nr_copied = 0;
+      root_ = Splay(root_, offset);
+      auto cmp = Compare(offset, root_);
+      assert(cmp.order == 0);
+      nr_copied = std::min(root_->piece.size() - cmp.relative_index, len);
+      result.Append(root_->piece.data() + cmp.relative_index, nr_copied);
+      len -= nr_copied;
+      offset += nr_copied;
+    }
+    return result;
+  }
+
   void clear() {
     std::vector<Node *> worklist;
     worklist.push_back(root_);

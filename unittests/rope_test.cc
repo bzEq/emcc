@@ -142,4 +142,11 @@ TEST(RopeTest, SplitTest) {
   EXPECT_TRUE(rhs == "Jude!");
 }
 
+TEST(RopeTest, CopyTest) {
+  Rope lhs;
+  lhs.Append("Hey, Jude!");
+  Rope rhs(lhs.Copy(5, 5));
+  EXPECT_TRUE(rhs == "Jude!");
+}
+
 } // namespace
