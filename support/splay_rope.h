@@ -278,8 +278,7 @@ private:
     r->left = node->right;
     r->update();
     while (!update_stack.empty()) {
-      Node *tmp = update_stack.back();
-      tmp->update();
+      update_stack.back()->update();
       update_stack.pop_back();
     }
     node->left = N.right;
