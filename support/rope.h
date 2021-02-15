@@ -328,6 +328,22 @@ private:
     return node;
   }
 
+  Node *FillNode(const Char *data, size_t len) {
+    size_t i = 0;
+    Node *left = nullptr;
+    while (i < len) {
+      Node *node = CreateNode();
+      size_t piece_size = len - i >= kMaxPieceSize ? kMaxPieceSize : len - i;
+      node->piece.append(data + i, piece_size);
+      node->left = left;
+      node->UpdateSize();
+      left = node;
+      i += piece_size;
+    }
+    assert(i == len);
+    return left;
+  }
+
 public:
   static constexpr size_t npos = ~0UL;
   Rope() : root_(nullptr) {}
@@ -435,22 +451,6 @@ public:
 
   size_t Append(const Piece &piece) {
     return Append(piece.begin(), piece.end());
-  }
-
-  Node *FillNode(const Char *data, size_t len) {
-    size_t i = 0;
-    Node *left = nullptr;
-    while (i < len) {
-      Node *node = CreateNode();
-      size_t piece_size = len - i >= kMaxPieceSize ? kMaxPieceSize : len - i;
-      node->piece.append(data + i, piece_size);
-      node->left = left;
-      node->UpdateSize();
-      left = node;
-      i += piece_size;
-    }
-    assert(i == len);
-    return left;
   }
 
   void clear() {
