@@ -21,7 +21,7 @@ void Page::Reload(size_t start_line) {
       ++pos.y;
       pos.x = 0;
     } else {
-      pos = JumpTo(width(), pos, w);
+      pos = Cursor::Goto(width(), pos, w);
     }
   }
   // Draw status line.

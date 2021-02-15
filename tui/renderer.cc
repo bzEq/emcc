@@ -8,7 +8,7 @@ void NcursesRenderer::RenderRange(const Framebuffer &fb, Cursor begin,
   int max_y, max_x;
   GetMaxYX(max_y, max_x);
   Cursor boundary(max_y, max_x);
-  for (Cursor c = begin; c != end; c = JumpTo(fb.width(), c, 1)) {
+  for (Cursor c = begin; c != end; c = Cursor::Goto(fb.width(), c, 1)) {
     if (Cursor::IsBeyond(c, boundary) || Cursor::IsBeyond(c, fb.GetBoundary()))
       break;
     const Pixel &p = fb.Get(c.y, c.x);

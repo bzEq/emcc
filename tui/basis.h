@@ -18,29 +18,27 @@ struct Cursor {
       return true;
     return pos.y >= boundary.y || pos.x >= boundary.x;
   }
-};
-
-inline int WrapDistance(const int wrap_width, Cursor a, Cursor b) {
-  assert(wrap_width > 0);
-  assert(a.x < wrap_width && b.x < wrap_width);
-  return (b.y - a.y) * wrap_width + b.x - a.x;
-}
-
-inline Cursor JumpTo(const int wrap_width, Cursor origin, int distance) {
-  assert(wrap_width > 0);
-  int dx = distance % wrap_width;
-  int dy = distance / wrap_width;
-  if (origin.x + dx < 0) {
-    dx += wrap_width;
-    dy -= 1;
-  } else if (origin.x + dx >= wrap_width) {
-    dy += 1;
+  static int ComputeDistance(const int wrap_width, Cursor start, Cursor end) {
+    assert(wrap_width > 0);
+    assert(start.x < wrap_width && end.x < wrap_width);
+    return (end.y - start.y) * wrap_width + (end.x - start.x);
   }
-  return Cursor{
-      origin.y + dy,
-      (origin.x + dx) % wrap_width,
-  };
-}
+  static Cursor Goto(const int wrap_width, Cursor origin, int distance) {
+    assert(wrap_width > 0);
+    int dx = distance % wrap_width;
+    int dy = distance / wrap_width;
+    if (origin.x + dx < 0) {
+      dx += wrap_width;
+      dy -= 1;
+    } else if (origin.x + dx >= wrap_width) {
+      dy += 1;
+    }
+    return Cursor{
+        origin.y + dy,
+        (origin.x + dx) % wrap_width,
+    };
+  }
+};
 
 struct Command {};
 
