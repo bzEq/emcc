@@ -16,5 +16,5 @@ local_repository(
 new_local_repository(
   name = 'sol2',
   path = './third_party/sol2',
-  build_file = 'sol2.BUILD',
+  build_file = './third_party/sol2.BUILD',
 )
