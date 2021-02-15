@@ -140,8 +140,8 @@ private:
   }
 
   Node *Splay(Node *node, const size_t index) {
-    // return CanonicalSplay(node, index);
-    return TrickySplay(node, index);
+    return CanonicalSplay(node, index);
+    // return TrickySplay(node, index);
   }
 
   // https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-size-splay.c
