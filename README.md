@@ -12,10 +12,15 @@ sudo apt install clang libgtest-dev libre2-dev libblocksruntime-dev libncurses-d
 
 ## Run all tests
 ```
-CC=clang bazel test unittests:*
+CC=clang bazel test //unittests:*
 ```
 
 ## Build all tools
 ```
-CC=clang bazel build tools:*
+CC=clang bazel build //tools:*
+```
+
+## Build all examples
+```
+CC=clang bazel build //examples:*
 ```
