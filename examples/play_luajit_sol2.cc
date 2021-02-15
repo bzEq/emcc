@@ -1,12 +1,9 @@
 #define SOL_ALL_SAFETIES_ON 1
-#include <sol/sol.hpp> // or #include "sol.hpp", whichever suits your needs
+#include <sol/sol.hpp>
 
 int main(int argc, char *argv[]) {
-
   sol::state lua;
   lua.open_libraries(sol::lib::base);
-
-  lua.script("print('bark bark bark!')");
-
+  lua.script("print('Hello, emcc!')");
   return 0;
 }
