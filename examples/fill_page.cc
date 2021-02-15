@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   using namespace emcc;
   using namespace emcc::tui;
   if (argc != 3)
-    Die("Usage: %s <filename>", argv[0]);
+    Die("Usage: {} <filename> <start_line>", argv[0]);
   std::string filename(argv[1]);
   size_t start_line = std::stoul(argv[2]);
   auto buffer = MonoBuffer::CreateFromFile(filename);
