@@ -123,9 +123,9 @@ private:
     if (lhs == nullptr) {
       return rhs;
     }
-    Node *const l = RotateLeftTillEnd(lhs);
+    Node *const l = Splay(lhs, lhs->size);
     assert(l->right == nullptr);
-    Node *const r = RotateRightTillEnd(rhs);
+    Node *const r = Splay(rhs, 0);
     if (r != nullptr && l->piece.size() + r->piece.size() <= kMaxPieceSize) {
       assert(r->left == nullptr);
       // Compress the piece.

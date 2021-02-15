@@ -84,12 +84,13 @@ public:
       root_ = new_root;
       return true;
     }
-    Node *right = RotateRightTillEnd(root_->right);
-    assert(right);
-    assert(right->left == nullptr);
-    right->left = root_->left;
+    assert(i == root_->left_size());
+    Node *const new_root = Splay(root_->right, 0);
+    assert(new_root);
+    assert(new_root->left == nullptr);
+    new_root->left = root_->left;
     Release(root_);
-    root_ = right;
+    root_ = new_root;
     root_->update();
     return true;
   }
