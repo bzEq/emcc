@@ -455,6 +455,7 @@ public:
     Rope result;
     if (offset >= size())
       return result;
+    len = std::min(len, size() - offset);
     assert(root_);
     while (len) {
       assert(offset < size());
