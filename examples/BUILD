@@ -101,3 +101,13 @@ cc_binary(
         "//tui:emcc_tui",
     ],
 )
+
+cc_binary(
+    name = "play_luajit_sol2",
+    srcs = ["play_luajit_sol2.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "@sol2//:sol2",
+    ],
+)
