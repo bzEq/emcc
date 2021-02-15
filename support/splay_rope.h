@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cassert>
+#include <iostream>
 #include <stddef.h>
 #include <utility>
 #include <vector>
@@ -226,6 +227,76 @@ private:
   }
 
   Node *Splay(Node *node, const size_t index) {
+    return CanonicalSplay(node, index);
+  }
+
+  // https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-size-splay.c
+  Node *CanonicalSplay(Node *node, const size_t index) {
+    if (node == nullptr)
+      return nullptr;
+    Node N, *l, *r;
+    l = r = &N;
+    size_t key = index;
+    while (true) {
+      auto cmp = Compare(key, node);
+      key = cmp.relative_index;
+      if (cmp.order == 0)
+        break;
+      if (cmp.order < 0) {
+        if (node->left == nullptr)
+          break;
+        cmp = Compare(key, node->left);
+        if (cmp.order < 0) {
+          node = RotateRight(node);
+          key = cmp.relative_index;
+          if (node->left == nullptr)
+            break;
+        }
+        r->left = node;
+        r = node;
+        node = node->left;
+      } else {
+        if (node->right == nullptr)
+          break;
+        cmp = Compare(key, node->right);
+        if (cmp.order > 0) {
+          node = RotateLeft(node);
+          key = cmp.relative_index;
+          if (node->right == nullptr)
+            break;
+        }
+        l->right = node;
+        l = node;
+        node = node->right;
+      }
+    }
+    l->right = node->left;
+    l->update();
+    r->left = node->right;
+    r->update();
+    std::vector<Node *> update_stack;
+    for (Node *tmp = N.right; tmp != node->left; tmp = tmp->right)
+      update_stack.emplace_back(tmp);
+    while (!update_stack.empty()) {
+      Node *tmp = update_stack.back();
+      tmp->update();
+      update_stack.pop_back();
+    }
+    for (Node *tmp = N.left; tmp != node->right; tmp = tmp->left)
+      update_stack.emplace_back(tmp);
+    while (!update_stack.empty()) {
+      Node *tmp = update_stack.back();
+      tmp->update();
+      update_stack.pop_back();
+    }
+    node->left = N.right;
+    node->right = N.left;
+    node->update();
+    assert(node->right == nullptr || node->left_size() == index);
+    return node;
+  }
+
+  Node *TrickySplay(Node *node, const size_t index) {
     if (node == nullptr)
       return nullptr;
     while (true) {
@@ -276,6 +347,7 @@ private:
         }
       }
     }
+    assert(node->right == nullptr || node->left_size() == index);
     return node;
   }
 
