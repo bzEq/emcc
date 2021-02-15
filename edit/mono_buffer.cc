@@ -107,7 +107,7 @@ size_t MonoBuffer::CountLines() {
 
 std::unique_ptr<MonoBuffer>
 MonoBuffer::CreateFromFile(const std::string &filename) {
-  MMapFile file(filename, 64UL << 20);
+  MMapFile file(filename, 32UL << 30);
   if (!file.is_open())
     return nullptr;
   auto buffer = std::make_unique<MonoBuffer>();
