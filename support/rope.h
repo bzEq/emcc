@@ -140,6 +140,69 @@ private:
   }
 
   Node *Splay(Node *node, const size_t index) {
+    // return CanonicalSplay(node, index);
+    return TrickySplay(node, index);
+  }
+
+  // https://www.link.cs.cmu.edu/link/ftp-site/splaying/top-down-size-splay.c
+  Node *CanonicalSplay(Node *node, const size_t index) {
+    if (node == nullptr)
+      return nullptr;
+    size_t key = index;
+    std::vector<Node *> UpdateSize_stack;
+    Node N, *l, *r;
+    l = r = &N;
+    while (true) {
+      auto cmp = Compare(key, node);
+      key = cmp.relative_index;
+      if (cmp.order == 0)
+        break;
+      if (cmp.order < 0) {
+        if (node->left == nullptr)
+          break;
+        cmp = Compare(key, node->left);
+        if (cmp.order < 0) {
+          node = RotateRight(node);
+          key = cmp.relative_index;
+          if (node->left == nullptr)
+            break;
+        }
+        r->left = node;
+        r = node;
+        UpdateSize_stack.emplace_back(node);
+        node = node->left;
+      } else {
+        if (node->right == nullptr)
+          break;
+        cmp = Compare(key, node->right);
+        if (cmp.order > 0) {
+          node = RotateLeft(node);
+          key = cmp.relative_index;
+          if (node->right == nullptr)
+            break;
+        }
+        l->right = node;
+        l = node;
+        UpdateSize_stack.emplace_back(node);
+        node = node->right;
+      }
+    }
+    l->right = node->left;
+    l->UpdateSize();
+    r->left = node->right;
+    r->UpdateSize();
+    while (!UpdateSize_stack.empty()) {
+      UpdateSize_stack.back()->UpdateSize();
+      UpdateSize_stack.pop_back();
+    }
+    node->left = N.right;
+    node->right = N.left;
+    node->UpdateSize();
+    return node;
+  }
+
+  // Amazingly, TrickySplay runs faster than CanonicalSplay in random tests.
+  Node *TrickySplay(Node *node, const size_t index) {
     if (node == nullptr)
       return nullptr;
     while (true) {
