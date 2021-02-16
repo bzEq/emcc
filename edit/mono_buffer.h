@@ -36,6 +36,10 @@ public:
   void ComputePoint(size_t line, size_t col, size_t &point) {
     return ComputeOffset(line, col, point);
   }
+  size_t GetLineSize(size_t line) {
+    assert(line < line_size_.size());
+    return line_size_.At(line);
+  }
   bool Verify();
   void set_filename(const std::string &filename) { filename_ = filename; }
   const std::string &filename() const { return filename_; }

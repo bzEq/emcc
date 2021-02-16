@@ -1,4 +1,5 @@
 #include "tui/buffer_view.h"
+#include "support/misc.h"
 
 namespace emcc::tui {
 
@@ -93,6 +94,26 @@ void BufferView::ScaleFramebuffer(size_t size) {
   framebuffer_.resize(size);
   for (; i < framebuffer_.size(); ++i)
     framebuffer_[i].resize(width());
+}
+
+void BufferView::DrawStatusLine() {
+  if (framebuffer_.empty())
+    return;
+  const Pixel &at = GetPixel(cursor_.y, cursor_.x);
+  size_t line, col;
+  buffer_->ComputePosition(at.position.point, line, col);
+  std::vector<Pixel> &status_line = framebuffer_.back();
+  std::string content =
+      fmt::format("----| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
+                  buffer_->filename(), at.position.point, buffer_->CountChars(),
+                  line, buffer_->CountLines(), col, buffer_->GetLineSize(line));
+  for (size_t i = 0; i < status_line.size(); ++i) {
+    if (i < content.size()) {
+      status_line[i].shade.character = content[i];
+    } else {
+      status_line[i].shade.character = '-';
+    }
+  }
 }
 
 } // namespace emcc::tui

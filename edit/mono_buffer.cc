@@ -1,4 +1,5 @@
 #include "edit/mono_buffer.h"
+#include "support/misc.h"
 #include "support/sys.h"
 
 #include <iostream>
@@ -174,7 +175,7 @@ bool MonoBuffer::Verify() {
     }
   }
   stats.push_back(current);
-  if (std::abs((long)stats.size() - (long)line_size_.size()) > 1)
+  if (abs_diff(stats.size(), line_size_.size()) > 1)
     return false;
   for (size_t i = 0; i < std::min(stats.size(), line_size_.size()); ++i) {
     if (stats[i] != line_size_.At(i))

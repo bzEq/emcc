@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
   auto buffer = MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename.c_str());
+  assert(buffer->Verify());
   {
     initscr();
     defer { endwin(); };
@@ -25,8 +26,10 @@ int main(int argc, char *argv[]) {
     int height, width;
     renderer.GetMaxYX(height, width);
     BufferView view(buffer.get());
+    view.set_width(width);
     view.set_baseline(start_line);
     view.FillFramebuffer(height);
+    view.DrawStatusLine();
     renderer.RenderRange(view, {0, 0}, view.GetBoundary());
     renderer.DrawCursor({0, 0});
     while (true) {

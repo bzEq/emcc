@@ -24,6 +24,7 @@ public:
   bool GetPixel(size_t y, size_t x, Pixel &pixel);
   bool GetPixel(Cursor c, Pixel &pixel);
   Cursor GetBoundary() const { return Cursor(framebuffer_.size(), width()); }
+  void DrawStatusLine();
 
   void MoveUp();
   void MoveDown();
