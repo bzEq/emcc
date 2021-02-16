@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tui/buffer_view.h"
 #include "tui/cursor.h"
 #include "tui/page.h"
 
@@ -18,6 +19,8 @@ public:
   void RenderFull(const Framebuffer &fb);
 
   void RenderRange(const Framebuffer &fb, Cursor begin, Cursor end);
+
+  void RenderRange(const BufferView &fb, Cursor begin, Cursor end);
 
   void RenderRangeAt(Cursor anchor, const Framebuffer &fb, Cursor begin,
                      Cursor end);

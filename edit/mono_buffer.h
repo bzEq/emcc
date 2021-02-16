@@ -33,7 +33,7 @@ public:
   bool SaveFile(const std::string &filename);
   void ComputePosition(size_t offset, size_t &line, size_t &col);
   void ComputeOffset(size_t line, size_t col, size_t &offset);
-  void ComputePoint(size_t line, size_t col, size_t point) {
+  void ComputePoint(size_t line, size_t col, size_t &point) {
     return ComputeOffset(line, col, point);
   }
   bool Verify();

@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
   auto start = std::chrono::high_resolution_clock::now();
   auto end = std::chrono::high_resolution_clock::now();
   size_t nr_frames = 0;
+  BufferView view(buffer.get());
   {
     initscr();
     defer { endwin(); };
@@ -36,11 +37,15 @@ int main(int argc, char *argv[]) {
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       renderer.GetMaxYX(height, width);
+      view.set_width(width);
+      view.set_baseline(i);
+      view.FillFramebuffer(height);
       page.Resize(width, height);
-      page.set_baseline(i);
-      page.Reload();
+      // page.set_baseline(i);
+      // page.Reload();
       renderer.Clear();
-      renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
+      renderer.RenderRange(view, Cursor(0, 0), view.GetBoundary());
+      // renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
       renderer.DrawCursor(Cursor(0, 0));
       renderer.Refresh();
       ++nr_frames;

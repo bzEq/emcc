@@ -1,7 +1,7 @@
 cc_library(
     name = "emcc_tui",
-    srcs = glob(["*.cc"], exclude=["buffer_view.cc"]),
-    hdrs = glob(["*.h"], exclude=["buffer_view.h"]),
+    srcs = glob(["*.cc"]),
+    hdrs = glob(["*.h"]),
     copts = [
         "-std=c++17",
         "-O3",

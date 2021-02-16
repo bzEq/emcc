@@ -52,6 +52,13 @@ struct Pixel {
     assert(is_head());
     return offset();
   }
+  void set_offset(size_t len, size_t offset) {
+    if (offset == 0)
+      position.head_tail_pair =
+          (1 << (sizeof(position.head_tail_pair) * 8 - 1)) | len;
+    else
+      position.head_tail_pair = offset;
+  }
   static Pixel MakeHeadPixel(size_t point, size_t len, int c = 0) {
     Pixel p;
     assert(len < (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)));
