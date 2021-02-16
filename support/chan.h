@@ -6,7 +6,7 @@
 
 namespace emcc {
 
-template <typename T, size_t Cap>
+template <typename T, size_t Cap = 16>
 class Chan {
 private:
   T chan_[Cap];
@@ -74,9 +74,21 @@ public:
   }
 
   template <typename E>
+  bool put_nowait(E &&e) {
+    std::unique_lock<std::mutex> l(mu_);
+    if (closed_ || is_full())
+      return false;
+    chan_[w_] = std::forward<E>(e);
+    AdvanceWrite();
+    l.unlock();
+    cv_.notify_one();
+    return true;
+  }
+
+  template <typename E>
   bool put(E &&e) {
     std::unique_lock<std::mutex> l(mu_);
-    cv_.wait(l, [this] { return closed_ || size() != Cap; });
+    cv_.wait(l, [this] { return closed_ || !is_full(); });
     if (closed_)
       return false;
     chan_[w_] = std::forward<E>(e);

@@ -12,20 +12,27 @@
 
 namespace emcc::tui {
 
-class StreamInterpreter;
-class Terminal;
+using SignalQueueTy = Chan<int>;
 
 class WYSIWYGEditor {
 public:
   WYSIWYGEditor(Page *page, MonoBuffer *buffer, NcursesRenderer *renderer)
-      : changed_(false), loc_{0, 0}, page_(page), buffer_(buffer),
-        input_(nullptr), renderer_(renderer), have_to_stop_(false), status_(0) {
-  }
+      : signal_queue_(nullptr), changed_(false), loc_{0, 0}, page_(page),
+        buffer_(buffer), input_(nullptr), renderer_(renderer),
+        have_to_stop_(false), status_(0) {}
 
   WYSIWYGEditor(Page *page, MonoBuffer *buffer, NcursesInput *input,
                 NcursesRenderer *renderer)
-      : changed_(false), loc_{0, 0}, page_(page), buffer_(buffer),
-        input_(input), renderer_(renderer), have_to_stop_(false), status_(0) {}
+      : signal_queue_(nullptr), changed_(false), loc_{0, 0}, page_(page),
+        buffer_(buffer), input_(input), renderer_(renderer),
+        have_to_stop_(false), status_(0) {}
+
+  WYSIWYGEditor(Arc<SignalQueueTy> signal_queue, Page *page, MonoBuffer *buffer,
+                NcursesInput *input, NcursesRenderer *renderer)
+      : signal_queue_(signal_queue), changed_(false), loc_{0, 0}, page_(page),
+        buffer_(buffer), input_(input), renderer_(renderer),
+        have_to_stop_(false), status_(0) {}
+
   Cursor loc() const { return loc_; }
   void MoveTo(Cursor loc) {
     if (!Cursor::IsBeyond(loc, page_->GetBoundary()))
@@ -55,6 +62,7 @@ public:
 
 private:
   void Handle(int);
+  Arc<SignalQueueTy> signal_queue_;
   bool changed_;
   Cursor loc_;
   Page *page_;
