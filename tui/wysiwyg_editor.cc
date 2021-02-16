@@ -1,5 +1,7 @@
 #include "tui/wysiwyg_editor.h"
 
+#include <csignal>
+
 namespace emcc::tui {
 
 void WYSIWYGEditor::Show() {
@@ -20,11 +22,21 @@ int WYSIWYGEditor::Run() {
   changed_ = true;
   while (!have_to_stop_) {
     Show();
+    // Handle external signal.
+    int signum;
+    if (signal_queue_->get_nowait(signum)) {
+      if (signum == SIGWINCH) {
+        Resize();
+        continue;
+      }
+    }
     int ch = input_->GetNext();
-    Handle(ch);
+    Consume(ch);
   }
   return status_;
 }
+
+void WYSIWYGEditor::Resize() {}
 
 void WYSIWYGEditor::MoveUp() {
   Cursor probe = loc_;
@@ -58,7 +70,7 @@ void WYSIWYGEditor::MoveRight() {
     loc_ = probe;
 }
 
-void WYSIWYGEditor::Handle(int ch) {
+void WYSIWYGEditor::Consume(int ch) {
   // Esc is pressed.
   if (ch == 27) {
     have_to_stop_ = true;

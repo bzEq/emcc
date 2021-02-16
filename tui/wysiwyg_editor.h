@@ -61,7 +61,8 @@ public:
   void Show();
 
 private:
-  void Handle(int);
+  void Consume(int);
+  void Resize();
   Arc<SignalQueueTy> signal_queue_;
   bool changed_;
   Cursor loc_;
