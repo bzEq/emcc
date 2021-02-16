@@ -45,6 +45,8 @@ struct Pixel {
     return position.head_tail_pair >> (sizeof(position.head_tail_pair) * 8 - 1);
   }
   size_t offset() const {
+    if (is_head())
+      return 0;
     return position.head_tail_pair &
            (static_cast<decltype(position.head_tail_pair)>(~0U) >> 1);
   }
