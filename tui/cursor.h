@@ -40,4 +40,8 @@ struct Cursor {
   }
 };
 
+inline Cursor operator+(const Cursor lhs, const Cursor rhs) {
+  return {lhs.y + rhs.y, lhs.x + rhs.x};
+}
+
 } // namespace emcc::tui

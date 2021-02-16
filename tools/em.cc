@@ -17,7 +17,7 @@ static void SendSignal(int signum) { signal_queue->put_nowait(signum); }
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    Die("Usage: {} <filename>");
+    Die("Usage: {} <filename>", argv[0]);
   }
   std::string filename(argv[1]);
   auto buffer = MonoBuffer::CreateFromFile(filename);

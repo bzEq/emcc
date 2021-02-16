@@ -19,9 +19,14 @@ public:
 
   void RenderRange(const Framebuffer &fb, Cursor begin, Cursor end);
 
+  void RenderRangeAt(Cursor anchor, const Framebuffer &fb, Cursor begin,
+                     Cursor end);
+
   void DrawCursor(Cursor c);
 
   void Refresh() { wrefresh(window_); }
+
+  Cursor GetBoundary();
 
 private:
   WINDOW *window_;
