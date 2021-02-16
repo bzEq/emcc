@@ -17,9 +17,8 @@ int main(int argc, char *argv[]) {
     Die("Failed to open {}", filename);
   initscr();
   atexit([]() { endwin(); });
-  cbreak();
+  raw();
   noecho();
-  keypad(stdscr, true);
   NcursesRenderer renderer(stdscr);
   NcursesInput input(stdscr);
   int height, width;
