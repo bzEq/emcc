@@ -73,6 +73,17 @@ public:
     return true;
   }
 
+  bool get_nowait(T &receiver) {
+    std::unique_lock<std::mutex> l(mu_);
+    if (closed_ || is_full())
+      return false;
+    receiver = std::move(chan_[r_]);
+    AdvanceRead();
+    l.unlock();
+    cv_.notify_one();
+    return true;
+  }
+
   template <typename E>
   bool put_nowait(E &&e) {
     std::unique_lock<std::mutex> l(mu_);
