@@ -1,7 +1,6 @@
 #include "support/defer.h"
 #include "support/misc.h"
 #include "support/sys.h"
-#include "tui/page.h"
 #include "tui/renderer.h"
 
 #include <chrono>
@@ -30,8 +29,6 @@ int main(int argc, char *argv[]) {
     NcursesRenderer renderer(stdscr);
     int height, width;
     renderer.GetMaxYX(height, width);
-    Framebuffer framebuffer(width, height);
-    Page page(buffer.get(), &framebuffer, width, height);
     start = std::chrono::high_resolution_clock::now();
     size_t total_lines = buffer->CountLines();
     for (size_t i = std::min(total_lines - 1, start_line);
@@ -40,13 +37,9 @@ int main(int argc, char *argv[]) {
       view.set_width(width);
       view.set_baseline(i);
       view.FillFramebuffer(height);
-      page.Resize(width, height);
-      // page.set_baseline(i);
-      // page.Reload();
       renderer.Clear();
-      renderer.RenderRange(view, Cursor(0, 0), view.GetBoundary());
-      // renderer.RenderRange(framebuffer, Cursor(0, 0), page.GetBoundary());
-      renderer.DrawCursor(Cursor(0, 0));
+      renderer.RenderRange(view, {0, 0}, view.GetBoundary());
+      renderer.DrawCursor({0, 0});
       renderer.Refresh();
       ++nr_frames;
     }

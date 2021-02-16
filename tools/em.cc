@@ -33,9 +33,7 @@ int main(int argc, char *argv[]) {
   NcursesInput input(stdscr);
   int height, width;
   renderer.GetMaxYX(height, width);
-  Framebuffer framebuffer(width, height);
-  Page page(buffer.get(), &framebuffer, width, height);
-  page.set_baseline(0);
+  BufferView page(buffer.get());
   WYSIWYGEditor editor(signal_queue, &page, buffer.get(), &input, &renderer);
   return editor.Run();
 }

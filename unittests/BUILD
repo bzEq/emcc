@@ -115,9 +115,9 @@ cc_test(
 )
 
 cc_test(
-    name = "page_test",
+    name = "tui_test",
     srcs = [
-        "page_test.cc",
+        "tui_test.cc",
     ],
     copts = COPTS,
     linkopts = LINKOPTS,

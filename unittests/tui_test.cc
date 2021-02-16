@@ -1,5 +1,5 @@
 #include "tui/cursor.h"
-#include "tui/page.h"
+#include "tui/pixel.h"
 
 #include <gtest/gtest.h>
 
@@ -31,6 +31,18 @@ TEST(PageTest, PixelTest) {
   for (size_t i = 1; i < vec.size(); ++i) {
     EXPECT_TRUE(vec[i].offset() == i);
   }
+}
+
+TEST(PageTest, PixelTest1) {
+  Pixel p;
+  p.set_offset(3, 0);
+  EXPECT_TRUE(p.is_head());
+  p.set_offset(3, 1);
+  EXPECT_TRUE(!p.is_head());
+  EXPECT_TRUE(p.offset() == 1);
+  p.set_offset(3, 2);
+  EXPECT_TRUE(!p.is_head());
+  EXPECT_TRUE(p.offset() == 2);
 }
 
 } // namespace
