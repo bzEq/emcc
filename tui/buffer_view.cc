@@ -27,10 +27,14 @@ bool BufferView::GetPixel(size_t y, size_t x, Pixel &pixel) {
 }
 
 void BufferView::Reset(size_t h) {
-  framebuffer_.clear();
-  framebuffer_.resize(h);
+  if (h > framebuffer_.size()) {
+    size_t s = framebuffer_.size();
+    framebuffer_.resize(h);
+    for (; s < framebuffer_.size(); ++s)
+      framebuffer_[s].resize(width());
+  }
   for (size_t i = 0; i < framebuffer_.size(); ++i)
-    framebuffer_[i].resize(width());
+    std::fill(framebuffer_[i].begin(), framebuffer_[i].end(), Pixel());
 }
 
 void BufferView::FillFramebuffer(size_t nr_buffer_line) {
