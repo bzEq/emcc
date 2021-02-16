@@ -6,14 +6,13 @@ namespace emcc::tui {
 
 void WYSIWYGEditor::Show() {
   if (changed_) {
-    page_->Reload();
-    renderer_->RenderRange(page_->framebuffer(), Cursor(0, 0),
-                           page_->GetBoundary());
+    int height, width;
+    renderer_->GetMaxYX(height, width);
+    page_->set_width(width);
+    page_->FillFramebuffer(height);
+    renderer_->RenderRange(*page_, Cursor(0, 0), page_->GetBoundary());
     changed_ = false;
   }
-  page_->UpdateStatusLine(loc_);
-  renderer_->RenderRange(page_->framebuffer(), Cursor(page_->height() - 1, 0),
-                         page_->GetBoundary());
   renderer_->DrawCursor(loc_);
   renderer_->Refresh();
 }

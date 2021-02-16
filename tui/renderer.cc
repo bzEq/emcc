@@ -4,48 +4,27 @@
 
 namespace emcc::tui {
 
-void NcursesRenderer::RenderRange(const Framebuffer &fb, Cursor begin,
-                                  Cursor end) {
-  RenderRangeAt({0, 0}, fb, begin, end);
-}
-
 void NcursesRenderer::RenderRange(const BufferView &view, Cursor begin,
                                   Cursor end) {
+  RenderRangeAt({0, 0}, view, begin, end);
+}
+
+void NcursesRenderer::RenderRangeAt(Cursor anchor, const BufferView &view,
+                                    Cursor begin, Cursor end) {
   Cursor boundary(GetBoundary());
-  Cursor fb_boundary(view.GetBoundary());
+  if (Cursor::IsBeyond(anchor, boundary))
+    return;
+  Cursor view_boundary(view.GetBoundary());
   for (Cursor c = begin; !Cursor::IsBeyond(c, end);
        c = Cursor::Goto(view.width(), c, 1)) {
-    if (Cursor::IsBeyond(c, fb_boundary))
+    if (Cursor::IsBeyond(c, view_boundary))
       continue;
-    Cursor t = c;
+    Cursor t = anchor + c;
     if (Cursor::IsBeyond(t, boundary))
       continue;
     const Pixel &p = view.GetPixel(c.y, c.x);
     mvwaddch(window_, t.y, t.x, p.shade.character);
   }
-}
-
-void NcursesRenderer::RenderRangeAt(Cursor anchor, const Framebuffer &fb,
-                                    Cursor begin, Cursor end) {
-  Cursor boundary(GetBoundary());
-  if (Cursor::IsBeyond(anchor, boundary))
-    return;
-  Cursor fb_boundary(fb.GetBoundary());
-  for (Cursor c = begin; !Cursor::IsBeyond(c, end);
-       c = Cursor::Goto(fb.width(), c, 1)) {
-    if (Cursor::IsBeyond(c, fb_boundary))
-      continue;
-    Cursor t = anchor + c;
-    if (Cursor::IsBeyond(t, boundary))
-      continue;
-    const Pixel &p = fb.Get(c.y, c.x);
-    mvwaddch(window_, t.y, t.x, p.shade.character);
-  }
-}
-
-void NcursesRenderer::RenderFull(const Framebuffer &fb) {
-  Clear();
-  RenderRange(fb, {0, 0}, fb.GetBoundary());
 }
 
 Cursor NcursesRenderer::GetBoundary() {

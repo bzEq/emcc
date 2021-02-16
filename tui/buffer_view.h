@@ -18,6 +18,7 @@ public:
   size_t baseline() const { return baseline_; }
   void set_width(size_t width) { width_ = width; }
   size_t width() const { return width_; }
+  size_t height() const { return framebuffer_.size(); }
   void FillFramebuffer(size_t nr_buffer_line);
   const Pixel &GetPixel(size_t y, size_t x) const { return framebuffer_[y][x]; }
   bool GetPixel(size_t y, size_t x, Pixel &pixel);

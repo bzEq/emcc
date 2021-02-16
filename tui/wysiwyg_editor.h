@@ -7,7 +7,6 @@
 #include "support/misc.h"
 #include "tui/cursor.h"
 #include "tui/input.h"
-#include "tui/page.h"
 #include "tui/renderer.h"
 
 namespace emcc::tui {
@@ -16,19 +15,20 @@ using SignalQueueTy = Chan<int>;
 
 class WYSIWYGEditor {
 public:
-  WYSIWYGEditor(Page *page, MonoBuffer *buffer, NcursesRenderer *renderer)
+  WYSIWYGEditor(BufferView *page, MonoBuffer *buffer, NcursesRenderer *renderer)
       : signal_queue_(nullptr), changed_(false), loc_{0, 0}, page_(page),
         buffer_(buffer), input_(nullptr), renderer_(renderer),
         have_to_stop_(false), status_(0) {}
 
-  WYSIWYGEditor(Page *page, MonoBuffer *buffer, NcursesInput *input,
+  WYSIWYGEditor(BufferView *page, MonoBuffer *buffer, NcursesInput *input,
                 NcursesRenderer *renderer)
       : signal_queue_(nullptr), changed_(false), loc_{0, 0}, page_(page),
         buffer_(buffer), input_(input), renderer_(renderer),
         have_to_stop_(false), status_(0) {}
 
-  WYSIWYGEditor(Arc<SignalQueueTy> signal_queue, Page *page, MonoBuffer *buffer,
-                NcursesInput *input, NcursesRenderer *renderer)
+  WYSIWYGEditor(Arc<SignalQueueTy> signal_queue, BufferView *page,
+                MonoBuffer *buffer, NcursesInput *input,
+                NcursesRenderer *renderer)
       : signal_queue_(signal_queue), changed_(false), loc_{0, 0}, page_(page),
         buffer_(buffer), input_(input), renderer_(renderer),
         have_to_stop_(false), status_(0) {}
@@ -66,7 +66,7 @@ private:
   Arc<SignalQueueTy> signal_queue_;
   bool changed_;
   Cursor loc_;
-  Page *page_;
+  BufferView *page_;
   MonoBuffer *buffer_;
   NcursesInput *input_;
   NcursesRenderer *renderer_;
