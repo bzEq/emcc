@@ -12,7 +12,8 @@ struct Pixel {
   } shade;
 
   struct {
-    uint8_t head_tail_pair; // A character might span multiple pixels.
+    uint8_t is_head : 1; // A character might span multiple pixels.
+    uint8_t offset : 7;
     size_t point; // Point is the offset of the character at text buffer.
   } position;
 
@@ -41,40 +42,37 @@ struct Pixel {
     return memcmp(&this->shade, &other.shade, sizeof(this->shade)) == 0;
   }
 
-  bool is_head() const {
-    return position.head_tail_pair >> (sizeof(position.head_tail_pair) * 8 - 1);
-  }
+  bool is_head() const { return position.is_head; }
   size_t offset() const {
     if (is_head())
       return 0;
-    return position.head_tail_pair &
-           (static_cast<decltype(position.head_tail_pair)>(~0U) >> 1);
+    return position.offset;
   }
   size_t length() const {
     assert(is_head());
-    return offset();
+    return position.offset;
   }
   void set_offset(size_t len, size_t offset) {
-    if (offset == 0)
-      position.head_tail_pair =
-          (1 << (sizeof(position.head_tail_pair) * 8 - 1)) | len;
-    else
-      position.head_tail_pair = offset;
+    if (offset == 0) {
+      position.is_head = 1;
+      position.offset = len;
+    } else {
+      position.is_head = 0;
+      position.offset = offset;
+    }
   }
   static Pixel MakeHeadPixel(size_t point, size_t len, int c = 0) {
     Pixel p;
-    assert(len < (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)));
-    p.position.head_tail_pair =
-        (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)) | len;
+    p.position.is_head = 1;
+    p.position.offset = len;
     p.position.point = point;
     p.shade.character = c;
     return p;
   }
   static Pixel MakeTailPixel(size_t point, size_t offset, int c = 0) {
     Pixel p;
-    assert(offset > 0 &&
-           offset < (1 << (sizeof(p.position.head_tail_pair) * 8 - 1)));
-    p.position.head_tail_pair = offset;
+    p.position.is_head = 0;
+    p.position.offset = offset;
     p.position.point = point;
     p.shade.character = c;
     return p;
