@@ -49,6 +49,8 @@ public:
     return w_ + Cap - r_;
   }
 
+  bool is_full() const { return size() == Cap; }
+
   bool is_open() {
     std::unique_lock<std::mutex> l(mu_);
     return closed_;
@@ -83,7 +85,6 @@ public:
     cv_.notify_one();
     return true;
   }
-
 };
 
 template <typename T>
