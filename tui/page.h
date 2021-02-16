@@ -147,6 +147,8 @@ public:
   Cursor GetBoundary() const { return framebuffer_->GetBoundary(); }
   const Framebuffer &framebuffer() const { return *framebuffer_; }
   Framebuffer &framebuffer() { return *framebuffer_; }
+  bool GetPixel(Cursor pos, Pixel &result);
+  void UpdateStatusLine(Cursor pos);
 
 private:
   std::tuple<char, size_t> FillPixelAt(Cursor at, size_t offset);

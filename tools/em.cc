@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
   atexit([]() { endwin(); });
   raw();
   noecho();
+  keypad(stdscr, true);
   NcursesRenderer renderer(stdscr);
   NcursesInput input(stdscr);
   int height, width;

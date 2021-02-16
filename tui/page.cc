@@ -24,10 +24,25 @@ void Page::Reload() {
       pos = Cursor::Goto(width(), pos, w);
     }
   }
+}
+
+bool Page::GetPixel(Cursor pos, Pixel &pixel) {
+  if (Cursor::IsBeyond(pos, GetBoundary()))
+    return false;
+  pixel = framebuffer_->Get(pos.y, pos.x);
+  return true;
+}
+
+void Page::UpdateStatusLine(Cursor pos) {
+  Pixel pixel;
+  if (!GetPixel(pos, pixel) || pixel.position.point == ~0)
+    return;
+  size_t line, col;
+  buffer_->ComputePosition(pixel.position.point, line, col);
   // Draw status line.
   std::string content = fmt::format(
       "----  {}    Offset: {} of {} Line: {} of {}  ", buffer_->filename(),
-      start_offset, buffer_->CountChars(), baseline_, buffer_->CountLines());
+      pixel.position.point, buffer_->CountChars(), line, buffer_->CountLines());
   auto &status_line = framebuffer_->frame_[height() - 1];
   for (size_t i = 0; i < status_line.size(); ++i) {
     if (i < content.size()) {

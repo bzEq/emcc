@@ -18,15 +18,14 @@ class Terminal;
 class WYSIWYGEditor {
 public:
   WYSIWYGEditor(Page *page, MonoBuffer *buffer, NcursesRenderer *renderer)
-      : changed_(false), loc_{0, 0}, page_(page), input_(nullptr),
-        buffer_(buffer), renderer_(renderer), have_to_stop_(false), status_(0) {
+      : changed_(false), loc_{0, 0}, page_(page), buffer_(buffer),
+        input_(nullptr), renderer_(renderer), have_to_stop_(false), status_(0) {
   }
 
   WYSIWYGEditor(Page *page, MonoBuffer *buffer, NcursesInput *input,
                 NcursesRenderer *renderer)
-      : changed_(false), loc_{0, 0}, page_(page), input_(input),
-        buffer_(buffer), renderer_(renderer), have_to_stop_(false), status_(0) {
-  }
+      : changed_(false), loc_{0, 0}, page_(page), buffer_(buffer),
+        input_(input), renderer_(renderer), have_to_stop_(false), status_(0) {}
   Cursor loc() const { return loc_; }
   void MoveTo(Cursor loc) {
     if (!Cursor::IsBeyond(loc, page_->GetBoundary()))
@@ -48,6 +47,10 @@ public:
   void PreviousLine();
   void MoveBeginningOfLine();
   void MoveEndOfLine();
+  void MoveUp();
+  void MoveDown();
+  void MoveLeft();
+  void MoveRight();
   void Show();
 
 private:
