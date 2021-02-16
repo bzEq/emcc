@@ -13,4 +13,21 @@ void WYSIWYGEditor::Show() {
   renderer_->Refresh();
 }
 
+int WYSIWYGEditor::Run() {
+  changed_ = true;
+  while (!have_to_stop_) {
+    Show();
+    int ch = input_->GetNext();
+    Handle(ch);
+  }
+  return status_;
+}
+
+void WYSIWYGEditor::Handle(int ch) {
+  // Esc is pressed.
+  if (ch == 27) {
+    have_to_stop_ = true;
+  }
+}
+
 } // namespace emcc::tui

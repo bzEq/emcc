@@ -16,6 +16,7 @@ cc_binary(
     linkopts = LINKOPTS,
     deps = [
         "//edit:emcc_edit",
+        "//tui:emcc_tui",
     ],
 )
 
