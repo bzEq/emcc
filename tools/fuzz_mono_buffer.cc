@@ -16,12 +16,13 @@ int main() {
       for (size_t i = 0; i < len; ++i)
         buffer.Insert(l, c, '0');
       break;
-    case 'a':
+    case 'a': {
       scanf("%zu", &len);
       printf("a %zu\n", len);
-      for (size_t i = 0; i < len; ++i)
-        buffer.Append('0');
+      std::string s('0', len);
+      buffer.Append(s.data(), s.size());
       break;
+    }
     case 'e':
       scanf("%zu %zu %zu", &l, &c, &len);
       printf("e %zu %zu %zu\n", l, c, len);
