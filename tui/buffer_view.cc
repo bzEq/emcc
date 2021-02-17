@@ -28,73 +28,84 @@ bool BufferView::GetPixel(size_t y, size_t x, Pixel &pixel) {
   return true;
 }
 
-void BufferView::Reset(size_t h) {
-  if (h > framebuffer_.size()) {
-    framebuffer_.resize(h);
+void BufferView::FillFramebuffer(size_t nr_buffer_line) {
+  size_t start_point;
+  cursor_ = {0, 0};
+  buffer_->ComputePoint(baseline_, 0, start_point);
+  RewriteFrameBuffer(start_point, ~0, Cursor(nr_buffer_line, width()));
+}
+
+void BufferView::ResetFrameBuffer(Cursor begin, Cursor end) {
+  assert(end.y >= begin.y);
+  if (end.y >= framebuffer_.size()) {
+    framebuffer_.resize(end.y + 1);
   }
-  for (size_t i = 0; i < framebuffer_.size(); ++i) {
+  auto &start_line = framebuffer_[begin.y];
+  start_line.resize(width());
+  if (begin.y == end.y) {
+    if (begin.x < end.x) {
+      std::fill(start_line.begin() + begin.x, start_line.begin() + end.x,
+                Pixel());
+    }
+    return;
+  }
+  std::fill(start_line.begin() + begin.x, start_line.end(), Pixel());
+  for (size_t i = begin.y + 1; i < end.y; ++i) {
     framebuffer_[i].resize(width());
     std::fill(framebuffer_[i].begin(), framebuffer_[i].end(), Pixel());
   }
+  auto &end_line = framebuffer_[end.y];
+  end_line.resize(width());
+  std::fill(end_line.begin(), end_line.begin() + end.x, Pixel());
 }
 
-void BufferView::FillFramebuffer(size_t nr_buffer_line) {
-  Reset(nr_buffer_line);
+void BufferView::RewriteFrameBuffer(size_t start_point, size_t len,
+                                    Cursor boundary) {
+  ResetFrameBuffer(cursor_, {boundary.y - 1, boundary.x});
   Pixel cursor_pixel;
   GetPixel(cursor_, cursor_pixel);
-  size_t i;
-  buffer_->ComputePoint(baseline_, 0, i);
-  Cursor c;
-  for (; c.y < nr_buffer_line && i < buffer_->CountChars(); ++i) {
-    char ch;
-    size_t w;
-    std::tie(ch, w) = FillPixelAt(c, i);
-    if (w == 0)
+  for (size_t i = 0; !Cursor::IsBeyond(cursor_, boundary) && i < len; ++i) {
+    // We should avoid a character span across a framebuffer line.
+    size_t point = start_point + i;
+    char c = '0';
+    if (!buffer_->Get(point, c))
       break;
-    if (ch == MonoBuffer::kNewLine) {
-      ++c.y;
-      c.x = 0;
+    int rep;
+    size_t length;
+    std::tie(rep, length) = GetCharAndWidth(c);
+    assert(length <= width());
+    if (cursor_.x + length > width()) {
+      ++cursor_.y;
+      cursor_.x = 0;
+    }
+    for (size_t j = 0; j < length; ++j) {
+      if (cursor_.y >= framebuffer_.size())
+        break;
+      assert(cursor_.x < width());
+      Pixel &pixel = framebuffer_[cursor_.y][cursor_.x];
+      pixel.shade.character = rep;
+      pixel.position.point = point;
+      pixel.set_offset(length, j);
+    }
+    if (c == MonoBuffer::kNewLine) {
+      ++cursor_.y;
+      cursor_.x = 0;
     } else {
-      c = Cursor::Goto(width(), c, w);
+      cursor_ = Cursor::Goto(width(), cursor_, length);
     }
   }
   if (cursor_pixel.position.point != ~0) {
     if (!FindPoint(cursor_pixel.position.point, cursor_))
       cursor_ = {0, 0};
+  } else {
+    cursor_ = {0, 0};
   }
   // TODO: If framebuffer_ is too large, we need to shrink it.
 }
 
 // TODO: Handle '\t' and etc.
-static std::tuple<int, size_t> GetCharAndWidth(char c) { return {(int)c, 1}; }
-
-std::tuple<char, size_t> BufferView::FillPixelAt(Cursor at, size_t point) {
-  char c;
-  if (!buffer_->Get(point, c))
-    return {0, 0};
-  int print_character;
-  size_t w;
-  std::tie(print_character, w) = GetCharAndWidth(c);
-  for (size_t i = 0; i < w; ++i) {
-    if (at.y >= framebuffer_.size())
-      break;
-    assert(at.x < width());
-    Pixel &pixel = framebuffer_[at.y][at.x];
-    pixel.shade.character = print_character;
-    pixel.position.point = point;
-    pixel.set_offset(w, i);
-    at = Cursor::Goto(width(), at, 1);
-  }
-  return {c, w};
-}
-
-void BufferView::ScaleFramebuffer(size_t size) {
-  if (framebuffer_.size() >= size)
-    return;
-  size_t i = framebuffer_.size();
-  framebuffer_.resize(size);
-  for (; i < framebuffer_.size(); ++i)
-    framebuffer_[i].resize(width());
+std::tuple<int, size_t> BufferView::GetCharAndWidth(char c) {
+  return {(int)c, 1};
 }
 
 void BufferView::UpdateStatusLine() {

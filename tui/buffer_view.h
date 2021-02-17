@@ -42,10 +42,11 @@ public:
   void MoveRight();
 
 private:
-  void Reset(size_t height);
   bool FindPoint(size_t point, Cursor &c);
-  std::tuple<char, size_t> FillPixelAt(Cursor, size_t);
-  void ScaleFramebuffer(size_t);
+  void UpdateFrameBuffer(size_t start_point, size_t len, Cursor start_cursor);
+  void ResetFrameBuffer(Cursor begin, Cursor end);
+  void RewriteFrameBuffer(size_t start_point, size_t len, Cursor boundary);
+  std::tuple<int, size_t> GetCharAndWidth(char c);
 
   size_t width_;
   std::vector<std::vector<Pixel>> framebuffer_;
