@@ -116,4 +116,30 @@ void BufferView::DrawStatusLine() {
   }
 }
 
+void BufferView::MoveLeft() {
+  Cursor probe = cursor_;
+  probe.x -= 1;
+  if (probe.x < 0)
+    return;
+  Pixel px;
+  if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos)
+    return;
+  if (!px.is_head())
+    probe.x -= px.offset();
+  assert(probe.x >= 0);
+  cursor_ = probe;
+}
+
+void BufferView::MoveRight() {
+  Cursor probe = cursor_;
+  Pixel px;
+  if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos)
+    return;
+  assert(px.is_head());
+  probe.x += px.length();
+  if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos)
+    return;
+  cursor_ = probe;
+}
+
 } // namespace emcc::tui
