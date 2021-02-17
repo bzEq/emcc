@@ -31,6 +31,7 @@ public:
     FillFramebuffer(height);
     UpdateStatusLine();
   }
+  // TODO: Make render policy more precisely.
   std::tuple<Cursor, Cursor> GetRenderRange() const {
     return {{0, 0}, GetBoundary()};
   }
