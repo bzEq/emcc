@@ -38,6 +38,7 @@ MonoBuffer &MonoBuffer::Insert(size_t offset, char c) {
   if (c == kNewLine) {
     size_t new_line_size = line_size_.At(line) - (col + 1);
     line_size_.Add(line, -new_line_size);
+    assert(line_size_.At(line) > 0);
     if (new_line_size)
       line_size_.Insert(line + 1, new_line_size);
   }
@@ -97,14 +98,8 @@ void MonoBuffer::ComputeOffset(size_t line, size_t col, size_t &offset) {
   offset = line_size_.GetPrefixSum(line - 1) + col;
 }
 
-size_t MonoBuffer::CountLines() {
-  size_t s = line_size_.size();
-  if (s == 0)
-    return 0;
-  if (line_size_.At(s - 1) == 0)
-    return s - 1;
-  return s;
-}
+// Any value in line_size_ should not be zero.
+size_t MonoBuffer::CountLines() { return line_size_.size(); }
 
 std::unique_ptr<MonoBuffer>
 MonoBuffer::CreateFromFile(const std::string &filename) {
@@ -147,6 +142,10 @@ size_t MonoBuffer::Erase(size_t offset, size_t len) {
       line_size_.Remove(begin_line + 1);
     }
   }
+  if (line_size_.At(begin_line) == 0) {
+    assert(begin_line == line_size_.size() - 1);
+    line_size_.Remove(begin_line);
+  }
   return buffer_.Erase(offset, len);
 }
 
@@ -174,8 +173,9 @@ bool MonoBuffer::Verify() {
       current = 0;
     }
   }
-  stats.push_back(current);
-  if (abs_diff(stats.size(), line_size_.size()) > 1)
+  if (current)
+    stats.push_back(current);
+  if (abs_diff(stats.size(), line_size_.size()) != 0)
     return false;
   for (size_t i = 0; i < std::min(stats.size(), line_size_.size()); ++i) {
     if (stats[i] != line_size_.At(i))
