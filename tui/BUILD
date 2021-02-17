@@ -6,6 +6,7 @@ cc_library(
         "-std=c++17",
         "-O3",
         "-Wall",
+        "-fblocks",
     ],
     linkopts = [
         "-fuse-ld=lld",

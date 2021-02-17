@@ -1,5 +1,6 @@
 #include "tui/buffer_view.h"
-#include "support/misc.h"
+#include "support/chan.h"
+#include "support/defer.h"
 
 namespace emcc::tui {
 
@@ -96,17 +97,17 @@ void BufferView::ScaleFramebuffer(size_t size) {
     framebuffer_[i].resize(width());
 }
 
-void BufferView::DrawStatusLine() {
+void BufferView::UpdateStatusLine() {
   if (framebuffer_.empty())
     return;
   const Pixel &at = GetPixel(cursor_.y, cursor_.x);
   size_t line, col;
   buffer_->ComputePosition(at.position.point, line, col);
   std::vector<Pixel> &status_line = framebuffer_.back();
-  std::string content =
-      fmt::format("----| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
-                  buffer_->filename(), at.position.point, buffer_->CountChars(),
-                  line, buffer_->CountLines(), col, buffer_->GetLineSize(line));
+  std::string content = fmt::format(
+      "----| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
+      buffer_->filename(), at.position.point + 1, buffer_->CountChars(),
+      line + 1, buffer_->CountLines(), col + 1, buffer_->GetLineSize(line));
   for (size_t i = 0; i < status_line.size(); ++i) {
     if (i < content.size()) {
       status_line[i].shade.character = content[i];
@@ -117,6 +118,7 @@ void BufferView::DrawStatusLine() {
 }
 
 void BufferView::MoveLeft() {
+  defer { UpdateStatusLine(); };
   Cursor probe = cursor_;
   probe.x -= 1;
   if (probe.x < 0)
@@ -131,6 +133,7 @@ void BufferView::MoveLeft() {
 }
 
 void BufferView::MoveRight() {
+  defer { UpdateStatusLine(); };
   Cursor probe = cursor_;
   Pixel px;
   if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos)
@@ -142,8 +145,12 @@ void BufferView::MoveRight() {
   cursor_ = probe;
 }
 
-void BufferView::MoveUp() {}
+void BufferView::MoveUp() {
+  defer { UpdateStatusLine(); };
+}
 
-void BufferView::MoveDown() {}
+void BufferView::MoveDown() {
+  defer { UpdateStatusLine(); };
+}
 
 } // namespace emcc::tui

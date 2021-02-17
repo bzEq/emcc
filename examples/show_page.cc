@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     view.set_width(width);
     view.set_baseline(start_line);
     view.FillFramebuffer(height);
-    view.DrawStatusLine();
+    view.UpdateStatusLine();
     renderer.RenderRange(view, {0, 0}, view.GetBoundary());
     renderer.DrawCursor({0, 0});
     while (true) {

@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
       view.set_width(width);
       view.set_baseline(i);
       view.FillFramebuffer(height);
+      view.UpdateStatusLine();
       renderer.Clear();
       renderer.RenderRange(view, {0, 0}, view.GetBoundary());
       renderer.DrawCursor({0, 0});

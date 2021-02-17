@@ -5,20 +5,20 @@
 namespace emcc::tui {
 
 void WYSIWYGEditor::Show() {
-  if (changed_) {
-    int height, width;
-    renderer_->GetMaxYX(height, width);
-    page_->set_width(width);
-    page_->FillFramebuffer(height);
-    renderer_->RenderRange(*page_, Cursor(0, 0), page_->GetBoundary());
-    changed_ = false;
+  int height, width;
+  renderer_->GetMaxYX(height, width);
+  if (width != page_->width() || height != page_->height()) {
+    // Size changed.
+    page_->Resize(height, width);
   }
+  Cursor show_begin, show_end;
+  std::tie(show_begin, show_end) = page_->GetRenderRange();
+  renderer_->RenderRange(*page_, show_begin, show_end);
   renderer_->DrawCursor(page_->cursor());
   renderer_->Refresh();
 }
 
 int WYSIWYGEditor::Run() {
-  changed_ = true;
   while (!have_to_stop_) {
     Show();
     // Handle external signal.
@@ -35,7 +35,7 @@ int WYSIWYGEditor::Run() {
   return status_;
 }
 
-void WYSIWYGEditor::Resize() { changed_ = true; }
+void WYSIWYGEditor::Resize() {}
 
 void WYSIWYGEditor::Consume(int ch) {
   // Esc is pressed.

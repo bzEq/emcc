@@ -24,8 +24,16 @@ public:
   bool GetPixel(size_t y, size_t x, Pixel &pixel);
   bool GetPixel(Cursor c, Pixel &pixel);
   Cursor GetBoundary() const { return Cursor(framebuffer_.size(), width()); }
-  void DrawStatusLine();
+  void UpdateStatusLine();
   Cursor cursor() const { return cursor_; }
+  void Resize(size_t height, size_t width) {
+    set_width(width);
+    FillFramebuffer(height);
+    UpdateStatusLine();
+  }
+  std::tuple<Cursor, Cursor> GetRenderRange() const {
+    return {{0, 0}, GetBoundary()};
+  }
 
   void MoveUp();
   void MoveDown();
@@ -42,7 +50,7 @@ private:
   std::vector<std::vector<Pixel>> framebuffer_;
   MonoBuffer *buffer_;
   size_t baseline_;
-  Cursor cursor_;
+  Cursor cursor_, render_begin, render_end;
 };
 
 }; // namespace emcc::tui
