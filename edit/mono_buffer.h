@@ -18,6 +18,8 @@ public:
   MonoBuffer() {}
   size_t CountLines();
   size_t CountChars() { return buffer_.size(); }
+  size_t chars() const { return buffer_.size(); }
+  size_t lines() const { return line_size_.size(); }
   bool Get(size_t line, size_t col, char &c);
   bool Get(size_t offset, char &c);
   size_t GetLine(size_t line, size_t limit, std::string &content);
