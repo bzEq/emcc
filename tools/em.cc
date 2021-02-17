@@ -34,6 +34,6 @@ int main(int argc, char *argv[]) {
   int height, width;
   renderer.GetMaxYX(height, width);
   BufferView page(buffer.get());
-  WYSIWYGEditor editor(signal_queue, &page, buffer.get(), &input, &renderer);
+  WYSIWYGEditor editor(signal_queue, &page, &input, &renderer);
   return editor.Run();
 }

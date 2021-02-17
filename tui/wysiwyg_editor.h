@@ -15,49 +15,21 @@ using SignalQueueTy = Chan<int>;
 
 class WYSIWYGEditor {
 public:
-  WYSIWYGEditor(BufferView *page, MonoBuffer *buffer, NcursesRenderer *renderer)
-      : signal_queue_(nullptr), changed_(false), loc_{0, 0}, page_(page),
-        buffer_(buffer), input_(nullptr), renderer_(renderer),
-        have_to_stop_(false), status_(0) {}
+  WYSIWYGEditor(BufferView *page, NcursesRenderer *renderer)
+      : signal_queue_(nullptr), changed_(false), page_(page), input_(nullptr),
+        renderer_(renderer), have_to_stop_(false), status_(0) {}
 
-  WYSIWYGEditor(BufferView *page, MonoBuffer *buffer, NcursesInput *input,
+  WYSIWYGEditor(BufferView *page, NcursesInput *input,
                 NcursesRenderer *renderer)
-      : signal_queue_(nullptr), changed_(false), loc_{0, 0}, page_(page),
-        buffer_(buffer), input_(input), renderer_(renderer),
-        have_to_stop_(false), status_(0) {}
+      : signal_queue_(nullptr), changed_(false), page_(page), input_(input),
+        renderer_(renderer), have_to_stop_(false), status_(0) {}
 
   WYSIWYGEditor(Arc<SignalQueueTy> signal_queue, BufferView *page,
-                MonoBuffer *buffer, NcursesInput *input,
-                NcursesRenderer *renderer)
-      : signal_queue_(signal_queue), changed_(false), loc_{0, 0}, page_(page),
-        buffer_(buffer), input_(input), renderer_(renderer),
-        have_to_stop_(false), status_(0) {}
+                NcursesInput *input, NcursesRenderer *renderer)
+      : signal_queue_(signal_queue), changed_(false), page_(page),
+        input_(input), renderer_(renderer), have_to_stop_(false), status_(0) {}
 
-  Cursor loc() const { return loc_; }
-  void MoveTo(Cursor loc) {
-    if (!Cursor::IsBeyond(loc, page_->GetBoundary()))
-      loc_ = loc;
-  }
   int Run();
-  void Insert(char c);
-  void DeleteForward();
-  void Backspace();
-  void KillLine();
-  void KillRegion();
-  void Yank();
-  void GotoLine(size_t line);
-  void ForwardChar();
-  void ForwardWord();
-  void BackwardChar();
-  void BackwardWord();
-  void NextLine();
-  void PreviousLine();
-  void MoveBeginningOfLine();
-  void MoveEndOfLine();
-  void MoveUp();
-  void MoveDown();
-  void MoveLeft();
-  void MoveRight();
   void Show();
 
 private:
@@ -65,9 +37,7 @@ private:
   void Resize();
   Arc<SignalQueueTy> signal_queue_;
   bool changed_;
-  Cursor loc_;
   BufferView *page_;
-  MonoBuffer *buffer_;
   NcursesInput *input_;
   NcursesRenderer *renderer_;
   bool have_to_stop_;

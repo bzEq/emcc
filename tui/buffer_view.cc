@@ -142,4 +142,8 @@ void BufferView::MoveRight() {
   cursor_ = probe;
 }
 
+void BufferView::MoveUp() {}
+
+void BufferView::MoveDown() {}
+
 } // namespace emcc::tui

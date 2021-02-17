@@ -13,7 +13,7 @@ void WYSIWYGEditor::Show() {
     renderer_->RenderRange(*page_, Cursor(0, 0), page_->GetBoundary());
     changed_ = false;
   }
-  renderer_->DrawCursor(loc_);
+  renderer_->DrawCursor(page_->cursor());
   renderer_->Refresh();
 }
 
@@ -35,39 +35,7 @@ int WYSIWYGEditor::Run() {
   return status_;
 }
 
-void WYSIWYGEditor::Resize() {}
-
-void WYSIWYGEditor::MoveUp() {
-  Cursor probe = loc_;
-  probe.y = std::max(loc_.y - 1, 0);
-  Pixel pixel;
-  if (page_->GetPixel(probe, pixel) && pixel.position.point != ~0)
-    loc_ = probe;
-}
-
-void WYSIWYGEditor::MoveDown() {
-  Cursor probe = loc_;
-  probe.y = std::min(loc_.y + 1, (int)page_->height());
-  Pixel pixel;
-  if (page_->GetPixel(probe, pixel) && pixel.position.point != ~0)
-    loc_ = probe;
-}
-
-void WYSIWYGEditor::MoveLeft() {
-  Cursor probe = loc_;
-  probe.x = std::max(loc_.x - 1, 0);
-  Pixel pixel;
-  if (page_->GetPixel(probe, pixel) && pixel.position.point != ~0)
-    loc_ = probe;
-}
-
-void WYSIWYGEditor::MoveRight() {
-  Cursor probe = loc_;
-  probe.x = std::min((int)page_->width(), loc_.x + 1);
-  Pixel pixel;
-  if (page_->GetPixel(probe, pixel) && pixel.position.point != ~0)
-    loc_ = probe;
-}
+void WYSIWYGEditor::Resize() { changed_ = true; }
 
 void WYSIWYGEditor::Consume(int ch) {
   // Esc is pressed.
@@ -77,16 +45,16 @@ void WYSIWYGEditor::Consume(int ch) {
   }
   switch (ch) {
   case KEY_UP:
-    MoveUp();
+    page_->MoveUp();
     break;
   case KEY_DOWN:
-    MoveDown();
+    page_->MoveDown();
     break;
   case KEY_LEFT:
-    MoveLeft();
+    page_->MoveLeft();
     break;
   case KEY_RIGHT:
-    MoveRight();
+    page_->MoveRight();
     break;
   default:
     break;
