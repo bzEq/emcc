@@ -12,6 +12,7 @@ namespace emcc {
 class MonoBuffer {
 public:
   static constexpr char kNewLine = '\n';
+  static constexpr size_t npos = ~0UL;
   static std::unique_ptr<MonoBuffer>
   CreateFromFile(const std::string &filename);
   MonoBuffer() {}
