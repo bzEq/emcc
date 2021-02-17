@@ -27,6 +27,8 @@ TEST(RopeBenchmark, RopeRandomInsert) {
   for (size_t i = 0; i < (1 << 20); ++i) {
     rope.Insert(rnd.NextInt() % (rope.size() + 1), '0');
   }
+  std::cout << "Rope height: " << rope.height() << std::endl;
+  std::cout << "Rope nodes: " << rope.nodes() << std::endl;
 }
 
 TEST(RopeBenchmark, StringRandomInsert) {
@@ -76,6 +78,15 @@ TEST(RopeBenchmark, RopeAppendAndRandomInsert) {
   for (size_t i = 0; i < 100000; ++i) {
     rope.At(rnd.NextInt() % rope.size());
   }
+  std::cout << "Rope height: " << rope.height() << std::endl;
+}
+
+TEST(RopeBenchmark, CountNodes) {
+  std::string s(15UL << 20, '0');
+  Rope rope;
+  rope.Append(s.data(), s.size());
+  std::cout << "Rope nodes: " << rope.nodes() << std::endl;
+  std::cout << "Rope meta size: " << rope.meta_size() << std::endl;
 }
 
 } // namespace

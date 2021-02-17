@@ -30,7 +30,7 @@ cc_test(
     srcs = [
         "rope_benchmark.cc",
     ],
-    copts = COPTS,
+    copts = COPTS + ['-DEMCC_DEBUG'],
     linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",

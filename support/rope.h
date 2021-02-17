@@ -18,6 +18,9 @@ private:
   using Piece = std::basic_string<Char>;
 
   struct Node {
+#ifdef EMCC_DEBUG
+    size_t nr_node, height;
+#endif
     size_t size;
     Piece piece;
     Node *left, *right;
@@ -34,6 +37,10 @@ private:
 
     void UpdateSize() {
       size = piece.size() + (left ? left->size : 0) + (right ? right->size : 0);
+#ifdef EMCC_DEBUG
+      nr_node = 1 + (left ? left->nr_node : 0) + (right ? right->nr_node : 0);
+      height = std::max(left ? left->height : 0, right ? right->height : 0) + 1;
+#endif
     }
   };
 
@@ -496,6 +503,12 @@ public:
   }
 
   bool empty() const { return size() == 0; }
+
+#ifdef EMCC_DEBUG
+  size_t nodes() const { return root_ ? root_->nr_node : 0; }
+  size_t height() const { return root_ ? root_->height : 0; }
+  size_t meta_size() const { return sizeof(Node) * nodes(); }
+#endif
 };
 
 inline std::ostream &operator<<(std::ostream &out, Rope<char> &rope) {
