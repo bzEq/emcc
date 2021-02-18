@@ -19,7 +19,7 @@ private:
 
   struct Node {
 #ifdef EMCC_DEBUG
-    size_t nr_node, height;
+    size_t num_node, height;
 #endif
     size_t size;
     Piece piece;
@@ -38,7 +38,8 @@ private:
     void UpdateSize() {
       size = piece.size() + (left ? left->size : 0) + (right ? right->size : 0);
 #ifdef EMCC_DEBUG
-      nr_node = 1 + (left ? left->nr_node : 0) + (right ? right->nr_node : 0);
+      num_node =
+          1 + (left ? left->num_node : 0) + (right ? right->num_node : 0);
       height = std::max(left ? left->height : 0, right ? right->height : 0) + 1;
 #endif
     }
@@ -466,14 +467,14 @@ public:
     assert(root_);
     while (len) {
       assert(offset < size());
-      size_t nr_copied = 0;
+      size_t num_copied = 0;
       root_ = Splay(root_, offset);
       auto cmp = Compare(offset, root_);
       assert(cmp.order == 0);
-      nr_copied = std::min(root_->piece.size() - cmp.relative_index, len);
-      result.Append(root_->piece.data() + cmp.relative_index, nr_copied);
-      len -= nr_copied;
-      offset += nr_copied;
+      num_copied = std::min(root_->piece.size() - cmp.relative_index, len);
+      result.Append(root_->piece.data() + cmp.relative_index, num_copied);
+      len -= num_copied;
+      offset += num_copied;
     }
     return result;
   }
@@ -505,7 +506,7 @@ public:
   bool empty() const { return size() == 0; }
 
 #ifdef EMCC_DEBUG
-  size_t nodes() const { return root_ ? root_->nr_node : 0; }
+  size_t nodes() const { return root_ ? root_->num_node : 0; }
   size_t height() const { return root_ ? root_->height : 0; }
   size_t meta_size() const { return sizeof(Node) * nodes(); }
 #endif
