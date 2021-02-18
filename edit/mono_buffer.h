@@ -43,6 +43,16 @@ public:
     assert(line < line_size_.size());
     return line_size_.At(line);
   }
+  // Sum of line size between [start, end].
+  size_t GetLineSize(size_t start, size_t end) {
+    if (line_size_.empty())
+      return 0;
+    end = std::min(end, line_size_.size() - 1);
+    if (start == 0) {
+      return line_size_.GetPrefixSum(end);
+    }
+    return line_size_.GetPrefixSum(end) - line_size_.GetPrefixSum(start - 1);
+  }
   bool Verify();
   void set_filename(const std::string &filename) { filename_ = filename; }
   const std::string &filename() const { return filename_; }
