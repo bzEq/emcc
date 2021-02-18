@@ -78,6 +78,7 @@ MonoBuffer &MonoBuffer::Append(const char *data, size_t len) {
 }
 
 void MonoBuffer::ComputePosition(size_t offset, size_t &line, size_t &col) {
+  offset = std::min(buffer_.size(), offset);
   line = line_size_.LowerBound(offset);
   if (line == line_size_.size()) {
     col = 0;
