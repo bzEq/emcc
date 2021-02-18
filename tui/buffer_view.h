@@ -11,15 +11,17 @@ namespace emcc::tui {
 class BufferView {
 public:
   BufferView(MonoBuffer *buffer)
-      : width_(80), framebuffer_(), buffer_(buffer), baseline_(0), cursor_() {}
+      : height_(24), width_(80), framebuffer_(), buffer_(buffer), baseline_(0),
+        cursor_() {}
   void set_baseline(size_t baseline) {
     baseline_ = std::min(baseline, buffer_->CountLines() - 1);
   }
   size_t baseline() const { return baseline_; }
   void set_width(size_t width) { width_ = width; }
   size_t width() const { return width_; }
-  size_t height() const { return framebuffer_.size(); }
-  void FillFramebuffer(size_t nr_buffer_line);
+  void set_height(size_t height) const { height_ = height; }
+  size_t height() const { return height_; }
+  void FillFramebuffer(size_t num_buffer_line);
   const Pixel &GetPixel(size_t y, size_t x) const { return framebuffer_[y][x]; }
   bool GetPixel(size_t y, size_t x, Pixel &pixel);
   bool GetPixel(Cursor c, Pixel &pixel);
@@ -27,8 +29,9 @@ public:
   void UpdateStatusLine();
   Cursor cursor() const { return cursor_; }
   void Resize(size_t height, size_t width) {
+    set_height(height);
     set_width(width);
-    FillFramebuffer(height);
+    FillFramebuffer();
     UpdateStatusLine();
   }
   // TODO: Make render policy more precisely.
@@ -51,9 +54,13 @@ private:
                           Cursor at, Cursor boundary);
   void RewriteFrameBuffer(size_t start_point, size_t len, Cursor boundary);
   std::tuple<int, size_t> GetCharAndWidth(char c);
-  void ScrollUp(size_t);
+  size_t ScrollUp(size_t);
+  bool ScrollUp();
+  bool ScrollDown();
+  bool GetPixel(const FramebufferTy &fb, Cursor at, Pixel &px);
+  bool GetPixel(const FramebufferTy &fb, size_t y, size_t x, Pixel &px);
 
-  size_t width_;
+  size_t height_, width_;
   FramebufferTy framebuffer_;
   MonoBuffer *buffer_;
   size_t baseline_;
