@@ -28,19 +28,23 @@ bool BufferView::GetPixel(size_t y, size_t x, Pixel &pixel) {
   return true;
 }
 
-void BufferView::FillFramebuffer(size_t nr_buffer_line) {
+void BufferView::FillFramebuffer(size_t num_buffer_line) {
   size_t start_point;
   cursor_ = {0, 0};
   buffer_->ComputePoint(baseline_, 0, start_point);
-  RewriteFrameBuffer(start_point, ~0, Cursor(nr_buffer_line, width()));
+  RewriteFrameBuffer(start_point, ~0, Cursor(num_buffer_line, width()));
 }
 
 void BufferView::ResetFrameBuffer(Cursor begin, Cursor end) {
+  ResetFrameBuffer(framebuffer_, begin, end);
+}
+
+void BufferView::ResetFrameBuffer(FramebufferTy &fb, Cursor begin, Cursor end) {
   assert(end.y >= begin.y);
-  if (end.y >= framebuffer_.size()) {
-    framebuffer_.resize(end.y + 1);
+  if (end.y >= fb.size()) {
+    fb.resize(end.y + 1);
   }
-  auto &start_line = framebuffer_[begin.y];
+  auto &start_line = fb[begin.y];
   start_line.resize(width());
   if (begin.y == end.y) {
     if (begin.x < end.x) {
@@ -51,20 +55,23 @@ void BufferView::ResetFrameBuffer(Cursor begin, Cursor end) {
   }
   std::fill(start_line.begin() + begin.x, start_line.end(), Pixel());
   for (size_t i = begin.y + 1; i < end.y; ++i) {
-    framebuffer_[i].resize(width());
-    std::fill(framebuffer_[i].begin(), framebuffer_[i].end(), Pixel());
+    fb[i].resize(width());
+    std::fill(fb[i].begin(), fb[i].end(), Pixel());
   }
-  auto &end_line = framebuffer_[end.y];
+  auto &end_line = fb[end.y];
   end_line.resize(width());
   std::fill(end_line.begin(), end_line.begin() + end.x, Pixel());
 }
 
 void BufferView::RewriteFrameBuffer(size_t start_point, size_t len,
                                     Cursor boundary) {
-  ResetFrameBuffer(cursor_, {boundary.y - 1, boundary.x});
-  Pixel cursor_pixel;
-  GetPixel(cursor_, cursor_pixel);
-  for (size_t i = 0; !Cursor::IsBeyond(cursor_, boundary) && i < len; ++i) {
+  RewriteFrameBuffer(framebuffer_, start_point, len, cursor_, boundary);
+}
+
+void BufferView::RewriteFrameBuffer(FramebufferTy &fb, size_t start_point,
+                                    size_t len, Cursor at, Cursor boundary) {
+  ResetFrameBuffer(fb, at, {boundary.y - 1, boundary.x});
+  for (size_t i = 0; !Cursor::IsBeyond(at, boundary) && i < len; ++i) {
     // We should avoid a character span across a framebuffer line.
     size_t point = start_point + i;
     char c = '0';
@@ -74,33 +81,26 @@ void BufferView::RewriteFrameBuffer(size_t start_point, size_t len,
     size_t length;
     std::tie(rep, length) = GetCharAndWidth(c);
     assert(length <= width());
-    if (cursor_.x + length > width()) {
-      ++cursor_.y;
-      cursor_.x = 0;
+    if (at.x + length > width()) {
+      ++at.y;
+      at.x = 0;
     }
     for (size_t j = 0; j < length; ++j) {
-      if (cursor_.y >= framebuffer_.size())
+      if (at.y >= fb.size())
         break;
-      assert(cursor_.x < width());
-      Pixel &pixel = framebuffer_[cursor_.y][cursor_.x];
+      assert(at.x < width());
+      Pixel &pixel = fb[at.y][at.x];
       pixel.shade.character = rep;
       pixel.position.point = point;
       pixel.set_offset(length, j);
     }
     if (c == MonoBuffer::kNewLine) {
-      ++cursor_.y;
-      cursor_.x = 0;
+      ++at.y;
+      at.x = 0;
     } else {
-      cursor_ = Cursor::Goto(width(), cursor_, length);
+      at = Cursor::Goto(width(), at, length);
     }
   }
-  if (cursor_pixel.position.point != ~0) {
-    if (!FindPoint(cursor_pixel.position.point, cursor_))
-      cursor_ = {0, 0};
-  } else {
-    cursor_ = {0, 0};
-  }
-  // TODO: If framebuffer_ is too large, we need to shrink it.
 }
 
 // TODO: Handle '\t' and etc.
@@ -163,5 +163,7 @@ void BufferView::MoveUp() {
 void BufferView::MoveDown() {
   defer { UpdateStatusLine(); };
 }
+
+void BufferView::ScrollUp(size_t num_buffer_line) {}
 
 } // namespace emcc::tui

@@ -42,14 +42,19 @@ public:
   void MoveRight();
 
 private:
+  using FramebufferTy = std::vector<std::vector<Pixel>>;
   bool FindPoint(size_t point, Cursor &c);
   void UpdateFrameBuffer(size_t start_point, size_t len, Cursor start_cursor);
+  void ResetFrameBuffer(FramebufferTy &fb, Cursor begin, Cursor end);
   void ResetFrameBuffer(Cursor begin, Cursor end);
+  void RewriteFrameBuffer(FramebufferTy &fb, size_t start_point, size_t len,
+                          Cursor at, Cursor boundary);
   void RewriteFrameBuffer(size_t start_point, size_t len, Cursor boundary);
   std::tuple<int, size_t> GetCharAndWidth(char c);
+  void ScrollUp(size_t);
 
   size_t width_;
-  std::vector<std::vector<Pixel>> framebuffer_;
+  FramebufferTy framebuffer_;
   MonoBuffer *buffer_;
   size_t baseline_;
   Cursor cursor_, render_begin, render_end;
