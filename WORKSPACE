@@ -1,11 +1,13 @@
-local_repository(
+new_local_repository(
   name = 'fmt',
   path = './third_party/fmt',
+  build_file = './third_party/fmt.BUILD',
 )
 
-local_repository(
+new_local_repository(
   name = 'trie',
-  path = './third_party/trie',
+  path = './third_party/hat-trie',
+  build_file = './third_party/hat-trie.BUILD',
 )
 
 local_repository(
