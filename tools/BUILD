@@ -10,17 +10,6 @@ LINKOPTS = [
 ]
 
 cc_binary(
-    name = "em",
-    srcs = ["em.cc"],
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    deps = [
-        "//edit:emcc_edit",
-        "//tui:emcc_tui",
-    ],
-)
-
-cc_binary(
     name = "fuzz_line_buffer",
     srcs = ["fuzz_line_buffer.cc"],
     copts = COPTS,
