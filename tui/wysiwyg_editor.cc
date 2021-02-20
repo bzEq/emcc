@@ -45,16 +45,16 @@ void WYSIWYGEditor::Consume(int ch) {
     return;
   }
   switch (ch) {
-  case KEY_UP:
+  case 'k':
     page_->MoveUp();
     break;
-  case KEY_DOWN:
+  case 'j':
     page_->MoveDown();
     break;
-  case KEY_LEFT:
+  case 'h':
     page_->MoveLeft();
     break;
-  case KEY_RIGHT:
+  case 'l':
     page_->MoveRight();
     break;
   default:
