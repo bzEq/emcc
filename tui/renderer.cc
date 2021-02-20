@@ -23,6 +23,8 @@ void NcursesRenderer::RenderRegionAt(Cursor anchor, const BufferView &view,
 }
 
 void NcursesRenderer::RenderStringAt(Cursor at, const std::string &content) {
+  wmove(window_, at.y, 0);
+  wclrtoeol(window_);
   mvwprintw(window_, at.y, at.x, "%s", content.c_str());
 }
 
