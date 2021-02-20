@@ -53,7 +53,8 @@ void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,
       pixel.set_offset(length, j);
     }
     if (c == MonoBuffer::kNewLine) {
-      fb.Reset({width_, {at.y, at.x + (int)length}, {at.y + 1, 0}});
+      if (at.x + 1 < width_)
+        fb.Reset({width_, {at.y, at.x + (int)length}, {at.y + 1, 0}});
       ++at.y;
       at.x = 0;
     } else {
