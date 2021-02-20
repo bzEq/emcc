@@ -1,3 +1,6 @@
+#include "edit/mono_buffer.h"
+#include "support/misc.h"
+#include "tui/buffer_view.h"
 #include "tui/cursor.h"
 #include "tui/pixel.h"
 
@@ -98,6 +101,48 @@ TEST(RegionTest, ContainTest1) {
   EXPECT_TRUE(region.contains({11, 7}));
   EXPECT_TRUE(region.contains({16, 1}));
   EXPECT_TRUE(!region.contains({16, 2}));
+}
+
+TEST(BufferViewTest, ResizeTest) {
+  emcc::MonoBuffer buffer;
+  const char text[] = "hello\n"
+                      "rofl\n"
+                      "lmao\n";
+  buffer.Append(text, emcc::GetArrayLength(text));
+  BufferView view(&buffer);
+  view.Resize(2, 4);
+  EXPECT_TRUE(view.GetPixel({0, 3}).shade.character == (int)'l');
+  EXPECT_TRUE(view.GetPixel({1, 0}).shade.character == (int)'o');
+  EXPECT_TRUE(view.GetPixel({1, 1}).shade.character == (int)'\n');
+  EXPECT_TRUE(view.height() == 2);
+}
+
+TEST(BufferView, EmptyFramebuffer) {
+  emcc::MonoBuffer buffer;
+  const char text[] = "hello\n"
+                      "rofl\n"
+                      "lmao\n";
+  buffer.Append(text, emcc::GetArrayLength(text));
+  BufferView view(&buffer);
+  view.RewriteFrameBuffer(0, ~0);
+  EXPECT_TRUE(view.height() == 0);
+}
+
+TEST(BufferView, UpAndDownTest) {
+  emcc::MonoBuffer buffer;
+  const char text[] = "hello\n"
+                      "rofl\n"
+                      "lmao\n";
+  buffer.Append(text, emcc::GetArrayLength(text));
+  BufferView view(&buffer);
+  view.Resize(1, 4);
+  EXPECT_TRUE(view.GetPixel({0, 0}).shade.character == (int)'h');
+  view.MoveDown();
+  EXPECT_TRUE(view.cursor().y == 0);
+  EXPECT_TRUE(view.cursor().x == 0);
+  EXPECT_TRUE(view.GetPixel({0, 0}).shade.character == (int)'o');
+  view.MoveUp();
+  EXPECT_TRUE(view.GetPixel({0, 0}).shade.character == (int)'h');
 }
 
 } // namespace

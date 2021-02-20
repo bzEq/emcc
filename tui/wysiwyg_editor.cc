@@ -5,9 +5,8 @@
 namespace emcc::tui {
 
 void WYSIWYGEditor::Show() {
-  Cursor show_begin, show_end;
-  std::tie(show_begin, show_end) = page_->GetRenderRange();
-  renderer_->RenderRange(*page_, show_begin, show_end);
+  Region view_region = page_->GetDiffRegion(0, 0);
+  renderer_->RenderRegion(*page_, view_region);
   renderer_->DrawCursor(page_->cursor());
   renderer_->Refresh();
 }

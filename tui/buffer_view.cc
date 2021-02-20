@@ -4,100 +4,55 @@
 
 namespace emcc::tui {
 
-bool BufferView::FindPoint(size_t point, Cursor &c) {
-  for (size_t y = 0; y < framebuffer_.size(); ++y) {
-    for (size_t x = 0; x < framebuffer_[y].size(); ++x) {
-      if (framebuffer_[y][x].position.point == point) {
-        c.y = y;
-        c.x = x;
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-bool BufferView::GetPixel(Cursor c, Pixel &pixel) {
-  return GetPixel(framebuffer_, c.y, c.x, pixel);
-}
-
-bool BufferView::GetPixel(const FramebufferTy &fb, Cursor at, Pixel &px) {
-  return GetPixel(fb, at.y, at.x, px);
-}
-
-bool BufferView::GetPixel(size_t y, size_t x, Pixel &px) {
-  return GetPixel(framebuffer_, y, x, px);
-}
-
-bool BufferView::GetPixel(const FramebufferTy &fb, size_t y, size_t x,
-                          Pixel &pixel) {
-  if (y >= fb.size() || x >= width())
-    return false;
-  pixel = fb[y][x];
-  return true;
-}
-
-void BufferView::FillFramebuffer() {
-  size_t start_point;
-  buffer_->ComputePoint(baseline_, 0, start_point);
-  RewriteFrameBuffer(start_point, ~0, Cursor(height(), width()));
-}
-
-void BufferView::ResetFrameBuffer(Cursor begin, Cursor end) {
-  ResetFrameBuffer(framebuffer_, begin, end);
-}
-
-void BufferView::ResetFrameBuffer(FramebufferTy &fb, Cursor begin, Cursor end) {
-  assert(end.y >= begin.y);
-  if (end.y >= fb.size()) {
-    fb.resize(end.y + 1);
-  }
-  auto &start_line = fb[begin.y];
-  start_line.resize(width());
-  if (begin.y == end.y) {
-    if (begin.x < end.x) {
-      std::fill(start_line.begin() + begin.x, start_line.begin() + end.x,
-                Pixel());
-    }
+void BufferView::Resize(size_t height, size_t width) {
+  if (!height || !width)
     return;
+  if (width != width_) {
+    framebuffer_ = Framebuffer(width);
+    width_ = width;
   }
-  std::fill(start_line.begin() + begin.x, start_line.end(), Pixel());
-  for (size_t i = begin.y + 1; i < end.y; ++i) {
-    fb[i].resize(width());
-    std::fill(fb[i].begin(), fb[i].end(), Pixel());
+  framebuffer_.Resize(height);
+  // Record cursor_'s point.
+  Pixel px;
+  if (!framebuffer_.GetPixel(cursor_, px))
+    cursor_ = {0, 0};
+  size_t point;
+  buffer_->ComputePoint(baseline_, 0, point);
+  RewriteFrameBuffer(point, ~0, framebuffer_, framebuffer_.region());
+  // cursor_ should point to the same point.
+  if (px.position.point != MonoBuffer::npos) {
+    framebuffer_.FindPoint(px.position.point, cursor_);
   }
-  auto &end_line = fb[end.y];
-  end_line.resize(width());
-  std::fill(end_line.begin(), end_line.begin() + end.x, Pixel());
 }
 
-void BufferView::RewriteFrameBuffer(size_t start_point, size_t len,
-                                    Cursor boundary) {
-  RewriteFrameBuffer(framebuffer_, start_point, len, cursor_, boundary);
-}
-
-void BufferView::RewriteFrameBuffer(FramebufferTy &fb, size_t start_point,
-                                    size_t len, Cursor at, Cursor boundary) {
-  ResetFrameBuffer(fb, at, {at.y, boundary.x});
-  for (size_t i = 0; !Cursor::IsBeyond(at, boundary) && i < len; ++i) {
-    // We should avoid a character span across a framebuffer line.
-    size_t point = start_point + i;
-    char c = '0';
-    if (!buffer_->Get(point, c))
-      break;
+void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,
+                                    Region region) {
+  assert(width() == fb.width());
+  if (region.width() != fb.width())
+    return;
+  size_t endpoint = std::min(buffer_->CountChars(), point + len);
+  Cursor at = region.begin_cursor();
+  for (; point != endpoint && region.contains(at); ++point) {
+    char c;
+    buffer_->Get(point, c);
     int rep;
     size_t length;
     std::tie(rep, length) = GetCharAndWidth(c);
     assert(length <= width());
+    // Do not break character's pixels into multiple lines.
     if (at.x + length > width()) {
       ++at.y;
       at.x = 0;
-      ResetFrameBuffer(fb, at, {at.y, boundary.x});
+      if (!region.contains(at))
+        break;
     }
+    // Check if fb is capable to fill pixel at `at`.
+    if (fb.height() <= at.y)
+      fb.Resize(at.y + 1);
     for (size_t j = 0; j < length; ++j) {
-      assert(at.y < fb.size());
+      assert(at.y < fb.height());
       assert(at.x < width());
-      Pixel &pixel = fb[at.y][at.x];
+      Pixel &pixel = fb.GetPixel(at);
       pixel.shade.character = rep;
       pixel.position.point = point;
       pixel.set_offset(length, j);
@@ -105,7 +60,6 @@ void BufferView::RewriteFrameBuffer(FramebufferTy &fb, size_t start_point,
     if (c == MonoBuffer::kNewLine) {
       ++at.y;
       at.x = 0;
-      ResetFrameBuffer(fb, at, {at.y, boundary.x});
     } else {
       at = Cursor::Goto(width(), at, length);
     }
@@ -127,7 +81,8 @@ std::tuple<int, size_t> BufferView::GetCharAndWidth(char c) {
 //   std::string content = fmt::format(
 //       "----| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
 //       buffer_->filename(), at.position.point + 1, buffer_->CountChars(),
-//       line + 1, buffer_->CountLines(), col + 1, buffer_->GetLineSize(line));
+//       line + 1, buffer_->CountLines(), col + 1,
+//       buffer_->GetLineSize(line));
 //   for (size_t i = 0; i < status_line.size(); ++i) {
 //     if (i < content.size()) {
 //       status_line[i].shade.character = content[i];
@@ -137,16 +92,14 @@ std::tuple<int, size_t> BufferView::GetCharAndWidth(char c) {
 //   }
 // }
 
-void BufferView::UpdateStatusLine() {}
-
 void BufferView::MoveLeft() {
-  defer { UpdateStatusLine(); };
   Cursor probe = cursor_;
   probe.x -= 1;
   if (probe.x < 0)
     return;
   Pixel px;
-  if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos)
+  if (!framebuffer_.GetPixel(probe, px) ||
+      px.position.point == MonoBuffer::npos)
     return;
   if (!px.is_head())
     probe.x -= px.offset();
@@ -155,32 +108,33 @@ void BufferView::MoveLeft() {
 }
 
 void BufferView::MoveRight() {
-  defer { UpdateStatusLine(); };
   Cursor probe = cursor_;
   Pixel px;
-  if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos) {
+  if (!framebuffer_.GetPixel(probe, px) ||
+      px.position.point == MonoBuffer::npos) {
     return;
   }
   assert(px.is_head());
   probe.x += px.length();
-  if (!GetPixel(probe, px) || px.position.point == MonoBuffer::npos) {
+  if (!framebuffer_.GetPixel(probe, px) ||
+      px.position.point == MonoBuffer::npos) {
     return;
   }
   cursor_ = probe;
 }
 
 void BufferView::MoveUp() {
-  defer { UpdateStatusLine(); };
   Cursor probe = cursor_;
   if (probe.y == 0) {
-    if (!ScrollUp())
+    if (!ScrollUp()) {
       return;
+    }
   } else {
     probe.y -= 1;
   }
   Pixel px;
   for (; probe.x >= 0; --probe.x) {
-    if (!GetPixel(probe, px))
+    if (!framebuffer_.GetPixel(probe, px))
       return;
     if (px.position.point != MonoBuffer::npos) {
       cursor_ = probe;
@@ -190,9 +144,8 @@ void BufferView::MoveUp() {
 }
 
 void BufferView::MoveDown() {
-  defer { UpdateStatusLine(); };
   Cursor probe = cursor_;
-  if (probe.y + 1 >= framebuffer_.size()) {
+  if (probe.y + 1 >= framebuffer_.height()) {
     if (!ScrollDown()) {
       return;
     }
@@ -201,7 +154,7 @@ void BufferView::MoveDown() {
   }
   Pixel px;
   for (; probe.x >= 0; --probe.x) {
-    if (!GetPixel(probe, px))
+    if (!framebuffer_.GetPixel(probe, px))
       return;
     if (px.position.point != MonoBuffer::npos) {
       cursor_ = probe;
@@ -214,7 +167,7 @@ bool BufferView::ScrollDown() {
   if (framebuffer_.empty())
     return false;
   Pixel px;
-  if (!GetPixel(framebuffer_, {(int)framebuffer_.size() - 1, 0}, px))
+  if (!framebuffer_.GetPixel({(int)framebuffer_.height() - 1, 0}, px))
     return false;
   size_t point = px.position.point;
   if (point == MonoBuffer::npos)
@@ -225,39 +178,43 @@ bool BufferView::ScrollDown() {
     return false;
   size_t next_framebuffer_start_point;
   buffer_->ComputePoint(line, 0, next_framebuffer_start_point);
-  FramebufferTy next_fb;
+  FramebufferTy next_fb(width_);
   RewriteFrameBuffer(
-      next_fb, next_framebuffer_start_point,
-      buffer_->GetLineSize(line, line + 1), {0, 0},
-      Cursor(std::numeric_limits<decltype(cursor_.y)>::max(), width()));
+      next_framebuffer_start_point, buffer_->GetLineSize(line, line + 1),
+      next_fb,
+      Region(width_, {0, 0},
+             Cursor(std::numeric_limits<decltype(cursor_.y)>::max(), 0)));
   if (next_fb.empty()) {
     return false;
   }
   Pixel replica;
   int i = 0;
-  for (; i < next_fb.size(); ++i) {
-    if (GetPixel(next_fb, i, 0, replica) && replica.is_same_position(px))
+  for (; i < next_fb.height(); ++i) {
+    if (next_fb.GetPixel({i, 0}, replica) && replica.is_same_position(px))
       break;
   }
-  if (i >= next_fb.size() - 1)
+  if (i >= next_fb.height() - 1)
     return false;
   if (framebuffer_.empty())
     return false;
-  for (size_t j = 0; j < framebuffer_.size() - 1; ++j) {
-    framebuffer_[j] = std::move(framebuffer_[j + 1]);
+  for (size_t j = 0; j < framebuffer_.height() - 1; ++j) {
+    framebuffer_.SwapLine(j, j + 1);
   }
-  framebuffer_[framebuffer_.size() - 1] = std::move(next_fb[i + 1]);
+  Framebuffer::SwapLine(framebuffer_, framebuffer_.height() - 1, next_fb,
+                        i + 1);
   return true;
 }
 
 // TODO: Optimize scrolling in ScrollUp(size_t).
 bool BufferView::ScrollUp() {
   Pixel px;
-  if (!GetPixel(framebuffer_, {0, 0}, px))
+  if (!framebuffer_.GetPixel({0, 0}, px)) {
     return false;
+  }
   size_t point = px.position.point;
-  if (point == MonoBuffer::npos)
+  if (point == MonoBuffer::npos) {
     return false;
+  }
   size_t line, col;
   buffer_->ComputePosition(point, line, col);
   if (line != 0) {
@@ -266,27 +223,33 @@ bool BufferView::ScrollUp() {
   col = 0;
   size_t prev_framebuffer_start_point;
   buffer_->ComputePoint(line, col, prev_framebuffer_start_point);
-  FramebufferTy prev_fb;
+  FramebufferTy prev_fb(width_);
   RewriteFrameBuffer(
-      prev_fb, prev_framebuffer_start_point,
-      point - prev_framebuffer_start_point, {0, 0},
-      Cursor(std::numeric_limits<decltype(cursor_.y)>::max(), width()));
-  if (prev_fb.empty())
+      prev_framebuffer_start_point, point - prev_framebuffer_start_point,
+      prev_fb,
+      Region(width_, {0, 0},
+             Cursor(std::numeric_limits<decltype(cursor_.y)>::max(), 0)));
+  if (prev_fb.empty()) {
     return false;
+  }
   Pixel replica;
-  int i = (int)prev_fb.size() - 1;
+  int i = (int)prev_fb.height() - 1;
   for (; i >= 0; --i) {
-    if (GetPixel(prev_fb, i, 0, replica) && replica.is_same_position(px))
+    if (prev_fb.GetPixel({i, 0}, replica) && replica.is_same_position(px))
       break;
   }
-  if (i <= 0)
-    return false;
+  if (replica.is_same_shade(px)) {
+    if (i == 0)
+      return false;
+  } else {
+    i = prev_fb.height();
+  }
   if (framebuffer_.empty())
     return false;
-  for (size_t j = framebuffer_.size() - 1; j != 0; --j) {
-    framebuffer_[j] = std::move(framebuffer_[j - 1]);
+  for (size_t j = framebuffer_.height() - 1; j != 0; --j) {
+    framebuffer_.SwapLine(j, j - 1);
   }
-  framebuffer_[0] = std::move(prev_fb[i - 1]);
+  Framebuffer::SwapLine(framebuffer_, 0, prev_fb, i - 1);
   return true;
 }
 

@@ -15,16 +15,19 @@ public:
 
   void Clear() { wclear(window_); }
 
-  void RenderRange(const BufferView &fb, Cursor begin, Cursor end);
+  void RenderRegion(const BufferView &fb, Region region);
 
-  void RenderRangeAt(Cursor anchor, const BufferView &view, Cursor begin,
-                     Cursor end);
+  void RenderRegionAt(Cursor anchor, const BufferView &view, Region region);
 
   void DrawCursor(Cursor c);
 
   void Refresh() { wrefresh(window_); }
 
-  Cursor GetBoundary();
+  Region region() {
+    int y, x;
+    GetMaxYX(y, x);
+    return Region(x, {0, 0}, {y, 0});
+  }
 
 private:
   WINDOW *window_;

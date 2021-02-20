@@ -4,37 +4,26 @@
 
 namespace emcc::tui {
 
-void NcursesRenderer::RenderRange(const BufferView &view, Cursor begin,
-                                  Cursor end) {
-  RenderRangeAt({0, 0}, view, begin, end);
+void NcursesRenderer::RenderRegion(const BufferView &view, Region region) {
+  RenderRegionAt({0, 0}, view, region);
 }
 
-void NcursesRenderer::RenderRangeAt(Cursor anchor, const BufferView &view,
-                                    Cursor begin, Cursor end) {
-  Cursor boundary(GetBoundary());
-  if (Cursor::IsBeyond(anchor, boundary))
+void NcursesRenderer::RenderRegionAt(Cursor anchor, const BufferView &view,
+                                     Region view_region) {
+  Region render_region(region());
+  if (!render_region.contains(anchor))
     return;
-  Cursor view_boundary(view.GetBoundary());
-  for (Cursor c = begin; !Cursor::IsBeyond(c, end);
-       c = Cursor::Goto(view.width(), c, 1)) {
-    if (Cursor::IsBeyond(c, view_boundary))
-      continue;
+  for (auto c : view_region) {
     Cursor t = anchor + c;
-    if (Cursor::IsBeyond(t, boundary))
-      continue;
-    const Pixel &p = view.GetPixel(c.y, c.x);
+    if (!render_region.contains(t))
+      break;
+    const Pixel &p = view.GetPixel(c);
     mvwaddch(window_, t.y, t.x, p.shade.character);
   }
 }
 
-Cursor NcursesRenderer::GetBoundary() {
-  int max_y, max_x;
-  GetMaxYX(max_y, max_x);
-  return Cursor(max_y, max_x);
-}
-
 void NcursesRenderer::DrawCursor(Cursor c) {
-  if (!Cursor::IsBeyond(c, GetBoundary()))
+  if (region().contains(c))
     wmove(window_, c.y, c.x);
 }
 
