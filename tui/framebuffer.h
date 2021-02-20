@@ -36,8 +36,11 @@ public:
     if (begin.y == end.y) {
       std::fill(start_line.begin() + begin.x, start_line.end() + end.x,
                 Pixel());
-      count = end.x - begin.x;
+      count += end.x - begin.x;
       return count;
+    } else {
+      std::fill(start_line.begin() + begin.x, start_line.end(), Pixel());
+      count += width() - begin.x;
     }
     for (int i = begin.y + 1; i < end.y && i < height(); ++i) {
       auto &line = storage_[i];

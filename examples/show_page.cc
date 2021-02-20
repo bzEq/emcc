@@ -26,11 +26,9 @@ int main(int argc, char *argv[]) {
     int height, width;
     renderer.GetMaxYX(height, width);
     BufferView view(buffer.get());
-    view.set_width(width);
     view.set_baseline(start_line);
-    view.FillFramebuffer(height);
-    view.UpdateStatusLine();
-    renderer.RenderRange(view, {0, 0}, view.GetBoundary());
+    view.Resize(height, width);
+    renderer.RenderRegion(view, view.GetDiffRegion(0, 0));
     renderer.DrawCursor({0, 0});
     while (true) {
       int ch = getch();

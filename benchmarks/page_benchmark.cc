@@ -34,12 +34,10 @@ int main(int argc, char *argv[]) {
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       renderer.GetMaxYX(height, width);
-      view.set_width(width);
       view.set_baseline(i);
-      view.FillFramebuffer(height);
-      view.UpdateStatusLine();
+      view.Resize(height, width);
       renderer.Clear();
-      renderer.RenderRange(view, {0, 0}, view.GetBoundary());
+      renderer.RenderRegion(view, view.GetDiffRegion(0, 0));
       renderer.DrawCursor({0, 0});
       renderer.Refresh();
       ++nr_frames;
