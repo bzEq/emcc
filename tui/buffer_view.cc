@@ -199,6 +199,7 @@ bool BufferView::ScrollDown() {
 }
 
 // TODO: Optimize scrolling in ScrollUp(size_t).
+// FIXME: Would be f**ked if previous logical line is very long.
 bool BufferView::ScrollUp() {
   Pixel px;
   if (!framebuffer_.GetPixel({0, 0}, px)) {
