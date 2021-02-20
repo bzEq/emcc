@@ -74,10 +74,8 @@ bool BufferView::GetStatusLine(std::string &content) const {
   const Pixel &at = GetPixel(cursor_);
   size_t line, col;
   buffer_->ComputePosition(at.position.point, line, col);
-  content =
-      fmt::format("| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
-                  buffer_->filename(), at.position.point, buffer_->CountChars(),
-                  line, buffer_->CountLines(), col, buffer_->GetLineSize(line));
+  content = fmt::format("-- {} {} of {}, Ln {}, Col {}", buffer_->filename(),
+                        at.position.point, buffer_->CountChars(), line, col);
   return true;
 }
 

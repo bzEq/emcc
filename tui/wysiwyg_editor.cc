@@ -35,7 +35,7 @@ void WYSIWYGEditor::Resize() {
   renderer_->GetMaxYX(height, width);
   if (width != page_->width() || height != page_->height()) {
     // Size changed.
-    page_->Resize(height - 1, width);
+    page_->Resize(height - 2, width);
   }
 }
 
