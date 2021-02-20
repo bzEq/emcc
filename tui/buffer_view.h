@@ -25,6 +25,12 @@ public:
   Cursor cursor() const { return cursor_; }
   void Resize(size_t height, size_t width);
   const Pixel &GetPixel(Cursor c) const { return framebuffer_.GetPixel(c); }
+  bool GetStatusLine(std::string &content) const;
+  std::string GetStatusLine() const {
+    std::string s;
+    GetStatusLine(s);
+    return s;
+  }
 
   void MoveUp();
   void MoveDown();

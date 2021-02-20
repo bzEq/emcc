@@ -65,26 +65,18 @@ std::tuple<int, size_t> BufferView::GetCharAndWidth(char c) {
   return {(int)c, 1};
 }
 
-// void BufferView::UpdateStatusLine() {
-//   if (framebuffer_.empty())
-//     return;
-//   const Pixel &at = GetPixel(cursor_.y, cursor_.x);
-//   size_t line, col;
-//   buffer_->ComputePosition(at.position.point, line, col);
-//   std::vector<Pixel> &status_line = framebuffer_.back();
-//   std::string content = fmt::format(
-//       "----| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
-//       buffer_->filename(), at.position.point + 1, buffer_->CountChars(),
-//       line + 1, buffer_->CountLines(), col + 1,
-//       buffer_->GetLineSize(line));
-//   for (size_t i = 0; i < status_line.size(); ++i) {
-//     if (i < content.size()) {
-//       status_line[i].shade.character = content[i];
-//     } else {
-//       status_line[i].shade.character = '-';
-//     }
-//   }
-// }
+bool BufferView::GetStatusLine(std::string &content) const {
+  if (framebuffer_.empty())
+    return false;
+  const Pixel &at = GetPixel(cursor_);
+  size_t line, col;
+  buffer_->ComputePosition(at.position.point, line, col);
+  content = fmt::format("| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
+                        buffer_->filename(), at.position.point + 1,
+                        buffer_->CountChars(), line + 1, buffer_->CountLines(),
+                        col + 1, buffer_->GetLineSize(line));
+  return true;
+}
 
 void BufferView::MoveLeft() {
   Cursor probe = cursor_;

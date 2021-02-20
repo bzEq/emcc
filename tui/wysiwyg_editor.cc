@@ -7,6 +7,7 @@ namespace emcc::tui {
 void WYSIWYGEditor::Show() {
   Region view_region = page_->GetDiffRegion(0, 0);
   renderer_->RenderRegion(*page_, view_region);
+  renderer_->RenderStringAt({(int)page_->height(), 0}, page_->GetStatusLine());
   renderer_->DrawCursor(page_->cursor());
   renderer_->Refresh();
 }
@@ -34,7 +35,7 @@ void WYSIWYGEditor::Resize() {
   renderer_->GetMaxYX(height, width);
   if (width != page_->width() || height != page_->height()) {
     // Size changed.
-    page_->Resize(height, width);
+    page_->Resize(height - 1, width);
   }
 }
 

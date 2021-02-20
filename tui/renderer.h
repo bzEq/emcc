@@ -19,6 +19,8 @@ public:
 
   void RenderRegionAt(Cursor anchor, const BufferView &view, Region region);
 
+  void RenderStringAt(Cursor at, const std::string &content);
+
   void DrawCursor(Cursor c);
 
   void Refresh() { wrefresh(window_); }

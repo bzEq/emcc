@@ -22,6 +22,10 @@ void NcursesRenderer::RenderRegionAt(Cursor anchor, const BufferView &view,
   }
 }
 
+void NcursesRenderer::RenderStringAt(Cursor at, const std::string &content) {
+  mvwprintw(window_, at.y, at.x, "%s", content.c_str());
+}
+
 void NcursesRenderer::DrawCursor(Cursor c) {
   if (region().contains(c))
     wmove(window_, c.y, c.x);
