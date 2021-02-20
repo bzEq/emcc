@@ -232,24 +232,12 @@ bool BufferView::ScrollUp() {
   if (prev_fb.empty()) {
     return false;
   }
-  Pixel replica;
-  int i = (int)prev_fb.height() - 1;
-  for (; i >= 0; --i) {
-    if (prev_fb.GetPixel({i, 0}, replica) && replica.is_same_position(px))
-      break;
-  }
-  if (replica.is_same_shade(px)) {
-    if (i == 0)
-      return false;
-  } else {
-    i = prev_fb.height();
-  }
   if (framebuffer_.empty())
     return false;
   for (size_t j = framebuffer_.height() - 1; j != 0; --j) {
     framebuffer_.SwapLine(j, j - 1);
   }
-  Framebuffer::SwapLine(framebuffer_, 0, prev_fb, i - 1);
+  Framebuffer::SwapLine(framebuffer_, 0, prev_fb, prev_fb.height() - 1);
   return true;
 }
 

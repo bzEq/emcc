@@ -128,7 +128,7 @@ TEST(BufferView, EmptyFramebuffer) {
   EXPECT_TRUE(view.height() == 0);
 }
 
-TEST(BufferView, UpAndDownTest) {
+TEST(BufferView, MoveTest) {
   emcc::MonoBuffer buffer;
   const char text[] = "hello\n"
                       "rofl\n"
@@ -141,8 +141,29 @@ TEST(BufferView, UpAndDownTest) {
   EXPECT_TRUE(view.cursor().y == 0);
   EXPECT_TRUE(view.cursor().x == 0);
   EXPECT_TRUE(view.GetPixel({0, 0}).shade.character == (int)'o');
+  view.MoveRight();
   view.MoveUp();
-  EXPECT_TRUE(view.GetPixel({0, 0}).shade.character == (int)'h');
+  EXPECT_TRUE(view.GetPixel(view.cursor()).shade.character == (int)'e');
+}
+
+TEST(BufferView, MoveTest1) {
+  emcc::MonoBuffer buffer;
+  const char text[] = "hello\n"
+                      "rofl\n"
+                      "lmao\n";
+  buffer.Append(text, emcc::GetArrayLength(text));
+  BufferView view(&buffer);
+  view.Resize(2, 4);
+  EXPECT_TRUE(view.GetPixel(view.cursor()).shade.character == (int)'h');
+  view.MoveDown();
+  EXPECT_TRUE(view.cursor().y == 1);
+  EXPECT_TRUE(view.cursor().x == 0);
+  EXPECT_TRUE(view.GetPixel({1, 0}).shade.character == (int)'o');
+  view.MoveDown();
+  EXPECT_TRUE(view.GetPixel(view.cursor()).shade.character == (int)'r');
+  view.MoveUp();
+  view.MoveUp();
+  EXPECT_TRUE(view.GetPixel(view.cursor()).shade.character == (int)'h');
 }
 
 } // namespace
