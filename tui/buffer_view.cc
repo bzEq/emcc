@@ -72,7 +72,7 @@ bool BufferView::GetStatusLine(std::string &content) const {
   size_t line, col;
   buffer_->ComputePosition(at.position.point, line, col);
   content = fmt::format("| {} | p: {} of {} | l: {} of {} | c: {} of {} |",
-                        buffer_->filename(), at.position.point + 1,
+                        buffer_->filename(), at.position.point,
                         buffer_->CountChars(), line + 1, buffer_->CountLines(),
                         col + 1, buffer_->GetLineSize(line));
   return true;
