@@ -35,6 +35,7 @@ void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,
     assert(length <= width());
     // Do not break character's pixels into multiple lines.
     if (at.x + length > width()) {
+      fb.Reset({width_, {at.y, at.x}, {at.y + 1, 0}});
       ++at.y;
       at.x = 0;
       if (!region.contains(at))
@@ -52,6 +53,7 @@ void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,
       pixel.set_offset(length, j);
     }
     if (c == MonoBuffer::kNewLine) {
+      fb.Reset({width_, {at.y, at.x + (int)length}, {at.y + 1, 0}});
       ++at.y;
       at.x = 0;
     } else {
