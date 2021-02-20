@@ -13,6 +13,7 @@ struct Cursor {
     return x == other.x && y == other.y;
   }
   bool operator!=(const Cursor &other) const { return !(*this == other); }
+  // Deprecated, use Region::contains.
   static bool IsBeyond(Cursor pos, Cursor boundary) {
     if (pos.y < 0 || pos.x < 0)
       return true;
@@ -62,6 +63,10 @@ struct Region {
     if (c.y == end.y)
       return c.x >= 0 && c.x <= end.x;
     return c.x >= 0 && c.x < width && c.y > begin.y && c.y < end.y;
+  }
+  // Assume begin is {0,0}, width is (corner.x + 1), end is corner.
+  static bool contains(Cursor corner, Cursor c) {
+    return c.x >= 0 && c.x <= corner.x && c.y >= 0 && c.y <= corner.y;
   }
 };
 
