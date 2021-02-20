@@ -45,29 +45,55 @@ inline Cursor operator+(const Cursor lhs, const Cursor rhs) {
   return {lhs.y + rhs.y, lhs.x + rhs.x};
 }
 
-struct Region {
-  const size_t width;
-  Cursor begin, end;
-  Region(width, begin, end) : width(width), begin(begin), end(end) {
+// TODO: Add iterator.
+class Region {
+  Region(size_t width, Cursor begin, Cursor end)
+      : width_(width), begin_(begin), end_(end) {
     assert(begin.x < width && begin.x >= 0);
     assert(end.x < width && end.x >= 0);
     assert((end.y == begin.y && end.x >= begin.x) || end.y > begin.y);
   }
-  size_t size() const { return Cursor::ComputeDistance(width, begin, end) + 1; }
+  size_t width() const { return width_; }
+  size_t size() const { return Cursor::ComputeDistance(width, begin, end); }
   bool contains(Cursor c) {
     if (end.y == begin.y) {
-      return c.x >= begin.x && c.x <= end.x;
+      return c.x >= begin.x && c.x < end.x;
     }
     if (c.y == begin.y)
       return c.x >= begin.x && c.x < width;
     if (c.y == end.y)
-      return c.x >= 0 && c.x <= end.x;
+      return c.x >= 0 && c.x < end.x;
     return c.x >= 0 && c.x < width && c.y > begin.y && c.y < end.y;
   }
-  // Assume begin is {0,0}, width is (corner.x + 1), end is corner.
-  static bool contains(Cursor corner, Cursor c) {
-    return c.x >= 0 && c.x <= corner.x && c.y >= 0 && c.y <= corner.y;
+
+  class iterator {
+  public:
+    friend class Region;
+    iterator &operator++() { c_ = Cursor::Goto(parent_.width(), c_, 1); }
+    bool operator!=(const iterator &other) { return c_ != other.c_; }
+    const Cursor &operator*() const { return c_; }
+
+  private:
+    iterator(const Region parent) : parent_(parent) {}
+    const Region &parent_;
+    Cursor c_;
+  };
+
+  iterator begin() const {
+    iterator it(*this);
+    it.c_ = begin_;
+    return it;
   }
+  iterator end() const {
+    iterator it(*this);
+    it.c_ = end_;
+    return it;
+  }
+
+private:
+  const size_t width_;
+  const Cursor begin_;
+  const Cursor end_;
 };
 
 } // namespace emcc::tui
