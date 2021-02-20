@@ -47,34 +47,40 @@ inline Cursor operator+(const Cursor lhs, const Cursor rhs) {
 
 // TODO: Add iterator.
 class Region {
+public:
   Region(size_t width, Cursor begin, Cursor end)
       : width_(width), begin_(begin), end_(end) {
     assert(begin.x < width && begin.x >= 0);
     assert(end.x < width && end.x >= 0);
     assert((end.y == begin.y && end.x >= begin.x) || end.y > begin.y);
   }
+  const Cursor &begin_cursor() const { return begin_; }
+  const Cursor &end_cursor() const { return end_; }
   size_t width() const { return width_; }
-  size_t size() const { return Cursor::ComputeDistance(width, begin, end); }
+  size_t size() const { return Cursor::ComputeDistance(width_, begin_, end_); }
   bool contains(Cursor c) {
-    if (end.y == begin.y) {
-      return c.x >= begin.x && c.x < end.x;
+    if (end_.y == begin_.y) {
+      return c.x >= begin_.x && c.x < end_.x;
     }
-    if (c.y == begin.y)
-      return c.x >= begin.x && c.x < width;
-    if (c.y == end.y)
-      return c.x >= 0 && c.x < end.x;
-    return c.x >= 0 && c.x < width && c.y > begin.y && c.y < end.y;
+    if (c.y == begin_.y)
+      return c.x >= begin_.x && c.x < width_;
+    if (c.y == end_.y)
+      return c.x >= 0 && c.x < end_.x;
+    return c.x >= 0 && c.x < width_ && c.y > begin_.y && c.y < end_.y;
   }
 
   class iterator {
   public:
     friend class Region;
-    iterator &operator++() { c_ = Cursor::Goto(parent_.width(), c_, 1); }
+    iterator &operator++() {
+      c_ = Cursor::Goto(parent_.width(), c_, 1);
+      return *this;
+    }
     bool operator!=(const iterator &other) { return c_ != other.c_; }
     const Cursor &operator*() const { return c_; }
 
   private:
-    iterator(const Region parent) : parent_(parent) {}
+    iterator(const Region &parent) : parent_(parent) {}
     const Region &parent_;
     Cursor c_;
   };

@@ -45,4 +45,59 @@ TEST(PageTest, PixelTest1) {
   EXPECT_TRUE(p.offset() == 2);
 }
 
+TEST(RegionTest, SizeTest) {
+  Region region(8, {1, 7}, {2, 7});
+  EXPECT_TRUE(region.size() == 8);
+}
+
+TEST(RegionTest, SizeTest1) {
+  Region region(8, {4, 7}, {4, 7});
+  EXPECT_TRUE(region.size() == 0);
+}
+
+TEST(RegionTest, SizeTest3) {
+  Region region(8, {4, 7}, {16, 7});
+  EXPECT_TRUE(region.size() == 96);
+}
+
+TEST(RegionTest, IteratorTest) {
+  Region region(8, {4, 7}, {16, 7});
+  Cursor ref(4, 7);
+  size_t s = 0;
+  for (auto c : region) {
+    ++s;
+    EXPECT_TRUE(ref == c);
+    ref = Cursor::Goto(8, ref, 1);
+  }
+  EXPECT_TRUE(ref.y == 16);
+  EXPECT_TRUE(ref.x == 7);
+  EXPECT_TRUE(s == 96);
+}
+
+TEST(RegionTest, ContainTest) {
+  Region region(8, {4, 0}, {16, 0});
+  EXPECT_TRUE(region.contains({4, 0}));
+  EXPECT_TRUE(!region.contains({16, 0}));
+  EXPECT_TRUE(!region.contains({15, 8}));
+  EXPECT_TRUE(region.contains({15, 7}));
+  EXPECT_TRUE(!region.contains({-1, 7}));
+  EXPECT_TRUE(!region.contains({1, 7}));
+  EXPECT_TRUE(region.contains({5, 0}));
+  EXPECT_TRUE(region.contains({5, 7}));
+  EXPECT_TRUE(region.contains({4, 7}));
+  EXPECT_TRUE(!region.contains({4, 8}));
+  EXPECT_TRUE(region.contains({15, 0}));
+}
+
+TEST(RegionTest, ContainTest1) {
+  Region region(8, {4, 4}, {16, 2});
+  EXPECT_TRUE(region.contains({4, 4}));
+  EXPECT_TRUE(region.contains({4, 7}));
+  EXPECT_TRUE(!region.contains({4, 8}));
+  EXPECT_TRUE(region.contains({11, 0}));
+  EXPECT_TRUE(region.contains({11, 7}));
+  EXPECT_TRUE(region.contains({16, 1}));
+  EXPECT_TRUE(!region.contains({16, 2}));
+}
+
 } // namespace
