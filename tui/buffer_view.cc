@@ -78,42 +78,44 @@ bool BufferView::GetStatusLine(std::string &content) const {
   return true;
 }
 
-void BufferView::MoveLeft() {
+bool BufferView::MoveLeft() {
   Cursor probe = cursor_;
   probe.x -= 1;
   if (probe.x < 0)
-    return;
+    return false;
   Pixel px;
   if (!framebuffer_.GetPixel(probe, px) ||
       px.position.point == MonoBuffer::npos)
-    return;
+    return false;
   if (!px.is_head())
     probe.x -= px.offset();
   assert(probe.x >= 0);
   cursor_ = probe;
+  return true;
 }
 
-void BufferView::MoveRight() {
+bool BufferView::MoveRight() {
   Cursor probe = cursor_;
   Pixel px;
   if (!framebuffer_.GetPixel(probe, px) ||
       px.position.point == MonoBuffer::npos) {
-    return;
+    return false;
   }
   assert(px.is_head());
   probe.x += px.length();
   if (!framebuffer_.GetPixel(probe, px) ||
       px.position.point == MonoBuffer::npos) {
-    return;
+    return false;
   }
   cursor_ = probe;
+  return true;
 }
 
-void BufferView::MoveUp() {
+bool BufferView::MoveUp() {
   Cursor probe = cursor_;
   if (probe.y == 0) {
     if (!ScrollUp()) {
-      return;
+      return false;
     }
   } else {
     probe.y -= 1;
@@ -121,19 +123,20 @@ void BufferView::MoveUp() {
   Pixel px;
   for (; probe.x >= 0; --probe.x) {
     if (!framebuffer_.GetPixel(probe, px))
-      return;
+      return false;
     if (px.position.point != MonoBuffer::npos) {
       cursor_ = probe;
-      return;
+      return true;
     }
   }
+  return false;
 }
 
-void BufferView::MoveDown() {
+bool BufferView::MoveDown() {
   Cursor probe = cursor_;
   if (probe.y + 1 >= framebuffer_.height()) {
     if (!ScrollDown()) {
-      return;
+      return false;
     }
   } else {
     ++probe.y;
@@ -141,12 +144,13 @@ void BufferView::MoveDown() {
   Pixel px;
   for (; probe.x >= 0; --probe.x) {
     if (!framebuffer_.GetPixel(probe, px))
-      return;
+      return false;
     if (px.position.point != MonoBuffer::npos) {
       cursor_ = probe;
-      return;
+      return true;
     }
   }
+  return true;
 }
 
 bool BufferView::ScrollDown() {

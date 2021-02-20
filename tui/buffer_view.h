@@ -32,10 +32,10 @@ public:
     return s;
   }
 
-  void MoveUp();
-  void MoveDown();
-  void MoveLeft();
-  void MoveRight();
+  bool MoveUp();
+  bool MoveDown();
+  bool MoveLeft();
+  bool MoveRight();
   size_t version() const { return version_; }
 
   Region GetDiffRegion(size_t src, size_t target) const {
