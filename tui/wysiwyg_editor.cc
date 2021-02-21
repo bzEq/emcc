@@ -1,4 +1,5 @@
 #include "tui/wysiwyg_editor.h"
+#include "support/epoll.h"
 
 #include <csignal>
 
@@ -14,18 +15,33 @@ void WYSIWYGEditor::Show() {
 
 int WYSIWYGEditor::Run() {
   Resize();
+  EPoll ep;
+  ep.AddFD(signal_queue_->receive_chan(), EPOLLIN);
+  ep.AddFD(input_->fd(), EPOLLIN);
   while (!have_to_stop_) {
     Show();
-    // Handle external signal.
-    int signum;
-    if (signal_queue_->get_nowait(signum)) {
-      if (signum == SIGWINCH) {
-        Resize();
+    std::vector<epoll_event> events(2);
+    if (!ep.Wait(&events, -1)) {
+      if (errno == EINTR)
         continue;
+      status_ = -1;
+      break;
+    }
+    for (auto event : events) {
+      if (event.data.fd == signal_queue_->receive_chan()) {
+        // Handle external signals.
+        int signum;
+        if (signal_queue_->get_nowait(signum)) {
+          if (signum == SIGWINCH) {
+            Resize();
+          }
+        }
+      } else if (event.data.fd == input_->fd()) {
+        // Handle input.
+        int ch = input_->GetNext();
+        Consume(ch);
       }
     }
-    int ch = input_->GetNext();
-    Consume(ch);
   }
   return status_;
 }
@@ -33,10 +49,8 @@ int WYSIWYGEditor::Run() {
 void WYSIWYGEditor::Resize() {
   int height, width;
   renderer_->GetMaxYX(height, width);
-  if (width != page_->width() || height != page_->height()) {
-    // Size changed.
-    page_->Resize(height - 2, width);
-  }
+  renderer_->Clear();
+  page_->Resize(height - 2, width);
 }
 
 void WYSIWYGEditor::Consume(int ch) {

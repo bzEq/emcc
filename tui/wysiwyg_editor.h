@@ -11,7 +11,7 @@
 
 namespace emcc::tui {
 
-using SignalQueueTy = Chan<int>;
+using SignalQueueTy = GoChan<int>;
 
 class WYSIWYGEditor {
 public:

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sys/ioctl.h>
+
 #include "tui/buffer_view.h"
 #include "tui/cursor.h"
 
@@ -11,7 +13,14 @@ class NcursesRenderer {
 public:
   NcursesRenderer(WINDOW *window) : window_(window) {}
 
-  void GetMaxYX(int &y, int &x) { getmaxyx(window_, y, x); }
+  int fd() const { return STDOUT_FILENO; }
+
+  void GetMaxYX(int &y, int &x) {
+    struct winsize ws;
+    ioctl(fd(), TIOCGWINSZ, &ws);
+    y = ws.ws_row;
+    x = ws.ws_col;
+  }
 
   void Clear() { wclear(window_); }
 
