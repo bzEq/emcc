@@ -4,10 +4,22 @@
 
 namespace emcc::tui {
 
+void BufferView::GotoLine(size_t baseline) {
+  size_t point;
+  buffer_->ComputePoint(baseline, 0, point);
+  RewriteFrameBuffer(point, ~0, framebuffer_, framebuffer_.region());
+  cursor_ = {0, 0};
+}
+
 void BufferView::Resize(size_t height, size_t width) {
   if (!height || !width)
     return;
-  // TODO: Recover cursor_ after resizing.
+  Pixel px;
+  framebuffer_.GetPixel(cursor_, px);
+  size_t baseline = 0, col = 0;
+  if (px.position.point != MonoBuffer::npos) {
+    buffer_->ComputePosition(px.position.point, baseline, col);
+  }
   if (width != width_) {
     framebuffer_ = Framebuffer(width);
     width_ = width;
@@ -15,8 +27,15 @@ void BufferView::Resize(size_t height, size_t width) {
   framebuffer_.Resize(height);
   framebuffer_.Reset(framebuffer_.region());
   size_t point;
-  buffer_->ComputePoint(baseline_, 0, point);
+  buffer_->ComputePoint(baseline, 0, point);
   RewriteFrameBuffer(point, ~0, framebuffer_, framebuffer_.region());
+  if (px.position.point != MonoBuffer::npos) {
+    if (!framebuffer_.FindPoint(px.position.point, cursor_)) {
+      cursor_ = {0, 0};
+    }
+  } else {
+    cursor_ = {0, 0};
+  }
 }
 
 void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,

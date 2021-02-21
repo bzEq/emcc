@@ -15,11 +15,7 @@ class BufferView {
 public:
   BufferView(MonoBuffer *buffer)
       : version_(0), width_(80), framebuffer_(width_), buffer_(buffer),
-        baseline_(0), cursor_() {}
-  void set_baseline(size_t baseline) {
-    baseline_ = std::min(baseline, buffer_->CountLines() - 1);
-  }
-  size_t baseline() const { return baseline_; }
+        cursor_() {}
   size_t width() const { return width_; }
   size_t height() const { return framebuffer_.height(); }
   Cursor cursor() const { return cursor_; }
@@ -31,6 +27,7 @@ public:
     GetStatusLine(s);
     return s;
   }
+  void GotoLine(size_t baseline);
 
   bool MoveUp();
   bool MoveDown();
@@ -60,7 +57,6 @@ private:
   size_t width_;
   FramebufferTy framebuffer_;
   MonoBuffer *buffer_;
-  size_t baseline_;
   Cursor cursor_, render_begin, render_end;
 };
 
