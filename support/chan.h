@@ -233,6 +233,8 @@ private:
   std::vector<T> chan_;
 };
 
+// FIXME: This impl is not well tested under intensive contention.
+// FIXME: *_nowait is guarenteed if there are multiple writers.
 template <typename T>
 class GoChan {
 public:
