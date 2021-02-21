@@ -131,8 +131,10 @@ TEST(GoChanBenchmark, ReadWrite) {
     std::vector<epoll_event> events(1);
     for (int i = 0; i < Num; ++i) {
       int res;
-      ep.Wait(&events, -1);
-      c.get_nowait(res);
+      EXPECT_TRUE(ep.Wait(&events, -1));
+      EXPECT_TRUE(!events.empty());
+      EXPECT_TRUE(events.back().data.fd == c.receive_chan());
+      EXPECT_TRUE(c.get_nowait(res));
     }
   });
   auto b = std::thread([&] {
@@ -140,8 +142,10 @@ TEST(GoChanBenchmark, ReadWrite) {
     ep.AddFD(c.send_chan(), EPOLLIN);
     std::vector<epoll_event> events(1);
     for (int i = 0; i < Num; ++i) {
-      ep.Wait(&events, -1);
-      c.put_nowait(i);
+      EXPECT_TRUE(ep.Wait(&events, -1));
+      EXPECT_TRUE(!events.empty());
+      EXPECT_TRUE(events.back().data.fd == c.send_chan());
+      EXPECT_TRUE(c.put_nowait(i));
     }
   });
   a.join();
