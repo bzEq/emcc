@@ -24,3 +24,8 @@ CC=clang bazel build //tools:*
 ```
 CC=clang bazel build //examples:*
 ```
+
+## Build all benchmarks
+```
+CC=clang bazel build //benchmarks:*
+```
