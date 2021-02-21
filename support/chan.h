@@ -1,5 +1,6 @@
 #pragma once
 
+#include <errno.h>
 #include <sys/eventfd.h>
 #include <unistd.h>
 
@@ -123,13 +124,23 @@ class SemaChan {
 public:
   explicit SemaChan(size_t cap)
       : cap_(cap), empty_sema_(-1), full_sema_(-1), use_sema_(-1), r_(0), w_(0),
-        wrapped_(false), closed_(false), chan_(cap) {
+        wrapped_(false), chan_(cap) {
     empty_sema_ = eventfd(0, EFD_CLOEXEC | EFD_SEMAPHORE);
     full_sema_ = eventfd(cap_, EFD_CLOEXEC | EFD_SEMAPHORE);
     use_sema_ = eventfd(1, EFD_CLOEXEC | EFD_SEMAPHORE);
+    close_sema_ = eventfd(0, EFD_CLOEXEC | EFD_SEMAPHORE | EFD_NONBLOCK);
   }
 
-  bool is_open() const { return !closed_; }
+  void close() {
+    uint64_t val = ~uint64_t(0) - 1;
+    write(close_sema_, &val, sizeof(val));
+  }
+
+  bool is_open() const {
+    uint64_t val;
+    read(close_sema_, &val, sizeof(val));
+    return errno == EAGAIN;
+  }
 
   bool empty() const { return !wrapped_ && r_ == w_; }
 
@@ -149,6 +160,9 @@ public:
   bool put(E &&e) {
     uint64_t val;
     int err;
+    err = read(close_sema_, &val, sizeof(val));
+    if (errno != EAGAIN)
+      return false;
     err = read(full_sema_, &val, sizeof(val));
     assert(err > 0);
     err = read(use_sema_, &val, sizeof(val));
@@ -166,6 +180,9 @@ public:
   bool get(T &receiver) {
     uint64_t val;
     int err;
+    err = read(close_sema_, &val, sizeof(val));
+    if (errno != EAGAIN)
+      return false;
     err = read(empty_sema_, &val, sizeof(val));
     assert(err > 0);
     err = read(use_sema_, &val, sizeof(val));
@@ -181,11 +198,13 @@ public:
 
   ~SemaChan() {
     if (empty_sema_ >= 0)
-      close(empty_sema_);
+      ::close(empty_sema_);
     if (full_sema_ >= 0)
-      close(full_sema_);
+      ::close(full_sema_);
     if (use_sema_ >= 0)
-      close(use_sema_);
+      ::close(use_sema_);
+    if (close_sema_ >= 0)
+      ::close(close_sema_);
   }
 
 private:
@@ -208,9 +227,9 @@ private:
   }
 
   const size_t cap_;
-  int empty_sema_, full_sema_, use_sema_;
+  int empty_sema_, full_sema_, use_sema_, close_sema_;
   size_t r_, w_;
-  bool wrapped_, closed_;
+  bool wrapped_;
   std::vector<T> chan_;
 };
 
