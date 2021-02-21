@@ -257,6 +257,7 @@ public:
 
   int send_chan() const { return put_sema_; }
 
+  // FIXME: This is not real *_nowait.
   bool get_nowait(T &receiver) {
     std::unique_lock<std::mutex> l(mu_);
     if (closed_ || empty())
@@ -272,6 +273,7 @@ public:
     return true;
   }
 
+  // FIXME: This is not real *_nowait.
   template <typename... Args>
   bool put_nowait(Args &&...args) {
     std::unique_lock<std::mutex> l(mu_);
