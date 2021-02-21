@@ -233,4 +233,108 @@ private:
   std::vector<T> chan_;
 };
 
+template <typename T>
+class GoChan {
+public:
+  explicit GoChan(size_t cap)
+      : cap_(cap), r_(0), w_(0), wrapped_(false), closed_(false), chan_(cap_),
+        get_sema_(-1), put_sema_(-1) {
+    get_sema_ = eventfd(0, EFD_CLOEXEC | EFD_SEMAPHORE | EFD_NONBLOCK);
+    put_sema_ = eventfd(cap_, EFD_CLOEXEC | EFD_SEMAPHORE | EFD_NONBLOCK);
+  }
+
+  int receive_chan() const { return get_sema_; }
+
+  int send_chan() const { return put_sema_; }
+
+  bool get_nowait(T &receiver) {
+    std::unique_lock<std::mutex> l(mu_);
+    if (closed_ || empty())
+      return false;
+    uint64_t val = 0;
+    receiver = std::move(chan_[r_]);
+    AdvanceRead();
+    read(get_sema_, &val, sizeof(val));
+    assert(val == 1);
+    write(put_sema_, &val, sizeof(val));
+    l.unlock();
+    cv_.notify_one();
+    return true;
+  }
+
+  template <typename... Args>
+  bool put_nowait(Args &&...args) {
+    std::unique_lock<std::mutex> l(mu_);
+    if (closed_ || is_full())
+      return false;
+    chan_.emplace(chan_.begin() + w_, std::forward<Args>(args)...);
+    AdvanceWrite();
+    uint64_t val = 0;
+    read(put_sema_, &val, sizeof(val));
+    assert(val == 1);
+    write(get_sema_, &val, sizeof(val));
+    l.unlock();
+    cv_.notify_one();
+    return true;
+  }
+
+  bool empty() const { return !wrapped_ && r_ == w_; }
+
+  size_t size() const {
+    if (empty())
+      return 0;
+    if (r_ == w_)
+      return cap_;
+    if (w_ > r_)
+      return w_ - r_;
+    return w_ + cap_ - r_;
+  }
+
+  bool is_full() const { return size() == cap_; }
+
+  bool is_open() {
+    std::unique_lock<std::mutex> l(mu_);
+    return closed_;
+  }
+
+  void close() {
+    std::unique_lock<std::mutex> l(mu_);
+    closed_ = true;
+  }
+
+  ~GoChan() {
+    if (put_sema_ >= 0)
+      ::close(put_sema_);
+    if (get_sema_ >= 0)
+      ::close(get_sema_);
+  }
+
+private:
+  void AdvanceRead() {
+    if (r_ + 1 == cap_) {
+      wrapped_ = !wrapped_;
+      r_ = 0;
+    } else {
+      ++r_;
+    }
+  }
+
+  void AdvanceWrite() {
+    if (w_ + 1 == cap_) {
+      wrapped_ = !wrapped_;
+      w_ = 0;
+    } else {
+      ++w_;
+    }
+  }
+
+  const size_t cap_;
+  size_t r_, w_;
+  bool wrapped_, closed_;
+  std::mutex mu_;
+  std::condition_variable cv_;
+  std::vector<T> chan_;
+  int get_sema_, put_sema_;
+};
+
 } // namespace emcc

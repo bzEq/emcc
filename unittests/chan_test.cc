@@ -1,4 +1,5 @@
 #include "support/chan.h"
+#include "support/epoll.h"
 
 #include <gtest/gtest.h>
 #include <thread>
@@ -114,6 +115,34 @@ TEST(SemaChanBenchmark, ReadWrite) {
   auto b = std::thread([&] {
     for (int i = 0; i < Num; ++i)
       c.put(i);
+  });
+  a.join();
+  b.join();
+  EXPECT_TRUE(c.empty());
+}
+
+TEST(GoChanBenchmark, ReadWrite) {
+  const size_t Num = 1 << 16;
+  const size_t Cap = 1 << 8;
+  GoChan<int> c(Cap);
+  auto a = std::thread([&] {
+    EPoll ep;
+    ep.AddFD(c.receive_chan(), EPOLLIN);
+    std::vector<epoll_event> events(1);
+    for (int i = 0; i < Num; ++i) {
+      int res;
+      ep.Wait(&events, -1);
+      c.get_nowait(res);
+    }
+  });
+  auto b = std::thread([&] {
+    EPoll ep;
+    ep.AddFD(c.send_chan(), EPOLLIN);
+    std::vector<epoll_event> events(1);
+    for (int i = 0; i < Num; ++i) {
+      ep.Wait(&events, -1);
+      c.put_nowait(i);
+    }
   });
   a.join();
   b.join();
