@@ -80,9 +80,13 @@ public:
   }
 
   bool get_nowait(T &receiver) {
-    std::unique_lock<std::mutex> l(mu_);
-    if (closed_ || is_full())
+    std::unique_lock<std::mutex> l(mu_, std::defer_lock);
+    if (!l.try_lock())
       return false;
+    if (closed_ || is_full()) {
+      l.unlock();
+      return false;
+    }
     receiver = std::move(chan_[r_]);
     AdvanceRead();
     l.unlock();
@@ -92,9 +96,13 @@ public:
 
   template <typename E>
   bool put_nowait(E &&e) {
-    std::unique_lock<std::mutex> l(mu_);
-    if (closed_ || is_full())
+    std::unique_lock<std::mutex> l(mu_, std::defer_lock);
+    if (!l.try_lock())
       return false;
+    if (closed_ || is_full()) {
+      l.unlock();
+      return false;
+    }
     chan_[w_] = std::forward<E>(e);
     AdvanceWrite();
     l.unlock();
