@@ -104,11 +104,10 @@ size_t MonoBuffer::CountLines() { return line_size_.size(); }
 
 std::unique_ptr<MonoBuffer>
 MonoBuffer::CreateFromFile(const std::string &filename) {
-  auto membuf = MemoryBuffer::OpenIfExists(filename);
-  if (!membuf)
-    return nullptr;
   auto buffer = std::make_unique<MonoBuffer>();
-  buffer->Append(membuf->buffer(), membuf->length());
+  auto membuf = MemoryBuffer::OpenIfExists(filename);
+  if (membuf)
+    buffer->Append(membuf->buffer(), membuf->length());
   buffer->set_filename(filename);
   return buffer;
 }
