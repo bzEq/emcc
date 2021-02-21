@@ -1,0 +1,6 @@
+#!/bin/sh
+CC="$1" bazel build -j 1 //unittests:*
+CC="$1" bazel build -j 1 //tools:*
+CC="$1" bazel build -j 1 //examples:*
+CC="$1" bazel build -j 1 //benchmarks:*
+CC="$1" bazel build -j 1 :em
