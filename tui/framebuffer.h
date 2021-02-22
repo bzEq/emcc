@@ -84,8 +84,7 @@ public:
     for (size_t y = 0; y < storage_.size(); ++y) {
       for (size_t x = 0; x < storage_[y].size(); ++x) {
         if (storage_[y][x].position.point == point) {
-          c.y = y;
-          c.x = x;
+          c = {(int)y, (int)x};
           return true;
         }
       }
