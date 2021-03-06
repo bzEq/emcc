@@ -1,6 +1,7 @@
 #include "edit/mono_buffer.h"
 #include "support/misc.h"
 #include "support/sys.h"
+#include "support/utf8.h"
 
 #include <iostream>
 
@@ -182,6 +183,13 @@ bool MonoBuffer::Verify() {
       return false;
   }
   return true;
+}
+
+bool MonoBuffer::IsUTF8Encoded() {
+  uint32_t state = UTF8_ACCEPT, cp;
+  for (size_t i = 0; i < buffer_.size(); ++i)
+    DecodeUTF8(&state, &cp, buffer_.At(i));
+  return state == UTF8_ACCEPT;
 }
 
 } // namespace emcc

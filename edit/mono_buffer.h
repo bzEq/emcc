@@ -56,6 +56,7 @@ public:
   bool Verify();
   void set_filename(const std::string &filename) { filename_ = filename; }
   const std::string &filename() const { return filename_; }
+  bool IsUTF8Encoded();
 
 private:
   using StorageTy = Rope<char, 1UL << 12>;
