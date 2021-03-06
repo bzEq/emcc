@@ -137,3 +137,14 @@ cc_test(
         "//edit:emcc_edit",
     ],
 )
+
+cc_test(
+    name = "utf8_test",
+    srcs = [
+        "utf8_test.cc",
+    ],
+    linkopts = LINKOPTS,
+    deps = [
+        "//support:emcc_support",
+    ],
+)
