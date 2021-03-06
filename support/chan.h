@@ -59,7 +59,7 @@ public:
 
   bool is_open() {
     std::unique_lock<std::mutex> l(mu_);
-    return closed_;
+    return !closed_;
   }
 
   void close() {
@@ -258,7 +258,7 @@ public:
 
   bool get(T &receiver) {
     std::unique_lock<std::mutex> l(mu_);
-    if (closed_ || empty())
+    if (closed_ || empty_nolock())
       return false;
     uint64_t val = 0;
     receiver = std::move(chan_[r_]);
@@ -274,7 +274,7 @@ public:
   template <typename... Args>
   bool put(Args &&...args) {
     std::unique_lock<std::mutex> l(mu_);
-    if (closed_ || is_full())
+    if (closed_ || is_full_nolock())
       return false;
     chan_.emplace(chan_.begin() + w_, std::forward<Args>(args)...);
     AdvanceWrite();
@@ -287,10 +287,39 @@ public:
     return true;
   }
 
-  bool empty() const { return !wrapped_ && r_ == w_; }
-
   size_t size() const {
-    if (empty())
+    std::unique_lock<std::mutex> l(mu_);
+    return size_nolock();
+  }
+
+  bool empty() const {
+    std::unique_lock<std::mutex> l(mu_);
+    return empty_nolock();
+  }
+
+  bool is_full() const {
+    std::unique_lock<std::mutex> l(mu_);
+    return is_full_nolock();
+  }
+
+  void close() {
+    std::unique_lock<std::mutex> l(mu_);
+    closed_ = true;
+    if (put_sema_ >= 0) {
+      ::close(put_sema_);
+      put_sema_ = -1;
+    }
+    if (get_sema_ >= 0) {
+      ::close(get_sema_);
+      put_sema_ = -1;
+    }
+  }
+
+  ~GoChan() { close(); }
+
+private:
+  size_t size_nolock() const {
+    if (!wrapped_ && r_ == w_)
       return 0;
     if (r_ == w_)
       return cap_;
@@ -299,26 +328,14 @@ public:
     return w_ + cap_ - r_;
   }
 
-  bool is_full() const { return size() == cap_; }
+  bool empty_nolock() const { return size_nolock() == 0; }
 
-  bool is_open() {
-    std::unique_lock<std::mutex> l(mu_);
-    return closed_;
+  bool is_full_nolock() const { return size_nolock() == cap_; }
+
+  bool is_open_nolock() const {
+    return !closed_ && get_sema_ >= 0 && put_sema_ >= 0;
   }
 
-  void close() {
-    std::unique_lock<std::mutex> l(mu_);
-    closed_ = true;
-  }
-
-  ~GoChan() {
-    if (put_sema_ >= 0)
-      ::close(put_sema_);
-    if (get_sema_ >= 0)
-      ::close(get_sema_);
-  }
-
-private:
   void AdvanceRead() {
     if (r_ + 1 == cap_) {
       wrapped_ = !wrapped_;
@@ -340,7 +357,7 @@ private:
   const size_t cap_;
   size_t r_, w_;
   bool wrapped_, closed_;
-  std::mutex mu_;
+  mutable std::mutex mu_;
   std::condition_variable cv_;
   std::vector<T> chan_;
   int get_sema_, put_sema_;
