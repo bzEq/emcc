@@ -13,7 +13,7 @@ using namespace emcc::tui;
 
 static Arc<SignalQueueTy> signal_queue = std::make_shared<SignalQueueTy>(16);
 
-static void SendSignal(int signum) { signal_queue->put_nowait(signum); }
+static void SendSignal(int signum) { signal_queue->put(signum); }
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {

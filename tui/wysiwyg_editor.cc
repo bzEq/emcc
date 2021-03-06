@@ -31,7 +31,7 @@ int WYSIWYGEditor::Run() {
       if (event.data.fd == signal_queue_->receive_chan()) {
         // Handle external signals.
         int signum;
-        if (signal_queue_->get_nowait(signum)) {
+        if (signal_queue_->get(signum)) {
           if (signum == SIGWINCH) {
             Resize();
           }

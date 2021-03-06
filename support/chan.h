@@ -242,7 +242,6 @@ private:
 };
 
 // FIXME: This impl is not well tested under intensive contention.
-// FIXME: *_nowait is guarenteed if there are multiple writers.
 template <typename T>
 class GoChan {
 public:
@@ -257,8 +256,7 @@ public:
 
   int send_chan() const { return put_sema_; }
 
-  // FIXME: This is not real *_nowait.
-  bool get_nowait(T &receiver) {
+  bool get(T &receiver) {
     std::unique_lock<std::mutex> l(mu_);
     if (closed_ || empty())
       return false;
@@ -273,9 +271,8 @@ public:
     return true;
   }
 
-  // FIXME: This is not real *_nowait.
   template <typename... Args>
-  bool put_nowait(Args &&...args) {
+  bool put(Args &&...args) {
     std::unique_lock<std::mutex> l(mu_);
     if (closed_ || is_full())
       return false;

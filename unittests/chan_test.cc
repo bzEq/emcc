@@ -134,7 +134,7 @@ TEST(GoChanBenchmark, ReadWrite) {
       EXPECT_TRUE(ep.Wait(&events, -1));
       EXPECT_TRUE(!events.empty());
       EXPECT_TRUE(events.back().data.fd == c.receive_chan());
-      EXPECT_TRUE(c.get_nowait(res));
+      EXPECT_TRUE(c.get(res));
     }
   });
   auto b = std::thread([&] {
@@ -145,7 +145,7 @@ TEST(GoChanBenchmark, ReadWrite) {
       EXPECT_TRUE(ep.Wait(&events, -1));
       EXPECT_TRUE(!events.empty());
       EXPECT_TRUE(events.back().data.fd == c.send_chan());
-      EXPECT_TRUE(c.put_nowait(i));
+      EXPECT_TRUE(c.put(i));
     }
   });
   a.join();
