@@ -83,3 +83,13 @@ cc_binary(
         "@sol2",
     ],
 )
+
+cc_binary(
+    name = "play_terminal",
+    srcs = ["play_terminal.cc"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//tui:emcc_tui",
+    ],
+)
