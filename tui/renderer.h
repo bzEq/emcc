@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 #include "tui/buffer_view.h"
 #include "tui/cursor.h"
@@ -15,9 +16,7 @@ public:
 
   int fd() const { return STDOUT_FILENO; }
 
-  void GetMaxYX(int &y, int &x) {
-    getmaxyx(window_, y, x);
-  }
+  void GetMaxYX(int &y, int &x) { getmaxyx(window_, y, x); }
 
   void Clear() { wclear(window_); }
 
@@ -29,9 +28,7 @@ public:
 
   void DrawCursor(Cursor c);
 
-  void Resize(int height, int width) {
-    wresize(window_, height, width);
-  }
+  void Resize(int height, int width) { wresize(window_, height, width); }
 
   void Refresh() { wrefresh(window_); }
 

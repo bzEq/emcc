@@ -1,8 +1,5 @@
 #pragma once
 
-#include "support/chan.h"
-#include "support/misc.h"
-
 namespace emcc::tui {
 
 struct Cursor {
