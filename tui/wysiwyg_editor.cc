@@ -48,9 +48,13 @@ int WYSIWYGEditor::Run() {
 
 void WYSIWYGEditor::Resize() {
   int height, width;
-  renderer_->GetMaxYX(height, width);
+  struct winsize ws;
+  ioctl(renderer_->fd(), TIOCGWINSZ, &ws);
+  height = ws.ws_row;
+  width = ws.ws_col;
+  renderer_->Resize(height, width);
   renderer_->Clear();
-  page_->Resize(height - 2, width);
+  page_->Resize(height - 1, width);
 }
 
 void WYSIWYGEditor::Consume(int ch) {

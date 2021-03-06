@@ -16,10 +16,7 @@ public:
   int fd() const { return STDOUT_FILENO; }
 
   void GetMaxYX(int &y, int &x) {
-    struct winsize ws;
-    ioctl(fd(), TIOCGWINSZ, &ws);
-    y = ws.ws_row;
-    x = ws.ws_col;
+    getmaxyx(window_, y, x);
   }
 
   void Clear() { wclear(window_); }
@@ -31,6 +28,10 @@ public:
   void RenderStringAt(Cursor at, const std::string &content);
 
   void DrawCursor(Cursor c);
+
+  void Resize(int height, int width) {
+    wresize(window_, height, width);
+  }
 
   void Refresh() { wrefresh(window_); }
 
