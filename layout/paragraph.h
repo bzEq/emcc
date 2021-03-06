@@ -34,7 +34,17 @@ public:
   }
 
   template <typename... Args>
-  void Insert(int y, int x, Args &&...args);
+  void Insert(int y, int x, Args &&...args) {
+    if (line_index_.empty()) {
+      Append(std::forward<Args>(args)...);
+      return;
+    }
+    y = std::min((size_t)y, line_index_.size() - 1);
+    x = std::min((size_t)x, NumBoxes(y));
+    size_t i = line_index_[y] + x;
+    hlist_.Insert(i, std::forward<Args>(args)...);
+    ReCompute(y);
+  }
 
   template <typename... Args>
   void Append(Args &&...args) {
@@ -48,7 +58,8 @@ public:
   bool Update(int y, int x, size_t box_len);
   size_t Erase(int y, int x, size_t num_boxes);
   size_t NumBoxes(size_t i) {
-    assert(i < line_index_.size());
+    if (i >= line_index_.size())
+      return 0;
     if (i == line_index_.size() - 1)
       return hlist_.size() - line_index_[i];
     return line_index_[i + 1] - line_index_[i];
@@ -66,7 +77,7 @@ public:
     }
     bool operator!=(const iterator &other) const { return !(*this == other); }
 
-    HBox &operator*() { return parent_->hlist_[index_]; }
+    HBox &operator*() { return parent_.hlist_.At(index_); }
 
   private:
     iterator(Paragraph &parent, size_t index)

@@ -55,4 +55,42 @@ TEST(LayoutTest, Build2) {
   EXPECT_TRUE(p->NumBoxes(0) == 4);
 }
 
+TEST(LayoutTest, Append) {
+  auto p = std::make_unique<Paragraph<DumbBox>>(15);
+  p->Append(1);
+  p->Append(2);
+  p->Append(4);
+  p->Append(8);
+  p->Append(15);
+  EXPECT_TRUE(p->height() == 2);
+  EXPECT_TRUE(p->NumBoxes(0) == 4);
+  EXPECT_TRUE(p->NumBoxes(1) == 1);
+  size_t c = 0;
+  for (auto &hbox : p->GetLine(0)) {
+    EXPECT_TRUE(hbox.length() == (1 << (c++)));
+  }
+  for (auto &hbox : p->GetLine(1)) {
+    EXPECT_TRUE(hbox.length() == 15);
+  }
+}
+
+TEST(LayoutTest, Insert) {
+  auto p = std::make_unique<Paragraph<DumbBox>>(15);
+  p->Append(1);
+  p->Append(4);
+  p->Append(15);
+  p->Insert(0, 1, 2);
+  p->Insert(0, 3, 8);
+  EXPECT_TRUE(p->height() == 2);
+  EXPECT_TRUE(p->NumBoxes(0) == 4);
+  EXPECT_TRUE(p->NumBoxes(1) == 1);
+  size_t c = 0;
+  for (auto &hbox : p->GetLine(0)) {
+    EXPECT_TRUE(hbox.length() == (1 << (c++)));
+  }
+  for (auto &hbox : p->GetLine(1)) {
+    EXPECT_TRUE(hbox.length() == 15);
+  }
+}
+
 } // namespace
