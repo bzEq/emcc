@@ -143,8 +143,21 @@ cc_test(
     srcs = [
         "utf8_test.cc",
     ],
+    copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
+    ],
+)
+
+cc_test(
+    name = "layout_test",
+    srcs = [
+        "layout_test.cc",
+    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//layout:emcc_layout",
     ],
 )
