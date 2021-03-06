@@ -10,6 +10,7 @@
 
 namespace emcc::layout {
 
+// FIXME: Using rope would be cheaper.
 template <typename HBox>
 using HListTy = emcc::DynamicArray<HBox>;
 
@@ -34,8 +35,16 @@ public:
 
   template <typename... Args>
   void Insert(int y, int x, Args &&...args);
+
   template <typename... Args>
-  void Append(HBox &&hbox, Args &&...args);
+  void Append(Args &&...args) {
+    hlist_.Append(std::forward<Args>(args)...);
+    if (line_index_.empty())
+      ReCompute();
+    else
+      ReCompute(line_index_.size() - 1);
+  }
+
   bool Update(int y, int x, size_t box_len);
   size_t Erase(int y, int x, size_t num_boxes);
   size_t NumBoxes(size_t i) {
@@ -78,10 +87,14 @@ public:
   }
 
 private:
-  void ReCompute() {
-    line_index_.clear();
+  void ReCompute(size_t line) {
+    line = std::min(line, line_index_.size());
+    size_t start_from = 0;
+    if (!line_index_.empty())
+      start_from = line_index_[line];
+    line_index_.resize(line);
     size_t current_offset = 0;
-    for (size_t i = 0; i < hlist_.size(); ++i) {
+    for (size_t i = start_from; i < hlist_.size(); ++i) {
       auto &hbox = hlist_.At(i);
       size_t hlen = hbox.length();
       size_t s = current_offset + hlen;
@@ -97,6 +110,8 @@ private:
       }
     }
   }
+
+  void ReCompute() { ReCompute(0); }
 
   size_t width_;
   HListTy<HBox> hlist_;
