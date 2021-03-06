@@ -50,10 +50,10 @@ static const uint8_t utf8d[] = {
     1,   1,   1,   1,   1,   1,   1,   1,   1,   1, // s7..s8
 };
 
+} // namespace
+
 constexpr uint32_t UTF8_ACCEPT = 0;
 constexpr uint32_t UTF8_REJECT = 1;
-
-} // namespace
 
 inline bool DecodeUTF8(uint32_t *state, uint32_t *codepoint, uint8_t byte) {
   uint32_t type = utf8d[byte];

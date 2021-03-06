@@ -27,6 +27,7 @@ TEST(UTF8Test, CN) {
     if (DecodeUTF8(&state, &codepoint, c))
       ++l;
   }
+  EXPECT_TRUE(state == UTF8_ACCEPT);
   EXPECT_TRUE(l == 4);
 }
 
