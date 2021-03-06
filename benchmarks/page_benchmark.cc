@@ -17,6 +17,8 @@ int main(int argc, char *argv[]) {
   auto buffer = MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename.c_str());
+  if (!buffer->IsUTF8Encoded())
+    Die("Unable to handle non-utf8 encoded files");
   auto start = std::chrono::high_resolution_clock::now();
   auto end = std::chrono::high_resolution_clock::now();
   size_t nr_frames = 0;
