@@ -16,6 +16,9 @@ using HListTy = emcc::DynamicArray<HBox>;
 template <typename HBox>
 class Paragraph {
 public:
+  class iterator;
+  friend class iterator;
+
   Paragraph(size_t width) : width_(width) {}
 
   Paragraph(size_t width, HListTy<HBox> &&hlist)
@@ -40,6 +43,38 @@ public:
     if (i == line_index_.size() - 1)
       return hlist_.size() - line_index_[i];
     return line_index_[i + 1] - line_index_[i];
+  }
+
+  class iterator {
+  public:
+    friend class Paragraph;
+    iterator &operator++() {
+      ++index_;
+      return *this;
+    }
+    bool operator==(const iterator &other) const {
+      return &parent_ == &other.parent_ && index_ == other.index_;
+    }
+    bool operator!=(const iterator &other) const { return !(*this == other); }
+
+    HBox &operator*() { return parent_->hlist_[index_]; }
+
+  private:
+    iterator(Paragraph &parent, size_t index)
+        : index_(index), parent_(parent) {}
+
+    size_t index_;
+    Paragraph &parent_;
+  };
+
+  emcc::iterator_range<iterator> GetLine(size_t i) {
+    if (i >= line_index_.size())
+      return emcc::make_range(iterator(*this, 0), iterator(*this, 0));
+    if (i == line_index_.size() - 1)
+      return emcc::make_range(iterator(*this, line_index_[i]),
+                              iterator(*this, hlist_.size()));
+    return emcc::make_range(iterator(*this, line_index_[i]),
+                            iterator(*this, line_index_[i + 1]));
   }
 
 private:
