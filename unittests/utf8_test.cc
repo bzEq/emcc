@@ -13,7 +13,7 @@ TEST(UTF8Test, Basic) {
   size_t l = 0;
   uint32_t state = 0, codepoint;
   for (auto c : s) {
-    if (DecodeUTF8(&state, &codepoint, c) == UTF8_ACCEPT)
+    if (DecodeUTF8(&state, &codepoint, c))
       ++l;
   }
   EXPECT_TRUE(l == s.size());
@@ -24,7 +24,7 @@ TEST(UTF8Test, CN) {
   size_t l = 0;
   uint32_t state = 0, codepoint;
   for (auto c : s) {
-    if (DecodeUTF8(&state, &codepoint, c) == UTF8_ACCEPT)
+    if (DecodeUTF8(&state, &codepoint, c))
       ++l;
   }
   EXPECT_TRUE(l == 4);
