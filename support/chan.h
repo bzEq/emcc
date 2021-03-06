@@ -245,9 +245,9 @@ private:
 template <typename T>
 class GoChan {
 public:
-  explicit GoChan(size_t cap)
+  explicit GoChan(size_t cap, bool block = true)
       : cap_(cap), r_(0), w_(0), wrapped_(false), closed_(false), chan_(cap_),
-        get_sema_(-1), put_sema_(-1) {
+        block_(block), get_sema_(-1), put_sema_(-1) {
     get_sema_ = eventfd(0, EFD_CLOEXEC | EFD_SEMAPHORE | EFD_NONBLOCK);
     put_sema_ = eventfd(cap_, EFD_CLOEXEC | EFD_SEMAPHORE | EFD_NONBLOCK);
   }
@@ -258,6 +258,8 @@ public:
 
   bool get(T &receiver) {
     std::unique_lock<std::mutex> l(mu_);
+    if (block_)
+      cv_.wait(l, [this] { return closed_ || !empty_nolock(); });
     if (closed_ || empty_nolock())
       return false;
     uint64_t val = 0;
@@ -274,6 +276,8 @@ public:
   template <typename... Args>
   bool put(Args &&...args) {
     std::unique_lock<std::mutex> l(mu_);
+    if (block_)
+      cv_.wait(l, [this] { return closed_ || !is_full_nolock(); });
     if (closed_ || is_full_nolock())
       return false;
     chan_.emplace(chan_.begin() + w_, std::forward<Args>(args)...);
@@ -360,6 +364,7 @@ private:
   mutable std::mutex mu_;
   std::condition_variable cv_;
   std::vector<T> chan_;
+  bool block_;
   int get_sema_, put_sema_;
 };
 
