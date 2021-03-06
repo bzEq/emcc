@@ -11,7 +11,8 @@
 using namespace emcc;
 using namespace emcc::tui;
 
-static Arc<SignalQueueTy> signal_queue = std::make_shared<SignalQueueTy>(16);
+static Arc<SignalQueueTy> signal_queue =
+    std::make_shared<SignalQueueTy>(16, false);
 
 static void SendSignal(int signum) { signal_queue->put(signum); }
 
