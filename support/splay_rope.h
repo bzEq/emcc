@@ -120,6 +120,10 @@ public:
     root_ = Splay(root_, i);
     return *this;
   }
+  template <typename... Args>
+  SplayRope &Append(Args &&...args) {
+    return Insert(size(), std::forward<Args>(args)...);
+  }
   ~SplayRope() { Clear(); }
 
 #ifdef EMCC_DEBUG

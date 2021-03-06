@@ -6,41 +6,53 @@ namespace {
 
 using namespace emcc::layout;
 
+struct DumbBox {
+  size_t len;
+  template <typename... Args>
+  DumbBox(Args &&...args) : len(std::forward<Args>(args)...) {}
+  DumbBox(size_t len) : len(len) {}
+  DumbBox(DumbBox &&) = default;
+  size_t length() const { return len; }
+};
+
 TEST(LayoutTest, Build) {
-  HListTy hlist;
-  hlist.emplace_back(1);
-  hlist.emplace_back(2);
-  hlist.emplace_back(4);
-  hlist.emplace_back(8);
-  hlist.emplace_back(16);
-  ParagraphBuilder builder(17);
-  auto p = builder.Build(std::move(hlist));
+  HListTy<DumbBox> hlist;
+  hlist.Append(1);
+  hlist.Append(2);
+  hlist.Append(4);
+  hlist.Append(8);
+  hlist.Append(16);
+  EXPECT_TRUE(hlist.size() == 5);
+  auto p = std::make_unique<Paragraph<DumbBox>>(17, std::move(hlist));
   EXPECT_TRUE(p->height() == 2);
-  EXPECT_TRUE(p->GetLine(0).size() == 4);
-  EXPECT_TRUE(p->GetLine(1).size() == 1);
+  EXPECT_TRUE(p->NumBoxes(0) == 4);
+  EXPECT_TRUE(p->NumBoxes(1) == 1);
 }
 
 TEST(LayoutTest, Build1) {
-  HListTy hlist;
-  hlist.emplace_back(1);
-  hlist.emplace_back(2);
-  hlist.emplace_back(4);
-  hlist.emplace_back(8);
-  hlist.emplace_back(16);
-  ParagraphBuilder builder(15);
-  auto p = builder.Build(std::move(hlist));
-  EXPECT_TRUE(p == nullptr);
+  HListTy<DumbBox> hlist;
+  hlist.Append(1);
+  hlist.Append(2);
+  hlist.Append(4);
+  hlist.Append(8);
+  hlist.Append(16);
+  EXPECT_TRUE(hlist.size() == 5);
+  auto p = std::make_unique<Paragraph<DumbBox>>(15, std::move(hlist));
+  EXPECT_TRUE(p->height() == 2);
+  EXPECT_TRUE(p->NumBoxes(0) == 4);
+  EXPECT_TRUE(p->NumBoxes(1) == 1);
 }
 
 TEST(LayoutTest, Build2) {
-  HListTy hlist;
-  hlist.emplace_back(1);
-  hlist.emplace_back(2);
-  hlist.emplace_back(4);
-  hlist.emplace_back(8);
-  ParagraphBuilder builder(15);
-  auto p = builder.Build(std::move(hlist));
+  HListTy<DumbBox> hlist;
+  hlist.Append(1);
+  hlist.Append(2);
+  hlist.Append(4);
+  hlist.Append(8);
+  EXPECT_TRUE(hlist.size() == 4);
+  auto p = std::make_unique<Paragraph<DumbBox>>(15, std::move(hlist));
   EXPECT_TRUE(p->height() == 1);
+  EXPECT_TRUE(p->NumBoxes(0) == 4);
 }
 
 } // namespace

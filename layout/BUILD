@@ -13,5 +13,7 @@ cc_library(
         "-lncurses",
     ],
     visibility = ["//visibility:public"],
-    deps = [],
+    deps = [
+        "//support:emcc_support",
+    ],
 )
