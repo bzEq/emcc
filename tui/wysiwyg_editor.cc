@@ -21,13 +21,16 @@ int WYSIWYGEditor::Run() {
   while (!have_to_stop_) {
     Show();
     std::vector<epoll_event> events(2);
-    if (!ep.Wait(&events, -1)) {
+    int num_events;
+    if (!ep.Wait(-1, &events, &num_events)) {
       if (errno == EINTR)
         continue;
       status_ = -1;
       break;
     }
-    for (auto event : events) {
+    assert(num_events <= events.size());
+    for (int i = 0; i < num_events; ++i) {
+      auto &event = events[i];
       if (event.data.fd == signal_queue_->receive_chan()) {
         // Handle external signals.
         int signum;

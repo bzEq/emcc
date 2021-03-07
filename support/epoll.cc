@@ -28,9 +28,8 @@ bool EPoll::AddFD(int fd, uint32_t flags) {
           },
   };
   int ret = epoll_ctl(epfd_, EPOLL_CTL_ADD, fd, &event);
-  if (ret != 0) {
+  if (ret != 0)
     return false;
-  }
   return true;
 }
 
@@ -43,9 +42,8 @@ bool EPoll::ModFD(int fd, uint32_t flags) {
           },
   };
   int ret = epoll_ctl(epfd_, EPOLL_CTL_MOD, fd, &event);
-  if (ret != 0) {
+  if (ret != 0)
     return false;
-  }
   return true;
 }
 
@@ -66,4 +64,24 @@ bool EPoll::Wait(std::vector<struct epoll_event> *events, int timeout) {
   events->resize(ret);
   return true;
 }
+
+bool EPoll::Wait(int timeout, std::vector<epoll_event> *events,
+                 int *num_happened) {
+  assert(events);
+  *num_happened = epoll_wait(epfd_, events->data(), events->size(), timeout);
+  if (*num_happened < 0)
+    return false;
+  return true;
+}
+
+bool EPoll::MonitorReadEvent(int fd) { return AddFD(fd, EPOLLIN); }
+
+bool EPoll::MonitorWriteEvent(int fd) { return AddFD(fd, EPOLLOUT); }
+
+bool EPoll::MonitorRDWREvent(int fd) { return AddFD(fd, EPOLLIN | EPOLLOUT); }
+
+bool EPoll::MonitorRDWRERREvent(int fd) {
+  return AddFD(fd, EPOLLIN | EPOLLOUT | EPOLLERR);
+}
+
 } // namespace emcc
