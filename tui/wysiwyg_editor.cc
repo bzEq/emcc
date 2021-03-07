@@ -18,9 +18,9 @@ int WYSIWYGEditor::Run() {
   EPoll ep;
   ep.MonitorReadEvent(signal_queue_->receive_chan());
   ep.MonitorReadEvent(input_->fd());
+  std::vector<epoll_event> events(16);
   while (!have_to_stop_) {
     Show();
-    std::vector<epoll_event> events(2);
     int num_events;
     if (!ep.Wait(-1, &events, &num_events)) {
       if (errno == EINTR)
