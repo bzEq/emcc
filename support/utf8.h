@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace emcc {
 
@@ -61,6 +64,15 @@ inline bool DecodeUTF8(uint32_t *state, uint32_t *codepoint, uint8_t byte) {
                                        : (0xff >> type) & (byte);
   *state = utf8d[256 + *state * 16 + type];
   return *state == UTF8_ACCEPT;
+}
+
+inline bool DecodeUTF8(const std::string &s, std::vector<uint32_t> &result) {
+  uint32_t cp, state = UTF8_ACCEPT;
+  for (auto c : s) {
+    if (DecodeUTF8(&state, &cp, c))
+      result.emplace_back(cp);
+  }
+  return state == UTF8_ACCEPT;
 }
 
 } // namespace emcc
