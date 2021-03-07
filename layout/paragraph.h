@@ -1,7 +1,7 @@
 #pragma once
 
-#include "support/dynamic_array.h"
 #include "support/misc.h"
+#include "support/rope.h"
 
 #include <assert.h>
 #include <iostream>
@@ -12,7 +12,7 @@ namespace emcc::layout {
 
 // FIXME: Using rope would be cheaper.
 template <typename HBox>
-using HListTy = emcc::DynamicArray<HBox>;
+using HListTy = emcc::Rope<HBox>;
 
 template <typename HBox>
 class Paragraph {
@@ -33,22 +33,20 @@ public:
     ReCompute();
   }
 
-  template <typename... Args>
-  void Insert(int y, int x, Args &&...args) {
+  void Insert(int y, int x, HBox &&hbox) {
     if (line_index_.empty()) {
-      Append(std::forward<Args>(args)...);
+      Append(std::move(hbox));
       return;
     }
     y = std::min((size_t)y, line_index_.size() - 1);
     x = std::min((size_t)x, NumBoxes(y));
     size_t i = line_index_[y] + x;
-    hlist_.Insert(i, std::forward<Args>(args)...);
+    hlist_.Insert(i, std::move(hbox));
     ReCompute(y);
   }
 
-  template <typename... Args>
-  void Append(Args &&...args) {
-    hlist_.Append(std::forward<Args>(args)...);
+  void Append(HBox &&hbox) {
+    hlist_.Append(std::move(hbox));
     if (line_index_.empty())
       ReCompute();
     else
@@ -77,7 +75,7 @@ public:
     }
     bool operator!=(const iterator &other) const { return !(*this == other); }
 
-    HBox &operator*() { return parent_.hlist_.At(index_); }
+    HBox operator*() { return parent_.hlist_.At(index_); }
 
   private:
     iterator(Paragraph &parent, size_t index)
@@ -106,7 +104,7 @@ private:
     line_index_.resize(line);
     size_t current_offset = 0;
     for (size_t i = start_from; i < hlist_.size(); ++i) {
-      auto &hbox = hlist_.At(i);
+      auto hbox = hlist_.At(i);
       size_t hlen = hbox.length();
       size_t s = current_offset + hlen;
       size_t fill_current_line_badness =
