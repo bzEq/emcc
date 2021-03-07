@@ -15,11 +15,11 @@ void ANSITerminal::RegisterAtExitCleaning() {
   std::atexit(ANSITerminal::Clean);
 }
 
-bool ANSITerminal::EnableRawMode() const {
+bool ANSITerminal::EnableRawMode(int fd, bool recover_atexit) {
   struct termios raw;
-  tcgetattr(in(), &raw);
-  atexit_functions.emplace_back(
-      [=, fd = in()] { tcsetattr(fd, TCSANOW, &raw); });
+  tcgetattr(fd, &raw);
+  if (recover_atexit)
+    atexit_functions.emplace_back([=] { tcsetattr(fd, TCSANOW, &raw); });
   raw.c_iflag &=
       ~(IGNBRK | BRKINT | IGNPAR | PARMRK | INPCK | INLCR | IGNCR | ICRNL);
   raw.c_oflag &= ~(OPOST | ONLCR | OLCUC | OCRNL | ONOCR | ONLRET);
@@ -28,7 +28,7 @@ bool ANSITerminal::EnableRawMode() const {
         TOSTOP | ECHOCTL | ECHOPRT | ECHOKE | FLUSHO | PENDIN | IEXTEN);
   raw.c_cc[VMIN] = 1;
   raw.c_cc[VTIME] = 0;
-  if (tcsetattr(in(), TCSAFLUSH, &raw) != 0)
+  if (tcsetattr(fd, TCSAFLUSH, &raw) != 0)
     return false;
   return true;
 }

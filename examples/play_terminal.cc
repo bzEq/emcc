@@ -15,7 +15,7 @@ int main() {
   using namespace emcc::tui;
   ANSITerminal::RegisterAtExitCleaning();
   ANSITerminal vt(STDIN_FILENO, STDOUT_FILENO);
-  if (!vt.EnableRawMode())
+  if (!ANSITerminal::EnableRawMode(vt.in()))
     Die("Failed to enable raw mode for {}", vt.in());
   vt.Clear();
   vt.MoveCursor({16, 0});

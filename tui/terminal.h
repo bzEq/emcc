@@ -20,10 +20,9 @@ public:
   static std::vector<std::function<void(void)>> atexit_functions;
   static void Clean();
   static void RegisterAtExitCleaning();
+  static bool EnableRawMode(int fd, bool recover_atexit = true);
 
   ANSITerminal(int in, int out) : in_(in), out_(out) {}
-
-  bool EnableRawMode() const;
 
   int in() const { return in_; }
   int out() const { return out_; }
