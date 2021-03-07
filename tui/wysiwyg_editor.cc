@@ -16,8 +16,8 @@ void WYSIWYGEditor::Show() {
 int WYSIWYGEditor::Run() {
   Resize();
   EPoll ep;
-  ep.AddFD(signal_queue_->receive_chan(), EPOLLIN);
-  ep.AddFD(input_->fd(), EPOLLIN);
+  ep.MonitorReadEvent(signal_queue_->receive_chan());
+  ep.MonitorReadEvent(input_->fd());
   while (!have_to_stop_) {
     Show();
     std::vector<epoll_event> events(2);
