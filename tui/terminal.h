@@ -4,15 +4,26 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "fmt/format.h"
 #include "support/misc.h"
+#include "support/wcwidth.h"
 #include "tui/cursor.h"
+
+#include <functional>
+#include <vector>
 
 namespace emcc::tui {
 
 // See http://ascii-table.com/ansi-escape-sequences.php
 class ANSITerminal {
 public:
+  static std::vector<std::function<void(void)>> atexit_functions;
+  static void Clean();
+  static void RegisterAtExitCleaning();
+
   ANSITerminal(int in, int out) : in_(in), out_(out) {}
+
+  bool EnableRawMode() const;
 
   int in() const { return in_; }
   int out() const { return out_; }
