@@ -17,7 +17,7 @@ cc_binary(
         "-lncurses",
     ],
     deps = [
-        "//edit:emcc_edit",
+        "//editor:emcc_editor",
         "//support:emcc_support",
         "//tui:emcc_tui",
     ],

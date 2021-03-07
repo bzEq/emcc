@@ -1,4 +1,4 @@
-#include "edit/mono_buffer.h"
+#include "editor/mono_buffer.h"
 #include "support/misc.h"
 #include "tui/buffer_view.h"
 #include "tui/cursor.h"

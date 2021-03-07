@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Kai Luo <gluokai@gmail.com>. All rights reserved.
 
-#include "edit/mono_buffer.h"
+#include "editor/mono_buffer.h"
 #include "support/sys.h"
 
 #include <iostream>

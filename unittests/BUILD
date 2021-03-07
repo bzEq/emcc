@@ -96,7 +96,7 @@ cc_test(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//edit:emcc_edit",
+        "//editor:emcc_editor",
     ],
 )
 
@@ -134,7 +134,7 @@ cc_test(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//edit:emcc_edit",
+        "//editor:emcc_editor",
     ],
 )
 

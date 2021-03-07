@@ -1,4 +1,4 @@
-#include "edit/line_buffer.h"
+#include "editor/line_buffer.h"
 
 #include <gtest/gtest.h>
 

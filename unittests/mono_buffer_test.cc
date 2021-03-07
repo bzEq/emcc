@@ -1,4 +1,4 @@
-#include "edit/mono_buffer.h"
+#include "editor/mono_buffer.h"
 
 #include <gtest/gtest.h>
 

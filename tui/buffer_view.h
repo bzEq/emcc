@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "edit/mono_buffer.h"
+#include "editor/mono_buffer.h"
 #include "fmt/format.h"
 #include "tui/cursor.h"
 #include "tui/framebuffer.h"

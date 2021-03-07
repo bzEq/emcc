@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Kai Luo <gluokai@gmail.com>. All rights reserved.
 
-#include "edit/line_buffer.h"
+#include "editor/line_buffer.h"
 #include "support/sys.h"
 
 #include <iostream>

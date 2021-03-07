@@ -15,7 +15,7 @@ cc_binary(
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
-        "//edit:emcc_edit",
+        "//editor:emcc_editor",
         "//tui:emcc_tui",
     ],
 )
