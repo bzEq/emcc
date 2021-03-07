@@ -9,6 +9,7 @@
 
 namespace emcc::tui {
 
+// See http://ascii-table.com/ansi-escape-sequences.php
 class ANSITerminal {
 public:
   ANSITerminal(int in, int out) : in_(in), out_(out) {}
