@@ -161,3 +161,15 @@ cc_test(
         "//layout:emcc_layout",
     ],
 )
+
+cc_test(
+    name = "buffer_view_test",
+    srcs = [
+        "buffer_view_test.cc",
+    ],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    deps = [
+        "//editor:emcc_editor",
+    ],
+)

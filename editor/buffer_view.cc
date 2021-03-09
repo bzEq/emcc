@@ -39,11 +39,14 @@ void BufferView::Resize(size_t h, size_t w) {
 }
 
 void BufferView::FillBufferView() {
-  size_t current_line = baseline_ + lines_.size();
-  while (total_height_ < height_hint_) {
-    lines_.emplace_back(parent_, current_line, width_);
+  size_t current_line = baseline_ + lines_.size(),
+         total_lines = parent_->CountLines();
+  while (total_height_ < height_hint_ && current_line < total_lines) {
+    lines_.emplace_back(parent_, current_line++, width_);
+    // std::cout << lines_.back().height() << std::endl;
     total_height_ += lines_.back().height();
   }
+  // std::cout << total_height_ << std::endl;
 }
 
 } // namespace emcc::editor

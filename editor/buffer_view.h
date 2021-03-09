@@ -55,9 +55,9 @@ public:
     size_t lineno_, segno_;
   };
 
-  row_iterator begin() { return row_iterator(*this); }
+  row_iterator row_begin() { return row_iterator(*this); }
 
-  row_iterator end() {
+  row_iterator row_end() {
     row_iterator it(*this);
     it.lineno_ = lines_.size();
     return it;

@@ -93,8 +93,8 @@ private:
   CharView CreateCharView(size_t point, wchar_t wch) {
     CharView cv;
     cv.point = point;
-    cv.character = wch;
-    cv.width = wchar_width(wch);
+    cv.rune = wch;
+    cv.width = wch == '\n' ? 1 : wchar_width(wch);
     return cv;
   }
 
