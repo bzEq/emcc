@@ -5,18 +5,25 @@
 #include "tui/terminal.h"
 
 #include <chrono>
+#include <codecvt>
+#include <locale>
 #include <ncurses.h>
+#include <string>
 #include <thread>
 
 static void Render(emcc::editor::BufferView &view, int height, int width) {
+  auto to_string = [](const std::wstring &s) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.to_bytes(s);
+  };
+
   int y = 0;
   for (auto row : emcc::make_range(view.row_begin(), view.row_end())) {
-    int x = 0;
+    wmove(stdscr, y, 0);
     for (auto &cv : row) {
-      mvaddch(y, x, cv.rune);
-      x += cv.width;
-      if (x >= width)
-        break;
+      std::wstring ws;
+      ws.push_back(cv.rune);
+      waddnwstr(stdscr, ws.data(), ws.size());
     }
     ++y;
     if (y >= height)
@@ -42,12 +49,15 @@ int main(int argc, char *argv[]) {
   vt.GetMaxYX(height, width);
   BufferView view(buffer.get(), height, width);
   {
+    setlocale(LC_ALL, "");
+    using namespace std::chrono_literals;
     initscr();
     defer { endwin(); };
     cbreak();
     noecho();
     view.RePosition(start_line);
     Render(view, height, width);
+    // std::this_thread::sleep_for(2000ms);
     while (true) {
       int ch = getch();
       if (ch == '\x1b')
