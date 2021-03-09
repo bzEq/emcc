@@ -5,25 +5,34 @@
 #include "tui/terminal.h"
 
 #include <chrono>
-#include <ncurses.h>
+#include <codecvt>
+#include <locale>
+#include <string>
 #include <thread>
 
-static void Render(emcc::editor::BufferView &view, int height, int width) {
-  wclear(stdscr);
+static void Render(emcc::tui::ANSITerminal &vt, emcc::editor::BufferView &view,
+                   int height, int width) {
+  auto to_string = [](const std::wstring &s) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    return converter.to_bytes(s);
+  };
+  vt.Clear();
   int y = 0;
   for (auto row : emcc::make_range(view.row_begin(), view.row_end())) {
     int x = 0;
     for (auto &cv : row) {
-      mvwaddch(stdscr, y, x, cv.rune);
-      x += cv.width;
-      if (x >= width)
-        break;
+      std::wstring ws;
+      ws.push_back(cv.rune);
+      std::string s(to_string(ws));
+      vt.MoveCursor({y, x});
+      vt.Put(s);
+      x += cv.length();
     }
     ++y;
     if (y >= height)
       break;
   }
-  wrefresh(stdscr);
+  vt.Refresh();
 }
 
 int main(int argc, char *argv[]) {
@@ -39,6 +48,7 @@ int main(int argc, char *argv[]) {
     Die("Failed to open {}", filename.c_str());
   if (!buffer->IsUTF8Encoded())
     Die("Unable to handle non-utf8 encoded files");
+  emcc::tui::ANSITerminal::RegisterAtExitCleaning();
   emcc::tui::ANSITerminal vt(STDIN_FILENO, STDOUT_FILENO);
   int height, width;
   vt.GetMaxYX(height, width);
@@ -46,16 +56,12 @@ int main(int argc, char *argv[]) {
 
   {
     using namespace std::chrono_literals;
-    initscr();
-    defer { endwin(); };
-    cbreak();
-    noecho();
     size_t total_lines = buffer->CountLines();
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       view.RePosition(i);
-      Render(view, height, width);
-      std::this_thread::sleep_for(30ms);
+      Render(vt, view, height, width);
+      std::this_thread::sleep_for(16ms);
     }
   }
   return 0;
