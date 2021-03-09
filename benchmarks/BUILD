@@ -36,3 +36,30 @@ cc_binary(
         "//tui:emcc_tui",
     ],
 )
+
+cc_binary(
+    name = "page_benchmark2",
+    srcs = ["page_benchmark2.cc"],
+    copts = COPTS + ["-fblocks"],
+    linkopts = LINKOPTS + [
+    ],
+    deps = [
+        "//editor:emcc_editor",
+        "//support:emcc_support",
+        "//tui:emcc_tui",
+    ],
+)
+
+cc_binary(
+    name = "page_benchmark3",
+    srcs = ["page_benchmark3.cc"],
+    copts = COPTS + ["-fblocks"],
+    linkopts = LINKOPTS + [
+        "-lncursesw",
+    ],
+    deps = [
+        "//editor:emcc_editor",
+        "//support:emcc_support",
+        "//tui:emcc_tui",
+    ],
+)

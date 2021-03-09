@@ -34,23 +34,37 @@ public:
     x = ws.ws_col;
   }
 
-  void MoveCursor(Cursor c) {
+  ANSITerminal &MoveCursor(Cursor c) {
     std::string cs(fmt::format("\x1B[{};{}H", c.y, c.x));
-    ::write(out_, cs.data(), cs.length());
+    command_.append(std::move(cs));
+    return *this;
   }
 
-  void Clear() {
+  ANSITerminal &Clear() {
     static const char cs[] = "\x1B[2J";
-    ::write(out_, cs, GetArrayLength(cs));
+    command_.append(cs);
+    return *this;
   }
 
-  void ClearLine() {
+  ANSITerminal &ClearLine() {
     static const char cs[] = "\x1B[K";
-    ::write(out_, cs, GetArrayLength(cs));
+    command_.append(cs);
+    return *this;
+  }
+
+  void Refresh() {
+    ::write(out_, command_.data(), command_.length());
+    command_.clear();
+  }
+
+  ANSITerminal &Put(const std::string &cs) {
+    command_.append(cs);
+    return *this;
   }
 
 private:
   int in_, out_;
+  std::string command_;
 };
 
 } // namespace emcc::tui
