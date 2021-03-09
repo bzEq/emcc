@@ -2,10 +2,11 @@
 
 namespace emcc::editor {
 
-void LineView::ReCompute() {
+void LineView::Reset(size_t lineno) {
+  segment_index_.clear();
   hlist_.clear();
   size_t point;
-  parent_->ComputePoint(lineno_, 0, point);
+  parent_->ComputePoint(lineno, 0, point);
   UTF8Decoder utf8dec;
   for (size_t rune_point = point; point < parent_->CountChars(); ++point) {
     char ch;

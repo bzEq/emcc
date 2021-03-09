@@ -14,12 +14,19 @@ namespace emcc::editor {
 // Break a logical line in MonoBuffer into segments.
 class LineView {
 public:
+  LineView() = default;
   LineView(MonoBuffer *parent, size_t lineno, size_t width)
-      : width_(width), parent_(parent), lineno_(lineno) {
-    ReCompute();
+      : width_(width), parent_(parent) {
+    Reset(lineno);
   }
 
+  void Reset(size_t lineno);
   size_t height() const { return segment_index_.size(); }
+
+  void Resize(size_t width) {
+    width_ = width;
+    ReCompute(0);
+  }
 
   template <typename... Args>
   void Insert(int y, int x, Args &&...args) {
@@ -38,17 +45,17 @@ public:
   void Append(Args &&...args) {
     hlist_.emplace_back(std::forward<Args>(args)...);
     if (segment_index_.empty())
-      ReCompute();
+      ReCompute(0);
     else
       ReCompute(segment_index_.size() - 1);
   }
 
-  size_t NumCharViews(size_t i) const {
-    if (i >= segment_index_.size())
+  size_t NumCharViews(size_t seg) const {
+    if (seg >= segment_index_.size())
       return 0;
-    if (i == segment_index_.size() - 1)
-      return hlist_.size() - segment_index_[i];
-    return segment_index_[i + 1] - segment_index_[i];
+    if (seg == segment_index_.size() - 1)
+      return hlist_.size() - segment_index_[seg];
+    return segment_index_[seg + 1] - segment_index_[seg];
   }
 
   class iterator {
@@ -91,13 +98,10 @@ private:
     return cv;
   }
 
-  void ReCompute();
-
   void ReCompute(size_t seg);
 
   size_t width_;
   MonoBuffer *parent_;
-  const size_t lineno_;
   // Horizontal list, concept borrowed from TeX.
   std::vector<CharView> hlist_;
   std::vector<size_t> segment_index_;
