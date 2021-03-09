@@ -35,8 +35,7 @@ public:
   }
 
   ANSITerminal &MoveCursor(Cursor c) {
-    std::string cs(fmt::format("\x1B[{};{}H", c.y, c.x));
-    command_.append(std::move(cs));
+    command_.append(fmt::format("\x1B[{};{}H", c.y, c.x));
     return *this;
   }
 

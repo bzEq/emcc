@@ -21,7 +21,7 @@ static void Render(emcc::editor::BufferView &view, int height, int width) {
     if (y >= height)
       break;
   }
-  refresh();
+  wrefresh(stdscr);
 }
 
 int main(int argc, char *argv[]) {
