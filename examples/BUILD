@@ -107,3 +107,17 @@ cc_binary(
         "//tui:emcc_tui",
     ],
 )
+
+cc_binary(
+    name = "auto_scroll_page",
+    srcs = ["auto_scroll_page.cc"],
+    copts = COPTS + ["-fblocks"],
+    linkopts = LINKOPTS + [
+        "-lncurses",
+    ],
+    deps = [
+        "//editor:emcc_editor",
+        "//support:emcc_support",
+        "//tui:emcc_tui",
+    ],
+)
