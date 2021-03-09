@@ -75,4 +75,16 @@ inline bool DecodeUTF8(const std::string &s, std::vector<uint32_t> &result) {
   return state == UTF8_ACCEPT;
 }
 
+class UTF8Decoder {
+public:
+  UTF8Decoder() : state_(UTF8_ACCEPT) {}
+
+  bool Decode(uint8_t byte) { return DecodeUTF8(&state_, &cp_, byte); }
+
+  wchar_t codepoint() const { return cp_; }
+
+private:
+  uint32_t state_, cp_;
+};
+
 } // namespace emcc
