@@ -7,7 +7,7 @@ int main() {
   using namespace emcc;
   char cmd;
   size_t l, c, len;
-  MonoBuffer buffer;
+  editor::MonoBuffer buffer;
   while (~scanf("%c", &cmd) != 0) {
     switch (cmd) {
     case 'i':
@@ -31,7 +31,7 @@ int main() {
     case 'n':
       scanf("%zu %zu", &l, &c);
       printf("n %zu %zu\n", l, c);
-      buffer.Insert(l, c, MonoBuffer::kNewLine);
+      buffer.Insert(l, c, editor::MonoBuffer::kNewLine);
       break;
     default:
       break;

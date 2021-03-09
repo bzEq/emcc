@@ -4,6 +4,7 @@
 
 namespace {
 using namespace emcc;
+using namespace emcc::editor;
 
 TEST(LineBufferTest, AppendTest) {
   LineBuffer lb;

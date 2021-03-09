@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
   emcc::MMapFile file(argv[1], sysconf(_SC_PAGE_SIZE));
   if (!file.is_open())
     emcc::Die("Can't open %s", argv[1]);
-  emcc::MonoBuffer mb;
+  emcc::editor::MonoBuffer mb;
   for (auto block : file) {
     mb.Append(block.data, block.size());
   }

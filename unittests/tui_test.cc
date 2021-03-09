@@ -104,7 +104,7 @@ TEST(RegionTest, ContainTest1) {
 }
 
 TEST(BufferViewTest, ResizeTest) {
-  emcc::MonoBuffer buffer;
+  emcc::editor::MonoBuffer buffer;
   const char text[] = "hello\n"
                       "rofl\n"
                       "lmao\n";
@@ -118,7 +118,7 @@ TEST(BufferViewTest, ResizeTest) {
 }
 
 TEST(BufferView, EmptyFramebuffer) {
-  emcc::MonoBuffer buffer;
+  emcc::editor::MonoBuffer buffer;
   const char text[] = "hello\n"
                       "rofl\n"
                       "lmao\n";
@@ -129,7 +129,7 @@ TEST(BufferView, EmptyFramebuffer) {
 }
 
 TEST(BufferView, MoveTest) {
-  emcc::MonoBuffer buffer;
+  emcc::editor::MonoBuffer buffer;
   const char text[] = "hello\n"
                       "rofl\n"
                       "lmao\n";
@@ -147,7 +147,7 @@ TEST(BufferView, MoveTest) {
 }
 
 TEST(BufferView, MoveTest1) {
-  emcc::MonoBuffer buffer;
+  emcc::editor::MonoBuffer buffer;
   const char text[] = "hello\n"
                       "rofl\n"
                       "lmao\n";

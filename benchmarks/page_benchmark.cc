@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   std::string filename(argv[1]);
   size_t start_line = std::stoul(argv[2]);
   size_t end_line = std::stoul(argv[3]);
-  auto buffer = MonoBuffer::CreateFromFile(filename);
+  auto buffer = editor::MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename.c_str());
   if (!buffer->IsUTF8Encoded())

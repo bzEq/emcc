@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-namespace emcc {
+namespace emcc::editor {
 
 LineBuffer &LineBuffer::InsertEmptyLine(size_t i) {
   auto line = new Line();
@@ -173,4 +173,4 @@ bool LineBuffer::Get(size_t line, size_t col, char &c) {
   return true;
 }
 
-} // namespace emcc
+} // namespace emcc::editor

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   auto membuf = emcc::MemoryBuffer::OpenIfExists(filename);
   auto data = membuf->buffer();
   size_t len = membuf->length();
-  emcc::LineBuffer lb;
+  emcc::editor::LineBuffer lb;
   for (size_t i = 0; i < len; ++i)
     lb.Append(data[i]);
   std::string line;

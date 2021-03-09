@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     Die("Usage: {} <filename> <start_line>", argv[0]);
   std::string filename(argv[1]);
   size_t start_line = std::stoul(argv[2]);
-  auto buffer = MonoBuffer::CreateFromFile(filename);
+  auto buffer = editor::MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename.c_str());
   assert(buffer->Verify());

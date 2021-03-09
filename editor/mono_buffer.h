@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace emcc {
+namespace emcc::editor {
 
 class MonoBuffer {
 public:
@@ -66,4 +66,4 @@ private:
   std::string filename_;
 };
 
-} // namespace emcc
+} // namespace emcc::editor

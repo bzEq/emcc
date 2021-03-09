@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace emcc {
+namespace emcc::editor {
 
 // All lines must end with kNewLine except the last one.
 class LineBuffer {
@@ -48,4 +48,4 @@ private:
   PrefixSum<long> accumulate_size_;
 };
 
-} // namespace emcc
+} // namespace emcc::editor

@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace emcc {
+namespace emcc::editor {
 
 bool MonoBuffer::Get(size_t offset, char &c) {
   if (offset >= buffer_.size())
@@ -192,4 +192,4 @@ bool MonoBuffer::IsUTF8Encoded() {
   return state == UTF8_ACCEPT;
 }
 
-} // namespace emcc
+} // namespace emcc::editor

@@ -14,7 +14,7 @@ using FramebufferTy = emcc::tui::Framebuffer;
 
 class BufferView {
 public:
-  BufferView(MonoBuffer *buffer)
+  BufferView(editor::MonoBuffer *buffer)
       : version_(0), width_(80), framebuffer_(width_), buffer_(buffer),
         cursor_() {}
   size_t width() const { return width_; }
@@ -57,7 +57,7 @@ private:
   size_t version_;
   size_t width_;
   FramebufferTy framebuffer_;
-  MonoBuffer *buffer_;
+  editor::MonoBuffer *buffer_;
   Cursor cursor_, render_begin, render_end;
 };
 

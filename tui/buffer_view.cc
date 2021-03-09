@@ -17,7 +17,7 @@ void BufferView::Resize(size_t height, size_t width) {
   Pixel px;
   framebuffer_.GetPixel(cursor_, px);
   size_t baseline = 0, col = 0;
-  if (px.position.point != MonoBuffer::npos) {
+  if (px.position.point != editor::MonoBuffer::npos) {
     buffer_->ComputePosition(px.position.point, baseline, col);
   }
   if (width != width_) {
@@ -29,7 +29,7 @@ void BufferView::Resize(size_t height, size_t width) {
   size_t point;
   buffer_->ComputePoint(baseline, 0, point);
   RewriteFrameBuffer(point, ~0, framebuffer_, framebuffer_.region());
-  if (px.position.point != MonoBuffer::npos) {
+  if (px.position.point != editor::MonoBuffer::npos) {
     if (!framebuffer_.FindPoint(px.position.point, cursor_)) {
       cursor_ = {0, 0};
     }
@@ -71,7 +71,7 @@ void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,
       pixel.position.point = point;
       pixel.set_offset(length, j);
     }
-    if (c == MonoBuffer::kNewLine) {
+    if (c == editor::MonoBuffer::kNewLine) {
       if (at.x + 1 < width_)
         fb.Reset({width_, {at.y, at.x + (int)length}, {at.y + 1, 0}});
       ++at.y;
@@ -105,7 +105,7 @@ bool BufferView::MoveLeft() {
     return false;
   Pixel px;
   if (!framebuffer_.GetPixel(probe, px) ||
-      px.position.point == MonoBuffer::npos)
+      px.position.point == editor::MonoBuffer::npos)
     return false;
   if (!px.is_head())
     probe.x -= px.offset();
@@ -118,13 +118,13 @@ bool BufferView::MoveRight() {
   Cursor probe = cursor_;
   Pixel px;
   if (!framebuffer_.GetPixel(probe, px) ||
-      px.position.point == MonoBuffer::npos) {
+      px.position.point == editor::MonoBuffer::npos) {
     return false;
   }
   assert(px.is_head());
   probe.x += px.length();
   if (!framebuffer_.GetPixel(probe, px) ||
-      px.position.point == MonoBuffer::npos) {
+      px.position.point == editor::MonoBuffer::npos) {
     return false;
   }
   cursor_ = probe;
@@ -144,7 +144,7 @@ bool BufferView::MoveUp() {
   for (; probe.x >= 0; --probe.x) {
     if (!framebuffer_.GetPixel(probe, px))
       return false;
-    if (px.position.point != MonoBuffer::npos) {
+    if (px.position.point != editor::MonoBuffer::npos) {
       cursor_ = probe;
       return true;
     }
@@ -165,7 +165,7 @@ bool BufferView::MoveDown() {
   for (; probe.x >= 0; --probe.x) {
     if (!framebuffer_.GetPixel(probe, px))
       return false;
-    if (px.position.point != MonoBuffer::npos) {
+    if (px.position.point != editor::MonoBuffer::npos) {
       cursor_ = probe;
       return true;
     }
@@ -180,7 +180,7 @@ bool BufferView::ScrollDown() {
   if (!framebuffer_.GetPixel({(int)framebuffer_.height() - 1, 0}, px))
     return false;
   size_t point = px.position.point;
-  if (point == MonoBuffer::npos)
+  if (point == editor::MonoBuffer::npos)
     return false;
   size_t line, col;
   buffer_->ComputePosition(point, line, col);
@@ -223,7 +223,7 @@ bool BufferView::ScrollUp() {
     return false;
   }
   size_t point = px.position.point;
-  if (point == MonoBuffer::npos) {
+  if (point == editor::MonoBuffer::npos) {
     return false;
   }
   size_t line, col;

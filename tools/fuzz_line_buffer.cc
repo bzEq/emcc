@@ -7,7 +7,7 @@ int main() {
   using namespace emcc;
   char cmd;
   size_t l, c, len;
-  LineBuffer buffer;
+  editor::LineBuffer buffer;
   while (~scanf("%c", &cmd) != 0) {
     switch (cmd) {
     case 'i':

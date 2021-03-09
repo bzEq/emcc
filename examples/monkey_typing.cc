@@ -7,7 +7,7 @@
 int main() {
   using namespace emcc;
   Random rnd(time(nullptr));
-  LineBuffer buffer;
+  editor::LineBuffer buffer;
   const size_t kMaxLines = 1 << 20;
   const size_t kMaxColumns = 1 << 16;
   auto DoInsert = [&]() {
@@ -16,7 +16,7 @@ int main() {
     size_t len = rnd.Next() * kMaxColumns;
     for (size_t i = 0; i < len; ++i) {
       if (rnd.Next() < 1.0 / len)
-        buffer.Insert(line, column, LineBuffer::kNewLine);
+        buffer.Insert(line, column, editor::LineBuffer::kNewLine);
       else
         buffer.Insert(line, column, '0');
     }
@@ -25,7 +25,7 @@ int main() {
     size_t len = rnd.Next() * kMaxColumns;
     for (size_t i = 0; i < len; ++i) {
       if (rnd.Next() < 1.0 / len)
-        buffer.Append(LineBuffer::kNewLine);
+        buffer.Append(editor::LineBuffer::kNewLine);
       else
         buffer.Append('0');
     }

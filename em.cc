@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     Die("Usage: {} <filename>", argv[0]);
   }
   std::string filename(argv[1]);
-  auto buffer = MonoBuffer::CreateFromFile(filename);
+  auto buffer = editor::MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename);
   std::signal(SIGWINCH, SendSignal);
