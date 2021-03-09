@@ -19,8 +19,6 @@ namespace emcc::tui {
 // See http://ascii-table.com/ansi-escape-sequences.php
 class ANSITerminal {
 public:
-  static std::vector<std::function<void(void)>> atexit_functions;
-  static void Clean();
   static void RegisterAtExitCleaning();
   static bool EnableRawMode(int fd, bool recover_atexit = true);
 
@@ -64,6 +62,9 @@ public:
   }
 
 private:
+  static std::vector<std::function<void(void)>> atexit_functions;
+  static void Clean();
+
   int in_, out_;
   std::string command_;
 };
