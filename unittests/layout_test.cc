@@ -14,7 +14,7 @@ struct DumbBox {
 class DumbHList : public HListTy<DumbBox> {
 public:
   using Super = HListTy<DumbBox>;
-  void Append(size_t i) { Super::Append(DumbBox{i}); }
+  void Append(size_t i) { Super::emplace_back(DumbBox{i}); }
 };
 
 class DumbParagraph : public Paragraph<DumbBox> {
