@@ -6,6 +6,7 @@
 namespace emcc::editor {
 
 struct CharView {
+  size_t point;
   wchar_t character;
   uint8_t width;
   size_t length() const { return width; }
