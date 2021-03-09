@@ -14,6 +14,8 @@
 
 namespace emcc::tui {
 
+// FIXME: Need to investigate why is ncurses is much faster by comparing
+// benchmarks/page_benchmark2 and benchmarks/page_benchmark3.
 // See http://ascii-table.com/ansi-escape-sequences.php
 class ANSITerminal {
 public:
