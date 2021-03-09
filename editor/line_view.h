@@ -79,14 +79,14 @@ public:
     LineView &parent_;
   };
 
-  emcc::iterator_range<iterator> GetSegment(size_t i) {
-    if (i >= segment_index_.size())
+  emcc::iterator_range<iterator> GetSegment(size_t seg) {
+    if (seg >= segment_index_.size())
       return emcc::make_range(iterator(*this, 0), iterator(*this, 0));
-    if (i == segment_index_.size() - 1)
-      return emcc::make_range(iterator(*this, segment_index_[i]),
+    if (seg == segment_index_.size() - 1)
+      return emcc::make_range(iterator(*this, segment_index_[seg]),
                               iterator(*this, hlist_.size()));
-    return emcc::make_range(iterator(*this, segment_index_[i]),
-                            iterator(*this, segment_index_[i + 1]));
+    return emcc::make_range(iterator(*this, segment_index_[seg]),
+                            iterator(*this, segment_index_[seg + 1]));
   }
 
 private:
