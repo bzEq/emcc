@@ -69,12 +69,12 @@ MonoBuffer &MonoBuffer::Append(const char *data, size_t len) {
     ++current;
     if (data[i] == kNewLine) {
       assert(current);
-      line_size_.Insert(CountLines(), current);
+      line_size_.Insert(NumLines(), current);
       current = 0;
     }
   }
   if (current)
-    line_size_.Insert(CountLines(), current);
+    line_size_.Insert(NumLines(), current);
   return *this;
 }
 
@@ -99,9 +99,6 @@ void MonoBuffer::ComputeOffset(size_t line, size_t col, size_t &offset) {
             : 0;
   offset = line_size_.GetPrefixSum(line - 1) + col;
 }
-
-// Any value in line_size_ should not be zero.
-size_t MonoBuffer::CountLines() { return line_size_.size(); }
 
 std::unique_ptr<MonoBuffer>
 MonoBuffer::CreateFromFile(const std::string &filename) {

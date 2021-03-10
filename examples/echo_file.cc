@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
   for (auto block : file) {
     mb.Append(block.data, block.size());
   }
-  std::cerr << mb.CountLines() << " " << mb.CountChars() << std::endl;
-  for (size_t i = 0; i < mb.CountChars(); ++i) {
+  std::cerr << mb.NumLines() << " " << mb.size() << std::endl;
+  for (size_t i = 0; i < mb.size(); ++i) {
     char c;
     mb.Get(i, c);
     std::cout << c;

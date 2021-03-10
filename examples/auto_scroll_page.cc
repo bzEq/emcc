@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 
   {
     using namespace std::chrono_literals;
-    size_t total_lines = buffer->CountLines();
+    size_t total_lines = buffer->NumLines();
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       view.RePosition(i);

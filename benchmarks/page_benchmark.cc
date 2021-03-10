@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     renderer.GetMaxYX(height, width);
     view.Resize(height, width);
     start = std::chrono::high_resolution_clock::now();
-    size_t total_lines = buffer->CountLines();
+    size_t total_lines = buffer->NumLines();
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       view.GotoLine(i);

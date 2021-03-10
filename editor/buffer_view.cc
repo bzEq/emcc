@@ -40,7 +40,7 @@ void BufferView::Resize(size_t h, size_t w) {
 
 void BufferView::FillBufferView() {
   size_t current_line = baseline_ + lines_.size(),
-         total_lines = parent_->CountLines();
+         total_lines = parent_->NumLines();
   while (total_height_ < height_hint_ && current_line < total_lines) {
     lines_.emplace_back(parent_, current_line++, width_);
     // std::cout << lines_.back().height() << std::endl;

@@ -8,7 +8,7 @@ void LineView::Reset(size_t lineno) {
   size_t point;
   parent_->ComputePoint(lineno, 0, point);
   UTF8Decoder utf8dec;
-  for (size_t rune_point = point; point < parent_->CountChars(); ++point) {
+  for (size_t rune_point = point; point < parent_->size(); ++point) {
     char ch;
     parent_->Get(point, ch);
     if (utf8dec.Decode(ch)) {

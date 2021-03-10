@@ -43,7 +43,7 @@ void BufferView::RewriteFrameBuffer(size_t point, size_t len, Framebuffer &fb,
   assert(width() == fb.width());
   if (region.width() != fb.width())
     return;
-  size_t endpoint = std::min(buffer_->CountChars(), point + len);
+  size_t endpoint = std::min(buffer_->size(), point + len);
   Cursor at = region.begin_cursor();
   for (; point != endpoint && region.contains(at); ++point) {
     char c;
@@ -94,7 +94,7 @@ bool BufferView::GetStatusLine(std::string &content) const {
   size_t line, col;
   buffer_->ComputePosition(at.position.point, line, col);
   content = fmt::format("-- {} {} of {}, Ln {}, Col {}", buffer_->filename(),
-                        at.position.point, buffer_->CountChars(), line, col);
+                        at.position.point, buffer_->size(), line, col);
   return true;
 }
 
@@ -184,7 +184,7 @@ bool BufferView::ScrollDown() {
     return false;
   size_t line, col;
   buffer_->ComputePosition(point, line, col);
-  if (line + 1 >= buffer_->CountLines())
+  if (line + 1 >= buffer_->NumLines())
     return false;
   size_t next_framebuffer_start_point;
   buffer_->ComputePoint(line, 0, next_framebuffer_start_point);
