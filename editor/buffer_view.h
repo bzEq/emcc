@@ -14,6 +14,7 @@ public:
     Reset();
   }
 
+  MonoBuffer &buffer() { return *parent_; }
   void Reset();
   void RePosition(size_t baseline);
   void Resize(size_t h, size_t w);
@@ -61,6 +62,23 @@ public:
     row_iterator it(*this);
     it.lineno_ = lines_.size();
     return it;
+  }
+
+  // FIXME: Use fenwick tree to accelerate query.
+  std::optional<emcc::iterator_range<LineView::iterator>> GetRow(size_t row) {
+    size_t lineno = 0, segno = 0, num_rows = 0;
+    for (; lineno < lines_.size(); ++lineno) {
+      auto &lv = lines_[lineno];
+      size_t s = num_rows;
+      num_rows += lv.height();
+      if (num_rows > row) {
+        segno = row - s;
+        break;
+      }
+    }
+    if (lineno == lines_.size())
+      return std::nullopt;
+    return lines_[lineno].GetSegment(segno);
   }
 
 private:

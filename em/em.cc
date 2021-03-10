@@ -1,5 +1,6 @@
 // Copyright (c) 2019 Kai Luo <gluokai@gmail.com>. All rights reserved.
 
+#include "em.h"
 #include "editor/mono_buffer.h"
 #include "support/chan.h"
 #include "support/misc.h"
@@ -24,17 +25,8 @@ int main(int argc, char *argv[]) {
   auto buffer = editor::MonoBuffer::CreateFromFile(filename);
   if (!buffer)
     Die("Failed to open {}", filename);
+  if (!buffer->IsUTF8Encoded())
+    Die("{} is not utf8 encoded", filename);
   std::signal(SIGWINCH, SendSignal);
-  initscr();
-  atexit([]() { endwin(); });
-  raw();
-  noecho();
-  keypad(stdscr, true);
-  NcursesRenderer renderer(stdscr);
-  NcursesInput input(stdscr);
-  int height, width;
-  renderer.GetMaxYX(height, width);
-  BufferView page(buffer.get());
-  WYSIWYGEditor editor(signal_queue, &page, &input, &renderer);
-  return editor.Run();
+  return 0;
 }
