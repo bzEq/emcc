@@ -18,6 +18,7 @@ public:
   void Reset();
   void RePosition(size_t baseline);
   void Resize(size_t h, size_t w);
+  void Extend(size_t h);
 
   size_t NumLines() const { return lines_.size(); }
 
@@ -79,6 +80,28 @@ public:
     if (lineno == lines_.size())
       return std::nullopt;
     return lines_[lineno].GetSegment(segno);
+  }
+
+  emcc::iterator_range<row_iterator> row_range(size_t begin, size_t end) {
+    assert(end >= begin);
+    row_iterator b(*this), e(*this);
+    e.lineno_ = lines_.size();
+    size_t lineno = 0, num_rows = 0;
+    for (; lineno < lines_.size(); ++lineno) {
+      auto &lv = lines_[lineno];
+      size_t s = num_rows;
+      num_rows += lv.height();
+      if (num_rows > begin) {
+        b.lineno_ = lineno;
+        b.segno_ = begin - s;
+      }
+      if (num_rows > end) {
+        e.lineno_ = lineno;
+        e.segno_ = end - s;
+        break;
+      }
+    }
+    return emcc::make_range(b, e);
   }
 
 private:

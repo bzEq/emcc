@@ -49,4 +49,11 @@ void BufferView::FillBufferView() {
   // std::cout << total_height_ << std::endl;
 }
 
+void BufferView::Extend(size_t h) {
+  if (NumRows() >= h)
+    return;
+  height_hint_ = h;
+  FillBufferView();
+}
+
 } // namespace emcc::editor
