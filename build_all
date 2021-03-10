@@ -3,4 +3,4 @@ CC=clang bazel test --test_output=all //unittests:*
 CC=clang bazel build //tools:*
 CC=clang bazel build //examples:*
 CC=clang bazel build //benchmarks:*
-CC=clang bazel build :em
+CC=clang bazel build //em:em
