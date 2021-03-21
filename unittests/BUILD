@@ -30,7 +30,7 @@ cc_test(
     srcs = [
         "rope_benchmark.cc",
     ],
-    copts = COPTS + ['-DEMCC_DEBUG'],
+    copts = COPTS + ["-DEMCC_DEBUG"],
     linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
@@ -147,18 +147,6 @@ cc_test(
     linkopts = LINKOPTS,
     deps = [
         "//support:emcc_support",
-    ],
-)
-
-cc_test(
-    name = "layout_test",
-    srcs = [
-        "layout_test.cc",
-    ],
-    copts = COPTS,
-    linkopts = LINKOPTS,
-    deps = [
-        "//layout:emcc_layout",
     ],
 )
 
