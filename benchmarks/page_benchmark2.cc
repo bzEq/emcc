@@ -2,38 +2,13 @@
 #include "support/defer.h"
 #include "support/misc.h"
 #include "support/sys.h"
-#include "tui/terminal.h"
+#include "tui/renderer.h"
 
 #include <chrono>
 #include <codecvt>
 #include <locale>
 #include <string>
 #include <thread>
-
-static void Render(emcc::tui::ANSITerminal &vt, emcc::editor::BufferView &view,
-                   int height, int width) {
-  auto to_string = [](const std::wstring &s) {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.to_bytes(s);
-  };
-  vt.Clear();
-  int y = 0;
-  for (auto row : emcc::make_range(view.row_begin(), view.row_end())) {
-    int x = 0;
-    for (auto &cv : row) {
-      std::wstring ws;
-      ws.push_back(cv.rune);
-      std::string s(to_string(ws));
-      vt.MoveCursor({y, x});
-      vt.Put(s);
-      x += cv.length();
-    }
-    ++y;
-    if (y >= height)
-      break;
-  }
-  vt.Refresh();
-}
 
 int main(int argc, char *argv[]) {
   using namespace emcc;
@@ -62,7 +37,7 @@ int main(int argc, char *argv[]) {
     for (size_t i = std::min(total_lines - 1, start_line);
          i < std::min(total_lines, end_line); ++i) {
       view.RePosition(i);
-      Render(vt, view, height, width);
+      emcc::tui::RenderBufferView(view, vt, height, width);
       ++nr_frames;
     }
     end = std::chrono::high_resolution_clock::now();

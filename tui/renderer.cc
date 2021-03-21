@@ -1,36 +1,54 @@
 #include "tui/renderer.h"
-#include "tui/buffer_view.h"
-#include "tui/cursor.h"
+
+#include <codecvt>
+#include <locale>
+#include <string>
+#include <wchar.h>
 
 namespace emcc::tui {
 
-void NcursesRenderer::RenderRegion(const BufferView &view, Region region) {
-  RenderRegionAt({0, 0}, view, region);
-}
-
-void NcursesRenderer::RenderRegionAt(Cursor anchor, const BufferView &view,
-                                     Region view_region) {
-  Region render_region(region());
-  if (!render_region.contains(anchor))
-    return;
-  for (auto c : view_region) {
-    Cursor t = anchor + c;
-    if (!render_region.contains(t))
+void RenderBufferViewWithNCurses(emcc::editor::BufferView &view, WINDOW *window,
+                                 int height, int width) {
+  int y = 0;
+  for (auto row : emcc::make_range(view.row_begin(), view.row_end())) {
+    int x = 0;
+    for (auto &cv : row) {
+      mvwaddch(window, y, x, cv.rune);
+      x += cv.width;
+      if (x >= width)
+        break;
+    }
+    ++y;
+    if (y >= height)
       break;
-    const Pixel &p = view.GetPixel(c);
-    mvwaddch(window_, t.y, t.x, p.shade.character);
   }
+  wrefresh(window);
 }
 
-void NcursesRenderer::RenderStringAt(Cursor at, const std::string &content) {
-  wmove(window_, at.y, 0);
-  wclrtoeol(window_);
-  mvwprintw(window_, at.y, at.x, "%s", content.c_str());
+static std::string wstring_to_string(const std::wstring &s) {
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+  return converter.to_bytes(s);
 }
 
-void NcursesRenderer::DrawCursor(Cursor c) {
-  if (region().contains(c))
-    wmove(window_, c.y, c.x);
+void RenderBufferView(emcc::editor::BufferView &view,
+                      emcc::tui::ANSITerminal &vt, int height, int width) {
+  vt.Clear();
+  int y = 0;
+  for (auto row : emcc::make_range(view.row_begin(), view.row_end())) {
+    int x = 0;
+    for (auto &cv : row) {
+      std::wstring ws;
+      ws.push_back(cv.rune);
+      std::string s(wstring_to_string(ws));
+      vt.MoveCursor({y, x});
+      vt.Put(s);
+      x += cv.length();
+    }
+    ++y;
+    if (y >= height)
+      break;
+  }
+  vt.Refresh();
 }
 
 } // namespace emcc::tui

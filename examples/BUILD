@@ -61,20 +61,6 @@ cc_binary(
 )
 
 cc_binary(
-    name = "show_page",
-    srcs = ["show_page.cc"],
-    copts = COPTS + ["-fblocks"],
-    linkopts = LINKOPTS + [
-        "-lncurses",
-    ],
-    deps = [
-        "//editor:emcc_editor",
-        "//support:emcc_support",
-        "//tui:emcc_tui",
-    ],
-)
-
-cc_binary(
     name = "show_page1",
     srcs = ["show_page1.cc"],
     copts = COPTS + ["-fblocks"],

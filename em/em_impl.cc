@@ -180,12 +180,8 @@ void Window::Consume(const char *input, int n) {
 }
 
 void Window::Show() {
-  auto to_string = [](const std::wstring &s) {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.to_bytes(s);
-  };
   vt_.Clear();
-  int y = 0;
+  // int y = 0;
   // for (auto row : emcc::make_range(view_.row_begin(), view_.row_end())) {
   //   int x = 0;
   //   for (auto &cv : row) {

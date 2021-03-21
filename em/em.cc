@@ -5,7 +5,6 @@
 #include "support/chan.h"
 #include "support/misc.h"
 #include "support/sys.h"
-#include "tui/wysiwyg_editor.h"
 
 #include <csignal>
 

@@ -3,43 +3,19 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "tui/buffer_view.h"
+#include "editor/buffer_view.h"
 #include "tui/cursor.h"
+#include "tui/terminal.h"
 
 #include <ncurses.h>
+#include <string>
 
 namespace emcc::tui {
 
-class NcursesRenderer {
-public:
-  NcursesRenderer(WINDOW *window) : window_(window) {}
+void RenderBufferView(emcc::editor::BufferView &view,
+                      emcc::tui::ANSITerminal &vt, int height, int width);
 
-  int fd() const { return STDOUT_FILENO; }
-
-  void GetMaxYX(int &y, int &x) { getmaxyx(window_, y, x); }
-
-  void Clear() { wclear(window_); }
-
-  void RenderRegion(const BufferView &fb, Region region);
-
-  void RenderRegionAt(Cursor anchor, const BufferView &view, Region region);
-
-  void RenderStringAt(Cursor at, const std::string &content);
-
-  void DrawCursor(Cursor c);
-
-  void Resize(int height, int width) { wresize(window_, height, width); }
-
-  void Refresh() { wrefresh(window_); }
-
-  Region region() {
-    int y, x;
-    GetMaxYX(y, x);
-    return Region(x, {0, 0}, {y, 0});
-  }
-
-private:
-  WINDOW *window_;
-};
+void RenderBufferViewWithNCurses(emcc::editor::BufferView &view, WINDOW *window,
+                                 int height, int width);
 
 } // namespace emcc::tui

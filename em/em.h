@@ -1,12 +1,15 @@
 #pragma once
 
 #include "editor/buffer_view.h"
+#include "support/chan.h"
 #include "tui/cursor.h"
 #include "tui/terminal.h"
 
 #include <atomic>
 
 namespace emcc {
+
+using SignalQueueTy = GoChan<int>;
 
 class Window {
 public:
