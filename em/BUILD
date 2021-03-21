@@ -11,7 +11,10 @@ LINKOPTS = [
 
 cc_binary(
     name = "em",
-    srcs = glob(["*.cc", "*.h"]),
+    srcs = glob([
+        "*.cc",
+        "*.h",
+    ]),
     copts = COPTS,
     linkopts = LINKOPTS,
     deps = [
