@@ -1,8 +1,8 @@
 #pragma once
 
+#include "core/mono_buffer.h"
 #include "editor/char_view.h"
 #include "editor/line_view.h"
-#include "editor/mono_buffer.h"
 
 namespace emcc::editor {
 

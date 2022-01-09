@@ -1,4 +1,4 @@
-#include "editor/line_buffer.h"
+#include "core/line_buffer.h"
 
 #include <assert.h>
 #include <stdio.h>

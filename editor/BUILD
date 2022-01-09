@@ -14,6 +14,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//support:emcc_support",
-        "@fmt",
+        "//core:emcc_core",
     ],
 )

@@ -1,7 +1,7 @@
 // Copyright (c) 2019 Kai Luo <gluokai@gmail.com>. All rights reserved.
 
 #include "em.h"
-#include "editor/mono_buffer.h"
+#include "core/mono_buffer.h"
 #include "support/chan.h"
 #include "support/misc.h"
 #include "support/sys.h"

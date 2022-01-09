@@ -1,4 +1,4 @@
-#include "editor/mono_buffer.h"
+#include "core/mono_buffer.h"
 #include "support/misc.h"
 #include "support/sys.h"
 #include "support/utf8.h"

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "core/mono_buffer.h"
 #include "editor/char_view.h"
-#include "editor/mono_buffer.h"
 #include "support/misc.h"
 #include "support/utf8.h"
 #include "support/wcwidth.h"
