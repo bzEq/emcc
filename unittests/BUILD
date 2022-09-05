@@ -10,7 +10,6 @@ LINKOPTS = [
     "-fuse-ld=lld",
     "-lgtest_main",
     "-lgtest",
-    "-lBlocksRuntime",
 ]
 
 cc_test(

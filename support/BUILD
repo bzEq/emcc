@@ -9,7 +9,6 @@ cc_library(
         "-fblocks",
     ],
     linkopts = [
-        "-lBlocksRuntime",
         "-lre2",
         "-fuse-ld=lld",
     ],
